@@ -2,10 +2,10 @@
 
 **Extract, diff, lint, and track Angular component APIs from source.**
 
-[![npm version](https://img.shields.io/npm/v/ngx-component-meta)](https://www.npmjs.com/package/ngx-component-meta)
-[![license](https://img.shields.io/npm/l/ngx-component-meta)](./LICENSE)
-[![CI](https://img.shields.io/github/actions/workflow/status/user/ngx-component-meta/ci.yml?branch=main&label=CI)](https://github.com/user/ngx-component-meta/actions)
-[![bundle size](https://img.shields.io/bundlephobia/minzip/ngx-component-meta)](https://bundlephobia.com/package/ngx-component-meta)
+[![npm version](https://img.shields.io/npm/v/@nacho-labs/ngx-component-meta)](https://www.npmjs.com/package/@nacho-labs/ngx-component-meta)
+[![license](https://img.shields.io/npm/l/@nacho-labs/ngx-component-meta)](./LICENSE)
+[![CI](https://img.shields.io/github/actions/workflow/status/Nacho-Labs-LLC/ngx-component-meta/ci.yml?branch=main&label=CI)](https://github.com/Nacho-Labs-LLC/ngx-component-meta/actions)
+[![bundle size](https://img.shields.io/bundlephobia/minzip/@nacho-labs/ngx-component-meta)](https://bundlephobia.com/package/@nacho-labs/ngx-component-meta)
 
 ---
 
@@ -18,7 +18,7 @@ Angular has no lightweight metadata extraction tool. Compodoc is a full document
 ## Quick Start
 
 ```bash
-npm install -D ngx-component-meta
+npm install -D @nacho-labs/ngx-component-meta
 ```
 
 ```bash
@@ -172,17 +172,17 @@ All commands support:
 Five entry points cover the full surface:
 
 ```typescript
-import { parse, parseAll, createParser } from 'ngx-component-meta';
-import { diff } from 'ngx-component-meta';
-import { lint } from 'ngx-component-meta';
-import { computeStats } from 'ngx-component-meta';
-import { toPropsJson } from 'ngx-component-meta';
+import { parse, parseAll, createParser } from '@nacho-labs/ngx-component-meta';
+import { diff } from '@nacho-labs/ngx-component-meta';
+import { lint } from '@nacho-labs/ngx-component-meta';
+import { computeStats } from '@nacho-labs/ngx-component-meta';
+import { toPropsJson } from '@nacho-labs/ngx-component-meta';
 ```
 
 ### Reusable parser (recommended for multiple files)
 
 ```typescript
-import { createParser } from 'ngx-component-meta';
+import { createParser } from '@nacho-labs/ngx-component-meta';
 
 const parser = createParser('./tsconfig.json');
 
@@ -202,7 +202,7 @@ The parser reuses its `ts.Program` across calls, so subsequent parses are fast.
 ### One-shot convenience functions
 
 ```typescript
-import { parse, parseAll } from 'ngx-component-meta';
+import { parse, parseAll } from '@nacho-labs/ngx-component-meta';
 
 // Auto-detects tsconfig.json by walking up from the first file
 const docs = parse(['src/button/button.component.ts']);
@@ -212,7 +212,7 @@ const result = parseAll(['src/**/*.ts']);
 ### API diff
 
 ```typescript
-import { parse, diff, formatDiffMarkdown } from 'ngx-component-meta';
+import { parse, diff, formatDiffMarkdown } from '@nacho-labs/ngx-component-meta';
 
 const base = parse(['src/**/*.component.ts']); // e.g., from main branch
 const head = parse(['src/**/*.component.ts']); // e.g., from PR branch
@@ -228,7 +228,7 @@ if (result.summary.breaking > 0) {
 ### Lint
 
 ```typescript
-import { parseAll, lint, formatLintStylish } from 'ngx-component-meta';
+import { parseAll, lint, formatLintStylish } from '@nacho-labs/ngx-component-meta';
 
 const result = parseAll(['src/**/*.ts']);
 const report = lint(result, {
@@ -244,7 +244,7 @@ console.log(formatLintStylish(report));
 ### Migration stats
 
 ```typescript
-import { parseAll, computeStats, formatStatsText } from 'ngx-component-meta';
+import { parseAll, computeStats, formatStatsText } from '@nacho-labs/ngx-component-meta';
 
 const result = parseAll(['src/**/*.ts']);
 const stats = computeStats(result);
@@ -261,8 +261,8 @@ No Storybook config changes needed. Replace Compodoc's JSON with `ngx-component-
 ```typescript
 // .storybook/preview.ts
 import { setCompodocJson } from '@storybook/addon-docs/angular';
-import { parse } from 'ngx-component-meta';
-import { toCompodocJson } from 'ngx-component-meta/storybook';
+import { parse } from '@nacho-labs/ngx-component-meta';
+import { toCompodocJson } from '@nacho-labs/ngx-component-meta/storybook';
 
 setCompodocJson(toCompodocJson(parse(['src/**/*.component.ts'])));
 ```
@@ -273,7 +273,7 @@ Bypasses Compodoc entirely. Gives you richer Storybook categories (inputs, outpu
 
 ```typescript
 // .storybook/preview.ts
-import { createArgTypesExtractor } from 'ngx-component-meta/storybook';
+import { createArgTypesExtractor } from '@nacho-labs/ngx-component-meta/storybook';
 
 export default {
   parameters: {
@@ -290,7 +290,7 @@ For Storybook with Vite or standalone Vite builds, use the Vite plugin to serve 
 
 ```typescript
 // vite.config.ts
-import { ngxComponentMeta } from 'ngx-component-meta/vite';
+import { ngxComponentMeta } from '@nacho-labs/ngx-component-meta/vite';
 
 export default {
   plugins: [
@@ -316,7 +316,7 @@ The plugin watches for changes to `.component.ts`, `.directive.ts`, and `.pipe.t
 Detect breaking API changes on every pull request:
 
 ```yaml
-- uses: user/ngx-component-meta/action@v1
+- uses: Nacho-Labs-LLC/ngx-component-meta/action@v1
   with:
     base: api-baseline.json
     fail-on-breaking: 'true'
@@ -386,7 +386,7 @@ Private members, `@internal`-tagged members, and lifecycle hooks are automatical
 5. `npm test` to verify
 6. Open a pull request
 
-[Open an issue](https://github.com/user/ngx-component-meta/issues) for bugs or feature requests.
+[Open an issue](https://github.com/Nacho-Labs-LLC/ngx-component-meta/issues) for bugs or feature requests.
 
 ## License
 

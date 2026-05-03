@@ -1,5 +1,5 @@
 {
-  "name": "ngx-component-meta",
+  "name": "@nacho-labs/ngx-component-meta",
   "version": "0.1.0",
   "description": "Lightweight Angular component metadata extractor — inputs, outputs, models, methods, types from source",
   "license": "MIT",
