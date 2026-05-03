@@ -1,6 +1,6 @@
 import ts from 'typescript';
 import type { InputDoc, ModelDoc } from '../types.js';
-import { isAngularCoreCall, getCallName, getSignalBaseName } from '../utils/import-tracker.js';
+import { getCallName, getSignalBaseName } from '../utils/import-tracker.js';
 import { getUnwrappedReturnType } from '../utils/type-resolver.js';
 import { getSignalDefaultValue } from '../utils/default-value.js';
 import { getDescription, getRawDescription, getTags } from '../utils/jsdoc.js';
@@ -16,8 +16,6 @@ export function tryExtractSignalInput(
   callExpr: ts.CallExpression,
   sourceFile: ts.SourceFile,
 ): InputDoc | null {
-  if (!isAngularCoreCall(checker, callExpr)) return null;
-
   const baseName = getSignalBaseName(callExpr);
   if (baseName !== 'input') return null;
 
@@ -54,8 +52,6 @@ export function tryExtractModel(
   callExpr: ts.CallExpression,
   sourceFile: ts.SourceFile,
 ): ModelDoc | null {
-  if (!isAngularCoreCall(checker, callExpr)) return null;
-
   const baseName = getSignalBaseName(callExpr);
   if (baseName !== 'model') return null;
 

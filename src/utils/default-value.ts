@@ -13,11 +13,6 @@ export function getDefaultValue(
   sourceFile: ts.SourceFile,
 ): string | undefined {
   if (!prop.initializer) return undefined;
-
-  // For signal calls like input('default'), the default is the first argument
-  // but that case is handled in the signal extractors, not here.
-  // This function handles decorator-based properties.
-
   return prop.initializer.getText(sourceFile);
 }
 

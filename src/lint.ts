@@ -186,8 +186,12 @@ export function lint(docs: ParseResult, options?: Partial<LintOptions>): LintRes
     if (clean) passed++;
   }
 
-  const errors = violations.filter(v => v.severity === 'error').length;
-  const warnings = violations.filter(v => v.severity === 'warn').length;
+  let errors = 0;
+  let warnings = 0;
+  for (const v of violations) {
+    if (v.severity === 'error') errors++;
+    else warnings++;
+  }
 
   return {
     violations,

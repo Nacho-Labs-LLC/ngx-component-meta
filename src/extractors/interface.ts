@@ -1,7 +1,7 @@
 import ts from 'typescript';
-import type { InterfaceDoc, InterfacePropertyDoc, InterfaceMethodDoc, MethodParamDoc } from '../types.js';
-import { getDescription, getRawDescription, getTags, getParamDescription, isInternal } from '../utils/jsdoc.js';
-import { getParamDefaultValue } from '../utils/default-value.js';
+import type { InterfaceDoc, InterfacePropertyDoc, InterfaceMethodDoc } from '../types.js';
+import { extractParams, getReturnTypeString } from '../utils/ast-helpers.js';
+import { getDescription, getRawDescription, getTags, isInternal } from '../utils/jsdoc.js';
 
 /**
  * Extract an exported interface declaration into an InterfaceDoc.
@@ -90,44 +90,29 @@ function extractInterfaceMethod(
   if (!symbol) return null;
 
   const signature = checker.getSignatureFromDeclaration(member);
+  const params = extractParams(checker, member.parameters, sourceFile, symbol);
 
-  const params: MethodParamDoc[] = member.parameters.map(param => {
-    const paramName = ts.isIdentifier(param.name) ? param.name.text : param.name.getText(sourceFile);
-    const paramSymbol = checker.getSymbolAtLocation(param.name);
-    let paramType = paramSymbol
-      ? checker.getTypeOfSymbolAtLocation(paramSymbol, param)
-      : checker.getTypeAtLocation(param);
-
-    // Strip undefined from optional params — optionality is conveyed by the `optional` flag
-    const isOptional = !!param.questionToken || !!param.initializer;
-    if (isOptional && paramType.isUnion()) {
-      const filtered = paramType.types.filter(t => !(t.flags & ts.TypeFlags.Undefined));
-      if (filtered.length === 1) {
-        paramType = filtered[0];
+  // Strip "| undefined" from optional param types — optionality is conveyed by the flag
+  for (let i = 0; i < member.parameters.length; i++) {
+    const param = member.parameters[i];
+    if (param.questionToken || param.initializer) {
+      const paramSymbol = checker.getSymbolAtLocation(param.name);
+      let paramType = paramSymbol
+        ? checker.getTypeOfSymbolAtLocation(paramSymbol, param)
+        : checker.getTypeAtLocation(param);
+      if (paramType.isUnion()) {
+        const filtered = paramType.types.filter(t => !(t.flags & ts.TypeFlags.Undefined));
+        if (filtered.length === 1) {
+          params[i].type = checker.typeToString(filtered[0], param, ts.TypeFormatFlags.NoTruncation);
+        }
       }
     }
-
-    return {
-      name: paramName,
-      type: checker.typeToString(paramType, param, ts.TypeFormatFlags.NoTruncation),
-      optional: isOptional,
-      defaultValue: getParamDefaultValue(param, sourceFile),
-      description: getParamDescription(checker, symbol, paramName),
-    };
-  });
-
-  const returnType = signature
-    ? checker.typeToString(
-        checker.getReturnTypeOfSignature(signature),
-        member,
-        ts.TypeFormatFlags.NoTruncation,
-      )
-    : 'void';
+  }
 
   return {
     name: symbol.getName(),
     params,
-    returnType,
+    returnType: getReturnTypeString(checker, signature, member),
     description: getDescription(checker, symbol),
     rawDescription: getRawDescription(symbol),
     tags: getTags(symbol),

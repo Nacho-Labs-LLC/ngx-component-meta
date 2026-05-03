@@ -1,10 +1,8 @@
 import ts from 'typescript';
-import type { DecoratorInfo } from '../types.js';
+import type { DecoratorInfo, MethodParamDoc } from '../types.js';
+import { getParamDefaultValue } from './default-value.js';
+import { getParamDescription } from './jsdoc.js';
 
-/**
- * Get all decorators from a class or class member declaration.
- * Uses ts.getDecorators (TS 5.0+) which reads from the modifiers array.
- */
 export function getDecorators(node: ts.HasDecorators): DecoratorInfo[] {
   const decorators = ts.getDecorators(node);
   if (!decorators) return [];
@@ -23,24 +21,14 @@ export function getDecorators(node: ts.HasDecorators): DecoratorInfo[] {
     .filter(d => d.name !== '');
 }
 
-/**
- * Find a specific decorator by name on a declaration.
- */
 export function findDecorator(node: ts.HasDecorators, name: string): DecoratorInfo | undefined {
   return getDecorators(node).find(d => d.name === name);
 }
 
-/**
- * Check if a declaration has a specific decorator.
- */
 export function hasDecorator(node: ts.HasDecorators, name: string): boolean {
   return findDecorator(node, name) !== undefined;
 }
 
-/**
- * Get the name of a decorator from its call expression.
- * @Component() → 'Component', @Input() → 'Input'
- */
 function getDecoratorName(call: ts.CallExpression): string | undefined {
   const expr = call.expression;
   if (ts.isIdentifier(expr)) return expr.text;
@@ -48,10 +36,6 @@ function getDecoratorName(call: ts.CallExpression): string | undefined {
   return undefined;
 }
 
-/**
- * Extract a string property from an object literal expression.
- * e.g., from `{ selector: 'app-button', standalone: true }` get 'selector' → 'app-button'
- */
 export function getStringProperty(
   obj: ts.ObjectLiteralExpression,
   propertyName: string,
@@ -64,9 +48,6 @@ export function getStringProperty(
   return undefined;
 }
 
-/**
- * Extract a boolean property from an object literal expression.
- */
 export function getBooleanProperty(
   obj: ts.ObjectLiteralExpression,
   propertyName: string,
@@ -80,9 +61,6 @@ export function getBooleanProperty(
   return undefined;
 }
 
-/**
- * Get the first argument of a decorator as an object literal.
- */
 export function getDecoratorObjectArg(
   decorator: DecoratorInfo,
 ): ts.ObjectLiteralExpression | undefined {
@@ -92,10 +70,6 @@ export function getDecoratorObjectArg(
   return undefined;
 }
 
-/**
- * Get the first argument of a decorator as a string literal.
- * Used for @Input('aliasName') and @Output('aliasName').
- */
 export function getDecoratorStringArg(decorator: DecoratorInfo): string | undefined {
   if (!decorator.args?.length) return undefined;
   const first = decorator.args[0];
@@ -103,9 +77,6 @@ export function getDecoratorStringArg(decorator: DecoratorInfo): string | undefi
   return undefined;
 }
 
-/**
- * Check if a class member is private (private keyword or # prefix).
- */
 export function isPrivateMember(member: ts.ClassElement): boolean {
   if (ts.isPropertyDeclaration(member) || ts.isMethodDeclaration(member)) {
     // Check # private name
@@ -117,9 +88,6 @@ export function isPrivateMember(member: ts.ClassElement): boolean {
   return false;
 }
 
-/**
- * Check if a class member is protected.
- */
 export function isProtectedMember(member: ts.ClassElement): boolean {
   if (ts.isPropertyDeclaration(member) || ts.isMethodDeclaration(member)) {
     const modifiers = ts.getModifiers(member);
@@ -128,9 +96,6 @@ export function isProtectedMember(member: ts.ClassElement): boolean {
   return false;
 }
 
-/**
- * Check if a class member has the readonly modifier.
- */
 export function isReadonlyMember(member: ts.ClassElement): boolean {
   if (ts.isPropertyDeclaration(member)) {
     const modifiers = ts.getModifiers(member);
@@ -139,9 +104,6 @@ export function isReadonlyMember(member: ts.ClassElement): boolean {
   return false;
 }
 
-/**
- * Get the member name as a string.
- */
 export function getMemberName(member: ts.ClassElement): string | undefined {
   if (!member.name) return undefined;
   if (ts.isIdentifier(member.name)) return member.name.text;
@@ -149,9 +111,6 @@ export function getMemberName(member: ts.ClassElement): string | undefined {
   return undefined;
 }
 
-/**
- * Check if a property has a call expression initializer (e.g., input(), output()).
- */
 export function getCallExpressionInitializer(
   prop: ts.PropertyDeclaration,
 ): ts.CallExpression | undefined {
@@ -160,10 +119,6 @@ export function getCallExpressionInitializer(
   return undefined;
 }
 
-/**
- * Get the expression name from a property's initializer if it's a `new` expression.
- * e.g., `new EventEmitter<T>()` → 'EventEmitter'
- */
 export function getNewExpressionName(
   prop: ts.PropertyDeclaration,
 ): string | undefined {
@@ -173,10 +128,6 @@ export function getNewExpressionName(
   return undefined;
 }
 
-/**
- * Get an expression property from an object literal (returns the expression node).
- * Used for extracting transform functions.
- */
 export function getExpressionProperty(
   obj: ts.ObjectLiteralExpression,
   propertyName: string,
@@ -187,4 +138,41 @@ export function getExpressionProperty(
     return prop.initializer;
   }
   return undefined;
+}
+
+export function extractParams(
+  checker: ts.TypeChecker,
+  parameters: ts.NodeArray<ts.ParameterDeclaration>,
+  sourceFile: ts.SourceFile,
+  parentSymbol: ts.Symbol,
+): MethodParamDoc[] {
+  return parameters.map(param => {
+    const paramName = ts.isIdentifier(param.name) ? param.name.text : param.name.getText(sourceFile);
+    const paramSymbol = checker.getSymbolAtLocation(param.name);
+    const paramType = paramSymbol
+      ? checker.getTypeOfSymbolAtLocation(paramSymbol, param)
+      : checker.getTypeAtLocation(param);
+
+    return {
+      name: paramName,
+      type: checker.typeToString(paramType, param, ts.TypeFormatFlags.NoTruncation),
+      optional: !!param.questionToken || !!param.initializer,
+      defaultValue: getParamDefaultValue(param, sourceFile),
+      description: getParamDescription(checker, parentSymbol, paramName),
+    };
+  });
+}
+
+export function getReturnTypeString(
+  checker: ts.TypeChecker,
+  signature: ts.Signature | undefined,
+  node: ts.Node,
+  fallback = 'void',
+): string {
+  if (!signature) return fallback;
+  return checker.typeToString(
+    checker.getReturnTypeOfSignature(signature),
+    node,
+    ts.TypeFormatFlags.NoTruncation,
+  );
 }

@@ -3,6 +3,15 @@
   "version": "0.1.0",
   "description": "Lightweight Angular component metadata extractor — inputs, outputs, models, methods, types from source",
   "license": "MIT",
+  "author": "Nate Richardson",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Nacho-Labs-LLC/ngx-component-meta.git"
+  },
+  "homepage": "https://github.com/Nacho-Labs-LLC/ngx-component-meta#readme",
+  "bugs": {
+    "url": "https://github.com/Nacho-Labs-LLC/ngx-component-meta/issues"
+  },
   "type": "module",
   "exports": {
     ".": {

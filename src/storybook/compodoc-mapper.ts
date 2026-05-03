@@ -117,10 +117,10 @@ function toCompodocJsonFromParseResult(result: ParseResult): CompodocJson {
   };
 }
 
-function mapComponent(doc: ComponentDoc): CompodocComponent {
+function mapComponentOrDirective(doc: ComponentDoc, type: 'component' | 'directive'): CompodocComponent | CompodocDirective {
   return {
     name: doc.name,
-    type: 'component',
+    type,
     selector: doc.selector ?? '',
     exportAs: doc.exportAs ?? undefined,
     inputsClass: [
@@ -138,25 +138,12 @@ function mapComponent(doc: ComponentDoc): CompodocComponent {
   };
 }
 
+function mapComponent(doc: ComponentDoc): CompodocComponent {
+  return mapComponentOrDirective(doc, 'component') as CompodocComponent;
+}
+
 function mapDirective(doc: ComponentDoc): CompodocDirective {
-  return {
-    name: doc.name,
-    type: 'directive',
-    selector: doc.selector ?? '',
-    exportAs: doc.exportAs ?? undefined,
-    inputsClass: [
-      ...doc.inputs.map(mapInputProperty),
-      ...doc.models.map(mapModelAsInput),
-    ],
-    outputsClass: [
-      ...doc.outputs.map(mapOutputProperty),
-      ...doc.models.map(mapModelAsOutput),
-    ],
-    propertiesClass: doc.properties.map(mapProperty),
-    methodsClass: doc.methods.map(mapMethod),
-    description: doc.description || undefined,
-    rawdescription: doc.rawDescription || undefined,
-  };
+  return mapComponentOrDirective(doc, 'directive') as CompodocDirective;
 }
 
 function mapPipe(doc: PipeDoc): CompodocPipe {

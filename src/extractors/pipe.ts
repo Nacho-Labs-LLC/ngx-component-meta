@@ -4,9 +4,10 @@ import {
   getDecoratorObjectArg,
   getStringProperty,
   getBooleanProperty,
+  extractParams,
+  getReturnTypeString,
 } from '../utils/ast-helpers.js';
-import { getDescription, getRawDescription, getTags, getParamDescription } from '../utils/jsdoc.js';
-import { getParamDefaultValue } from '../utils/default-value.js';
+import { getDescription, getRawDescription, getTags } from '../utils/jsdoc.js';
 
 /**
  * Extract a @Pipe() class into a PipeDoc.
@@ -63,30 +64,9 @@ function extractTransformSignature(
 ): { params: MethodParamDoc[]; returnType: string } {
   const methodSymbol = method.name ? checker.getSymbolAtLocation(method.name) : undefined;
   const signature = checker.getSignatureFromDeclaration(method);
-
-  const params: MethodParamDoc[] = method.parameters.map(param => {
-    const paramName = ts.isIdentifier(param.name) ? param.name.text : param.name.getText(sourceFile);
-    const paramSymbol = checker.getSymbolAtLocation(param.name);
-    const paramType = paramSymbol
-      ? checker.getTypeOfSymbolAtLocation(paramSymbol, param)
-      : checker.getTypeAtLocation(param);
-
-    return {
-      name: paramName,
-      type: checker.typeToString(paramType, param, ts.TypeFormatFlags.NoTruncation),
-      optional: !!param.questionToken || !!param.initializer,
-      defaultValue: getParamDefaultValue(param, sourceFile),
-      description: methodSymbol ? getParamDescription(checker, methodSymbol, paramName) : '',
-    };
-  });
-
-  const returnType = signature
-    ? checker.typeToString(
-        checker.getReturnTypeOfSignature(signature),
-        method,
-        ts.TypeFormatFlags.NoTruncation,
-      )
-    : 'any';
-
+  const params = methodSymbol
+    ? extractParams(checker, method.parameters, sourceFile, methodSymbol)
+    : extractParams(checker, method.parameters, sourceFile, classSymbol);
+  const returnType = getReturnTypeString(checker, signature, method, 'any');
   return { params, returnType };
 }

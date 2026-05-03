@@ -2,7 +2,6 @@
 
 import fs from 'fs';
 import path from 'path';
-import { glob } from 'fs';
 import { parse, parseAll, createParser, createWatchParser } from '../parser.js';
 import type { ComponentDoc, PipeDoc, ParserOptions } from '../types.js';
 import { parseArgs, printHelp } from './options.js';

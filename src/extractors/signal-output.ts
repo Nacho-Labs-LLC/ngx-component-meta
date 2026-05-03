@@ -1,6 +1,6 @@
 import ts from 'typescript';
 import type { OutputDoc } from '../types.js';
-import { isAngularCoreCall, getSignalBaseName } from '../utils/import-tracker.js';
+import { getSignalBaseName } from '../utils/import-tracker.js';
 import { getUnwrappedReturnType } from '../utils/type-resolver.js';
 import { getDescription, getRawDescription, getTags } from '../utils/jsdoc.js';
 import { getStringProperty } from '../utils/ast-helpers.js';
@@ -14,8 +14,6 @@ export function tryExtractSignalOutput(
   prop: ts.PropertyDeclaration,
   callExpr: ts.CallExpression,
 ): OutputDoc | null {
-  if (!isAngularCoreCall(checker, callExpr)) return null;
-
   const baseName = getSignalBaseName(callExpr);
   if (baseName !== 'output') return null;
 

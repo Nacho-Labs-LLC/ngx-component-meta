@@ -9,7 +9,6 @@ import type {
   ModelDoc,
   PropertyDoc,
   MethodDoc,
-  MethodParamDoc,
   QueryDoc,
   HostBindingDoc,
   HostListenerDoc,
@@ -25,10 +24,10 @@ import type {
   Parser,
   WatchParser,
 } from './types.js';
-import { findDecorator, hasDecorator, getDecorators, getDecoratorStringArg, isPrivateMember, getMemberName, getCallExpressionInitializer, getNewExpressionName } from './utils/ast-helpers.js';
-import { getDescription, getRawDescription, getTags, getParamDescription, isInternal } from './utils/jsdoc.js';
+import { findDecorator, getDecoratorStringArg, isPrivateMember, getMemberName, getCallExpressionInitializer, extractParams, getReturnTypeString } from './utils/ast-helpers.js';
+import { getDescription, getRawDescription, getTags, isInternal } from './utils/jsdoc.js';
 import { typeToString } from './utils/type-resolver.js';
-import { getDefaultValue, getParamDefaultValue } from './utils/default-value.js';
+import { getDefaultValue } from './utils/default-value.js';
 import { extractComponentMetadata } from './extractors/component.js';
 import { extractDecoratorInput } from './extractors/input.js';
 import { extractDecoratorOutput } from './extractors/output.js';
@@ -765,31 +764,9 @@ function extractHostListener(
     }
   }
 
-  // Extract method parameters
-  const params: MethodParamDoc[] = method.parameters.map(param => {
-    const paramName = ts.isIdentifier(param.name) ? param.name.text : param.name.getText(sourceFile);
-    const paramSymbol = checker.getSymbolAtLocation(param.name);
-    const paramType = paramSymbol
-      ? checker.getTypeOfSymbolAtLocation(paramSymbol, param)
-      : checker.getTypeAtLocation(param);
-
-    return {
-      name: paramName,
-      type: checker.typeToString(paramType, param, ts.TypeFormatFlags.NoTruncation),
-      optional: !!param.questionToken || !!param.initializer,
-      defaultValue: getParamDefaultValue(param, sourceFile),
-      description: getParamDescription(checker, symbol, paramName),
-    };
-  });
-
+  const params = extractParams(checker, method.parameters, sourceFile, symbol);
   const signature = checker.getSignatureFromDeclaration(method);
-  const returnType = signature
-    ? checker.typeToString(
-        checker.getReturnTypeOfSignature(signature),
-        method,
-        ts.TypeFormatFlags.NoTruncation,
-      )
-    : 'void';
+  const returnType = getReturnTypeString(checker, signature, method);
 
   return {
     name: memberName,
@@ -833,6 +810,7 @@ export function createWatchParser(
   };
 
   const rootFileNames = parsedConfig.fileNames;
+  const tsFiles = rootFileNames.filter(f => f.endsWith('.ts') && !f.endsWith('.d.ts'));
   const watchDir = options?.watchDir ?? configDir;
   const onUpdate = options?.onUpdate;
 
@@ -852,7 +830,6 @@ export function createWatchParser(
 
   function fullParse(): (ComponentDoc | PipeDoc)[] {
     const prog = buildProgram();
-    const tsFiles = rootFileNames.filter(f => f.endsWith('.ts') && !f.endsWith('.d.ts'));
     latestDocs = extractFromProgram(prog, tsFiles, options);
     return latestDocs;
   }

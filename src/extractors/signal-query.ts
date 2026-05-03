@@ -1,6 +1,6 @@
 import ts from 'typescript';
 import type { QueryDoc } from '../types.js';
-import { isAngularCoreCall, getCallName, getSignalBaseName } from '../utils/import-tracker.js';
+import { getCallName, getSignalBaseName } from '../utils/import-tracker.js';
 import { getUnwrappedReturnType } from '../utils/type-resolver.js';
 import { getDescription, getRawDescription, getTags } from '../utils/jsdoc.js';
 
@@ -24,8 +24,6 @@ export function tryExtractSignalQuery(
   callExpr: ts.CallExpression,
   sourceFile: ts.SourceFile,
 ): QueryDoc | null {
-  if (!isAngularCoreCall(checker, callExpr)) return null;
-
   const baseName = getSignalBaseName(callExpr);
   if (!baseName || !(baseName in QUERY_FUNCTIONS)) return null;
 

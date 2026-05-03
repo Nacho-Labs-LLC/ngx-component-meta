@@ -49,12 +49,8 @@ export function getTags(symbol: ts.Symbol): Record<string, string> {
   return tags;
 }
 
-/**
- * Check if a symbol has the @internal tag.
- */
 export function isInternal(symbol: ts.Symbol): boolean {
-  const tags = symbol.getJsDocTags();
-  return tags.some(t => t.name === 'internal');
+  return symbol.getJsDocTags().some(t => t.name === 'internal');
 }
 
 /**
