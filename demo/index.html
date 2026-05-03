@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ngx-component-meta — Live Demo</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0d1117;
+      color: #c9d1d9;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      padding: 12px 20px;
+      background: #161b22;
+      border-bottom: 1px solid #30363d;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-shrink: 0;
+    }
+
+    header h1 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #f0f6fc;
+    }
+
+    header span {
+      font-size: 12px;
+      color: #8b949e;
+      background: #21262d;
+      padding: 2px 8px;
+      border-radius: 12px;
+    }
+
+    .container {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 8px 16px;
+      background: #161b22;
+      border-bottom: 1px solid #30363d;
+      font-size: 12px;
+      font-weight: 600;
+      color: #8b949e;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      flex-shrink: 0;
+    }
+
+    .divider {
+      width: 1px;
+      background: #30363d;
+      flex-shrink: 0;
+    }
+
+    #editor {
+      flex: 1;
+      width: 100%;
+      background: #0d1117;
+      color: #c9d1d9;
+      border: none;
+      outline: none;
+      padding: 16px;
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      resize: none;
+      tab-size: 2;
+    }
+
+    .output-area {
+      flex: 1;
+      overflow: auto;
+      padding: 16px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 0;
+      background: #161b22;
+      border-bottom: 1px solid #30363d;
+      flex-shrink: 0;
+    }
+
+    .tab {
+      padding: 8px 16px;
+      font-size: 12px;
+      color: #8b949e;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      background: none;
+      border-top: none;
+      border-left: none;
+      border-right: none;
+      font-family: inherit;
+    }
+
+    .tab:hover { color: #c9d1d9; }
+
+    .tab.active {
+      color: #f0f6fc;
+      border-bottom-color: #f78166;
+    }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    pre {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 12px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .status {
+      padding: 8px 16px;
+      font-size: 11px;
+      color: #8b949e;
+      background: #161b22;
+      border-top: 1px solid #30363d;
+      flex-shrink: 0;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-left: 6px;
+    }
+
+    .badge-green { background: #238636; color: #fff; }
+    .badge-yellow { background: #9e6a03; color: #fff; }
+    .badge-red { background: #da3633; color: #fff; }
+    .badge-blue { background: #1f6feb; color: #fff; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 6px 12px;
+      border-bottom: 1px solid #21262d;
+    }
+
+    th {
+      color: #8b949e;
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    td { color: #c9d1d9; }
+
+    .type { color: #79c0ff; }
+    .name { color: #d2a8ff; }
+    .required { color: #f85149; }
+    .optional { color: #3fb950; }
+
+    .section-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #f0f6fc;
+      margin: 16px 0 8px 0;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #21262d;
+    }
+
+    .section-title:first-child { margin-top: 0; }
+
+    .error-msg {
+      color: #f85149;
+      padding: 12px;
+      background: #1c0c0c;
+      border: 1px solid #da3633;
+      border-radius: 6px;
+    }
+
+    .empty-msg {
+      color: #8b949e;
+      font-style: italic;
+      padding: 24px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>@nacho-labs/ngx-component-meta</h1>
+    <span>v0.1.0</span>
+  </header>
+
+  <div class="container">
+    <div class="panel">
+      <div class="panel-header">Angular Source</div>
+      <textarea id="editor" spellcheck="false">import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { input, output, model } from '@angular/core';
+
+/**
+ * A configurable button component.
+ * Supports both decorator and signal APIs.
+ */
+@Component({
+  selector: 'app-button',
+  standalone: true,
+  template: '<button>{{ label() }}</button>'
+})
+export class ButtonComponent {
+  /** The text displayed on the button */
+  label = input.required<string>();
+
+  /** Visual style variant */
+  @Input() variant: 'primary' | 'secondary' | 'danger' = 'primary';
+
+  /** Whether the button is disabled */
+  disabled = input(false);
+
+  /** Size of the button */
+  size = model<'sm' | 'md' | 'lg'>('md');
+
+  /** Emitted when the button is clicked */
+  clicked = output<MouseEvent>();
+
+  /** Emitted on hover */
+  @Output() hovered = new EventEmitter<void>();
+
+  /** Reset the button state */
+  reset(): void {
+    this.size.set('md');
+  }
+}</textarea>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="panel" id="output-panel">
+      <div class="tabs">
+        <button class="tab active" data-tab="visual">Visual</button>
+        <button class="tab" data-tab="json">JSON</button>
+        <button class="tab" data-tab="lint">Lint</button>
+        <button class="tab" data-tab="stats">Stats</button>
+      </div>
+
+      <div class="output-area">
+        <div id="tab-visual" class="tab-content active"></div>
+        <div id="tab-json" class="tab-content"><pre id="json-output"></pre></div>
+        <div id="tab-lint" class="tab-content"></div>
+        <div id="tab-stats" class="tab-content"></div>
+      </div>
+
+      <div class="status" id="status">Ready</div>
+    </div>
+  </div>
+
+  <script>
+    const editor = document.getElementById('editor');
+    const status = document.getElementById('status');
+    let debounceTimer;
+
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+      });
+    });
+
+    editor.addEventListener('input', () => {
+      clearTimeout(debounceTimer);
+      status.textContent = 'Typing...';
+      debounceTimer = setTimeout(runParse, 400);
+    });
+
+    editor.addEventListener('keydown', (e) => {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        const start = editor.selectionStart;
+        const end = editor.selectionEnd;
+        editor.value = editor.value.substring(0, start) + '  ' + editor.value.substring(end);
+        editor.selectionStart = editor.selectionEnd = start + 2;
+      }
+    });
+
+    async function runParse() {
+      const source = editor.value;
+      status.textContent = 'Parsing...';
+
+      try {
+        const res = await fetch('/api/parse', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ source }),
+        });
+
+        const data = await res.json();
+
+        if (data.error) {
+          showError(data.error);
+          status.textContent = 'Parse error';
+          return;
+        }
+
+        renderVisual(data);
+        renderJson(data);
+        renderLint(data.lintResult);
+        renderStats(data.stats);
+
+        const count = data.docs.length + (data.allDocs.pipes?.length || 0);
+        status.textContent = `Parsed ${count} entit${count === 1 ? 'y' : 'ies'} — ${data.lintResult.summary.errors} errors, ${data.lintResult.summary.warnings} warnings`;
+      } catch (err) {
+        showError(err.message);
+        status.textContent = 'Request failed';
+      }
+    }
+
+    function showError(msg) {
+      document.getElementById('tab-visual').innerHTML = `<div class="error-msg">${esc(msg)}</div>`;
+    }
+
+    function renderVisual(data) {
+      const el = document.getElementById('tab-visual');
+      const docs = data.docs;
+
+      if (!docs.length) {
+        el.innerHTML = '<div class="empty-msg">No components or pipes found. Add an @Component or @Pipe decorator.</div>';
+        return;
+      }
+
+      let html = '';
+      for (const doc of docs) {
+        html += `<div class="section-title">${esc(doc.name)} ${doc.selector ? `<span style="color:#8b949e;font-weight:normal;font-size:12px">${esc(doc.selector)}</span>` : ''}</div>`;
+
+        if (doc.description) {
+          html += `<p style="color:#8b949e;font-size:12px;margin-bottom:12px">${esc(doc.description)}</p>`;
+        }
+
+        if (doc.inputs?.length) {
+          html += renderMemberTable('Inputs', doc.inputs, ['name', 'bindingName', 'type', 'required', 'defaultValue', 'source']);
+        }
+        if (doc.outputs?.length) {
+          html += renderMemberTable('Outputs', doc.outputs, ['name', 'bindingName', 'type', 'source']);
+        }
+        if (doc.models?.length) {
+          html += renderMemberTable('Models', doc.models, ['name', 'bindingName', 'type', 'required', 'defaultValue']);
+        }
+        if (doc.properties?.length) {
+          html += renderMemberTable('Properties', doc.properties, ['name', 'type', 'optional', 'defaultValue']);
+        }
+        if (doc.methods?.length) {
+          html += renderMethodTable(doc.methods);
+        }
+      }
+
+      el.innerHTML = html;
+    }
+
+    function renderMemberTable(title, members, cols) {
+      let html = `<div style="margin-bottom:16px"><div style="font-size:12px;font-weight:600;color:#8b949e;margin-bottom:4px">${title} <span class="badge badge-blue">${members.length}</span></div>`;
+      html += '<table><thead><tr>';
+      for (const col of cols) html += `<th>${col}</th>`;
+      html += '</tr></thead><tbody>';
+      for (const m of members) {
+        html += '<tr>';
+        for (const col of cols) {
+          const val = m[col];
+          if (col === 'type') {
+            html += `<td class="type">${esc(String(val ?? ''))}</td>`;
+          } else if (col === 'name' || col === 'bindingName') {
+            html += `<td class="name">${esc(String(val ?? ''))}</td>`;
+          } else if (col === 'required') {
+            html += `<td class="${val ? 'required' : 'optional'}">${val ? 'yes' : 'no'}</td>`;
+          } else if (col === 'optional') {
+            html += `<td class="${val ? 'optional' : ''}">${val ? 'yes' : 'no'}</td>`;
+          } else {
+            html += `<td>${esc(String(val ?? '—'))}</td>`;
+          }
+        }
+        html += '</tr>';
+      }
+      html += '</tbody></table></div>';
+      return html;
+    }
+
+    function renderMethodTable(methods) {
+      let html = `<div style="margin-bottom:16px"><div style="font-size:12px;font-weight:600;color:#8b949e;margin-bottom:4px">Methods <span class="badge badge-blue">${methods.length}</span></div>`;
+      html += '<table><thead><tr><th>name</th><th>params</th><th>returnType</th></tr></thead><tbody>';
+      for (const m of methods) {
+        const params = m.params.map(p => `${p.name}${p.optional ? '?' : ''}: ${p.type}`).join(', ');
+        html += `<tr><td class="name">${esc(m.name)}</td><td class="type">${esc(params || '—')}</td><td class="type">${esc(m.returnType)}</td></tr>`;
+      }
+      html += '</tbody></table></div>';
+      return html;
+    }
+
+    function renderJson(data) {
+      document.getElementById('json-output').textContent = JSON.stringify(data.docs, null, 2);
+    }
+
+    function renderLint(result) {
+      const el = document.getElementById('tab-lint');
+      if (!result.violations.length) {
+        el.innerHTML = `<div style="padding:24px;text-align:center"><span class="badge badge-green" style="font-size:14px;padding:4px 12px">All checks passed</span><p style="color:#8b949e;margin-top:8px">${result.summary.components} components checked</p></div>`;
+        return;
+      }
+
+      let html = `<div style="margin-bottom:12px"><span class="badge badge-red">${result.summary.errors} errors</span> <span class="badge badge-yellow">${result.summary.warnings} warnings</span></div>`;
+      html += '<table><thead><tr><th>rule</th><th>severity</th><th>component</th><th>member</th><th>message</th></tr></thead><tbody>';
+      for (const v of result.violations) {
+        const sevClass = v.severity === 'error' ? 'required' : 'optional';
+        html += `<tr><td>${esc(v.rule)}</td><td class="${sevClass}">${v.severity}</td><td class="name">${esc(v.component)}</td><td>${esc(v.member || '—')}</td><td>${esc(v.message)}</td></tr>`;
+      }
+      html += '</tbody></table>';
+      el.innerHTML = html;
+    }
+
+    function renderStats(stats) {
+      const el = document.getElementById('tab-stats');
+      if (!stats || !stats.components || !stats.components.length) {
+        el.innerHTML = '<div class="empty-msg">No components to analyze.</div>';
+        return;
+      }
+
+      const pct = stats.aggregate?.adoptionPercentage ?? 0;
+      const color = pct === 100 ? 'badge-green' : pct > 0 ? 'badge-yellow' : 'badge-red';
+      let html = `<div style="margin-bottom:16px"><div style="font-size:13px;font-weight:600;color:#f0f6fc;margin-bottom:8px">Signal Adoption</div><span class="badge ${color}" style="font-size:16px;padding:4px 12px">${pct.toFixed(0)}%</span></div>`;
+
+      html += '<table><thead><tr><th>component</th><th>status</th><th>signal</th><th>decorator</th></tr></thead><tbody>';
+      for (const c of stats.components) {
+        const statusClass = c.status === 'fully-migrated' ? 'optional' : c.status === 'legacy' ? 'required' : '';
+        html += `<tr><td class="name">${esc(c.name)}</td><td class="${statusClass}">${esc(c.status)}</td><td>${c.signalCount}</td><td>${c.decoratorCount}</td></tr>`;
+      }
+      html += '</tbody></table>';
+      el.innerHTML = html;
+    }
+
+    function esc(str) {
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    runParse();
+  </script>
+</body>
+</html>
