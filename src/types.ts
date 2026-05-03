@@ -35,6 +35,10 @@ export interface ComponentDoc {
   methods: MethodDoc[];
   /** View and content queries. */
   queries: QueryDoc[];
+  /** Host property bindings. */
+  hostBindings: HostBindingDoc[];
+  /** Host event listeners. */
+  hostListeners: HostListenerDoc[];
   /** Implemented interfaces. */
   implements: string[];
   /** Superclass name, if any. */
@@ -189,12 +193,213 @@ export interface QueryDoc {
   tags: Record<string, string>;
 }
 
+export interface HostBindingDoc {
+  /** Property name in the class. */
+  name: string;
+  /** The host property name (e.g., 'class.active', 'style.color', 'attr.role'). */
+  hostPropertyName: string;
+  /** TypeScript type as a string. */
+  type: string;
+  /** Default value as source text. */
+  defaultValue: string | undefined;
+  /** JSDoc description. */
+  description: string;
+  /** Raw JSDoc text. */
+  rawDescription: string;
+  /** JSDoc tags. */
+  tags: Record<string, string>;
+}
+
+export interface HostListenerDoc {
+  /** Method name in the class. */
+  name: string;
+  /** The DOM event name (e.g., 'click', 'mouseenter', 'window:resize'). */
+  eventName: string;
+  /** The args expressions from the decorator (e.g., ['$event']). */
+  args: string[];
+  /** Method parameters. */
+  params: MethodParamDoc[];
+  /** Return type. */
+  returnType: string;
+  /** JSDoc description. */
+  description: string;
+  /** Raw JSDoc text. */
+  rawDescription: string;
+  /** JSDoc tags. */
+  tags: Record<string, string>;
+}
+
+// =============================================================================
+// Injectable, Interface, TypeAlias, Enum types
+// =============================================================================
+
+export interface InjectableDoc {
+  /** Class name. */
+  name: string;
+  /** Absolute file path. */
+  filePath: string;
+  /** The providedIn value from @Injectable metadata. */
+  providedIn: 'root' | 'platform' | 'any' | null;
+  /** JSDoc description. */
+  description: string;
+  /** Raw JSDoc text. */
+  rawDescription: string;
+  /** JSDoc tags. */
+  tags: Record<string, string>;
+  /** Public methods. */
+  methods: MethodDoc[];
+  /** Public properties. */
+  properties: PropertyDoc[];
+}
+
+export interface InterfacePropertyDoc {
+  name: string;
+  type: string;
+  optional: boolean;
+  description: string;
+  rawDescription: string;
+  tags: Record<string, string>;
+}
+
+export interface InterfaceMethodDoc {
+  name: string;
+  params: MethodParamDoc[];
+  returnType: string;
+  description: string;
+  rawDescription: string;
+  tags: Record<string, string>;
+}
+
+export interface InterfaceDoc {
+  /** Interface name. */
+  name: string;
+  /** Absolute file path. */
+  filePath: string;
+  /** JSDoc description. */
+  description: string;
+  /** Raw JSDoc text. */
+  rawDescription: string;
+  /** JSDoc tags. */
+  tags: Record<string, string>;
+  /** Interface properties. */
+  properties: InterfacePropertyDoc[];
+  /** Interface methods. */
+  methods: InterfaceMethodDoc[];
+  /** Extended interfaces. */
+  extends: string[];
+}
+
+export interface TypeAliasDoc {
+  /** Type alias name. */
+  name: string;
+  /** Absolute file path. */
+  filePath: string;
+  /** The resolved type as a string. */
+  type: string;
+  /** JSDoc description. */
+  description: string;
+  /** Raw JSDoc text. */
+  rawDescription: string;
+  /** JSDoc tags. */
+  tags: Record<string, string>;
+}
+
+export interface EnumMemberDoc {
+  name: string;
+  value: string;
+  description: string;
+}
+
+export interface EnumDoc {
+  /** Enum name. */
+  name: string;
+  /** Absolute file path. */
+  filePath: string;
+  /** JSDoc description. */
+  description: string;
+  /** Raw JSDoc text. */
+  rawDescription: string;
+  /** JSDoc tags. */
+  tags: Record<string, string>;
+  /** Enum members. */
+  members: EnumMemberDoc[];
+}
+
+export interface ClassDoc {
+  /** Class name. */
+  name: string;
+  /** Absolute file path. */
+  filePath: string;
+  /** JSDoc description. */
+  description: string;
+  /** Raw JSDoc text. */
+  rawDescription: string;
+  /** JSDoc tags. */
+  tags: Record<string, string>;
+  /** Public methods. */
+  methods: MethodDoc[];
+  /** Public properties. */
+  properties: PropertyDoc[];
+  /** Extended class name, if any. */
+  extends: string | null;
+  /** Implemented interfaces. */
+  implements: string[];
+}
+
+export interface FunctionDoc {
+  /** Function name. */
+  name: string;
+  /** Absolute file path. */
+  filePath: string;
+  /** JSDoc description. */
+  description: string;
+  /** Raw JSDoc text. */
+  rawDescription: string;
+  /** JSDoc tags. */
+  tags: Record<string, string>;
+  /** Parameters. */
+  params: MethodParamDoc[];
+  /** Return type. */
+  returnType: string;
+}
+
+export interface VariableDoc {
+  /** Variable name. */
+  name: string;
+  /** Absolute file path. */
+  filePath: string;
+  /** Type as a string. */
+  type: string;
+  /** Default value as source text. */
+  defaultValue: string | undefined;
+  /** Whether declared with const. */
+  isConst: boolean;
+  /** JSDoc description. */
+  description: string;
+  /** Raw JSDoc text. */
+  rawDescription: string;
+  /** JSDoc tags. */
+  tags: Record<string, string>;
+}
+
+export interface ParseResult {
+  components: ComponentDoc[];
+  pipes: PipeDoc[];
+  injectables: InjectableDoc[];
+  interfaces: InterfaceDoc[];
+  typeAliases: TypeAliasDoc[];
+  enums: EnumDoc[];
+  classes: ClassDoc[];
+  functions: FunctionDoc[];
+  variables: VariableDoc[];
+}
+
 // =============================================================================
 // Parser options and interface
 // =============================================================================
 
 /** Union type for any member doc — used in propFilter. */
-export type MemberDoc = InputDoc | OutputDoc | ModelDoc | PropertyDoc | MethodDoc | QueryDoc;
+export type MemberDoc = InputDoc | OutputDoc | ModelDoc | PropertyDoc | MethodDoc | QueryDoc | HostBindingDoc | HostListenerDoc;
 
 export interface ParserOptions {
   /**
@@ -246,6 +451,9 @@ export interface Parser {
   /** Parse one or more files and return component/directive/pipe metadata. */
   parse(filePathOrPaths: string | string[]): (ComponentDoc | PipeDoc)[];
 
+  /** Parse one or more files and return the full structured result including injectables, interfaces, type aliases, and enums. */
+  parseAll(filePathOrPaths: string | string[]): ParseResult;
+
   /** Parse with an externally-provided ts.Program (for IDE integration). */
   parseWithProgram(
     filePathOrPaths: string | string[],
@@ -254,6 +462,15 @@ export interface Parser {
 
   /** Get the underlying ts.Program (for advanced consumers). */
   getProgram(): ts.Program;
+}
+
+export interface WatchParser extends Parser {
+  /** Start watching for file changes. */
+  start(): void;
+  /** Stop watching. */
+  stop(): void;
+  /** Get the latest parsed docs (cached). */
+  getLatest(): (ComponentDoc | PipeDoc)[];
 }
 
 // =============================================================================

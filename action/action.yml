@@ -1,0 +1,39 @@
+name: 'ngx-component-meta/diff'
+description: 'Detect breaking changes in Angular component APIs'
+
+inputs:
+  base:
+    description: 'Path to baseline JSON file (e.g., from main branch or previous release)'
+    required: true
+  head:
+    description: 'Path to head JSON file. If omitted, parses current source using `project`'
+    required: false
+  project:
+    description: 'Path to tsconfig.json (used when `head` is omitted to parse live source)'
+    required: false
+  format:
+    description: 'Output format — text, json, markdown'
+    required: false
+    default: 'markdown'
+  fail-on-breaking:
+    description: 'Whether to fail the action when breaking changes are found'
+    required: false
+    default: 'true'
+  comment-on-pr:
+    description: 'Whether to post/update a PR comment with the diff'
+    required: false
+    default: 'true'
+
+outputs:
+  breaking-count:
+    description: 'Number of breaking changes'
+  non-breaking-count:
+    description: 'Number of non-breaking changes'
+  has-breaking:
+    description: "'true' or 'false'"
+  diff-output:
+    description: 'The formatted diff output string'
+
+runs:
+  using: 'node20'
+  main: 'dist/index.js'

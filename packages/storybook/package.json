@@ -1,0 +1,18 @@
+{
+  "name": "ngx-component-meta-storybook",
+  "version": "0.1.0",
+  "description": "Storybook preset for ngx-component-meta — replaces Compodoc",
+  "type": "module",
+  "exports": {
+    ".": "./dist/preset.js",
+    "./preset": "./dist/preset.js",
+    "./preview": "./dist/preview.js",
+    "./manager": "./dist/manager.js"
+  },
+  "files": ["dist"],
+  "peerDependencies": {
+    "ngx-component-meta": ">=0.1.0",
+    "@storybook/angular": ">=8.0.0",
+    "typescript": ">=5.0.0"
+  }
+}

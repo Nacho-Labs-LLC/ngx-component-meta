@@ -12,6 +12,8 @@ export interface CompodocJson {
   miscellaneous?: {
     typealiases?: CompodocTypeAlias[];
     enumerations?: CompodocEnum[];
+    functions?: CompodocFunction[];
+    variables?: CompodocVariable[];
   };
 }
 
@@ -101,4 +103,14 @@ export interface CompodocTypeAlias {
 export interface CompodocEnum {
   name: string;
   childs: { name: string; value: string }[];
+}
+
+export interface CompodocFunction {
+  name: string;
+  type: 'function';
+}
+
+export interface CompodocVariable {
+  name: string;
+  type: string;
 }

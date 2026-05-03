@@ -1,4 +1,4 @@
-import type { ComponentDoc, PipeDoc, InputDoc, OutputDoc, ModelDoc, PropertyDoc, MethodDoc } from '../types.js';
+import type { ComponentDoc, PipeDoc, InputDoc, OutputDoc, ModelDoc, PropertyDoc, MethodDoc, ParseResult } from '../types.js';
 import type {
   CompodocJson,
   CompodocComponent,
@@ -7,13 +7,24 @@ import type {
   CompodocProperty,
   CompodocMethod,
   CompodocJsDocTag,
+  CompodocInjectable,
+  CompodocClass,
+  CompodocTypeAlias,
+  CompodocEnum,
+  CompodocFunction,
+  CompodocVariable,
 } from './compodoc-types.js';
 
 /**
  * Convert ngx-component-meta output to CompodocJson format.
+ * Accepts either the legacy array format or the full ParseResult.
  * Drop-in replacement for Compodoc's documentation.json — use with setCompodocJson().
  */
-export function toCompodocJson(docs: (ComponentDoc | PipeDoc)[]): CompodocJson {
+export function toCompodocJson(docs: (ComponentDoc | PipeDoc)[] | ParseResult): CompodocJson {
+  if (isParseResult(docs)) {
+    return toCompodocJsonFromParseResult(docs);
+  }
+
   const components: CompodocComponent[] = [];
   const directives: CompodocDirective[] = [];
   const pipes: CompodocPipe[] = [];
@@ -37,6 +48,71 @@ export function toCompodocJson(docs: (ComponentDoc | PipeDoc)[]): CompodocJson {
     miscellaneous: {
       typealiases: [],
       enumerations: [],
+    },
+  };
+}
+
+function isParseResult(input: unknown): input is ParseResult {
+  return input !== null && typeof input === 'object' && !Array.isArray(input) && 'components' in input;
+}
+
+function toCompodocJsonFromParseResult(result: ParseResult): CompodocJson {
+  const components: CompodocComponent[] = [];
+  const directives: CompodocDirective[] = [];
+  const pipes: CompodocPipe[] = [];
+
+  for (const doc of result.components) {
+    if (doc.kind === 'directive') {
+      directives.push(mapDirective(doc));
+    } else {
+      components.push(mapComponent(doc));
+    }
+  }
+
+  for (const doc of result.pipes) {
+    pipes.push(mapPipe(doc));
+  }
+
+  const injectables: CompodocInjectable[] = result.injectables.map(i => ({
+    name: i.name,
+    type: 'injectable' as const,
+  }));
+
+  const typealiases: CompodocTypeAlias[] = result.typeAliases.map(t => ({
+    name: t.name,
+    rawtype: t.type,
+  }));
+
+  const enumerations: CompodocEnum[] = result.enums.map(e => ({
+    name: e.name,
+    childs: e.members.map(m => ({ name: m.name, value: m.value })),
+  }));
+
+  const classes: CompodocClass[] = result.classes.map(c => ({
+    name: c.name,
+  }));
+
+  const functions: CompodocFunction[] = result.functions.map(f => ({
+    name: f.name,
+    type: 'function' as const,
+  }));
+
+  const variables: CompodocVariable[] = result.variables.map(v => ({
+    name: v.name,
+    type: v.type,
+  }));
+
+  return {
+    components,
+    directives,
+    pipes,
+    injectables,
+    classes,
+    miscellaneous: {
+      typealiases,
+      enumerations,
+      functions,
+      variables,
     },
   };
 }

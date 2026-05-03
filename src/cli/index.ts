@@ -3,10 +3,18 @@
 import fs from 'fs';
 import path from 'path';
 import { glob } from 'fs';
-import { parse, createParser } from '../parser.js';
-import type { ParserOptions } from '../types.js';
+import { parse, parseAll, createParser, createWatchParser } from '../parser.js';
+import type { ComponentDoc, PipeDoc, ParserOptions } from '../types.js';
 import { parseArgs, printHelp } from './options.js';
-import { formatJson, formatCompodoc } from './formatters.js';
+import type { ExtractCliOptions, DiffCliOptions, LintCliOptions, StatsCliOptions } from './options.js';
+import { formatJson, formatCompodoc, formatMarkdown } from './formatters.js';
+import { diff } from '../diff.js';
+import { formatDiffText, formatDiffJson, formatDiffMarkdown } from '../diff-formatters.js';
+import { lint } from '../lint.js';
+import { formatLintText, formatLintJson, formatLintStylish } from '../lint-formatters.js';
+import { computeStats } from '../stats.js';
+import { formatStatsText, formatStatsJson, formatStatsMarkdown } from '../stats-formatters.js';
+import { toPropsJsonString } from '../props-json.js';
 
 async function main(): Promise<void> {
   const options = parseArgs(process.argv.slice(2));
@@ -23,6 +31,98 @@ async function main(): Promise<void> {
     process.exit(0);
   }
 
+  if (options.command === 'diff') {
+    await runDiff(options);
+    return;
+  }
+
+  if (options.command === 'lint') {
+    await runLint(options);
+    return;
+  }
+
+  if (options.command === 'stats') {
+    await runStats(options);
+    return;
+  }
+
+  await runExtract(options);
+}
+
+async function runDiff(options: DiffCliOptions): Promise<void> {
+  if (!options.base) {
+    console.error('Error: --base is required for the diff command. Use --help for usage information.');
+    process.exit(1);
+  }
+
+  const basePath = path.resolve(options.base);
+  if (!fs.existsSync(basePath)) {
+    console.error(`Error: Base file not found: ${options.base}`);
+    process.exit(1);
+  }
+
+  const baseDocs: (ComponentDoc | PipeDoc)[] = JSON.parse(fs.readFileSync(basePath, 'utf-8'));
+
+  let headDocs: (ComponentDoc | PipeDoc)[];
+
+  if (options.head) {
+    const headPath = path.resolve(options.head);
+    if (!fs.existsSync(headPath)) {
+      console.error(`Error: Head file not found: ${options.head}`);
+      process.exit(1);
+    }
+    headDocs = JSON.parse(fs.readFileSync(headPath, 'utf-8'));
+  } else {
+    if (!options.project) {
+      console.error('Error: Either --head or --project (-p) must be specified when using diff without a head file.');
+      process.exit(1);
+    }
+
+    const parserOptions: ParserOptions = {
+      shouldIncludeMethods: !options.noMethods,
+      shouldIncludeInherited: !options.noInherited,
+    };
+
+    const tsconfigPath = path.resolve(options.project);
+    const parser = createParser(tsconfigPath, parserOptions);
+    const program = parser.getProgram();
+    const sourceFiles = program.getSourceFiles()
+      .filter(sf => !sf.isDeclarationFile && !sf.fileName.includes('node_modules'))
+      .map(sf => sf.fileName);
+    headDocs = parser.parse(sourceFiles);
+  }
+
+  const result = diff(baseDocs, headDocs);
+
+  let output: string;
+  switch (options.format) {
+    case 'json':
+      output = formatDiffJson(result);
+      break;
+    case 'markdown':
+      output = formatDiffMarkdown(result);
+      break;
+    case 'text':
+    default:
+      output = formatDiffText(result);
+      break;
+  }
+
+  if (options.output) {
+    const outputPath = path.resolve(options.output);
+    fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+    fs.writeFileSync(outputPath, output + '\n', 'utf-8');
+    console.error(`Wrote diff output to ${outputPath}`);
+  } else {
+    console.log(output);
+  }
+
+  if (result.summary.breaking > 0) {
+    process.exit(1);
+  }
+}
+
+async function runExtract(options: ExtractCliOptions): Promise<void> {
   if (options.files.length === 0) {
     console.error('Error: No files specified. Use --help for usage information.');
     process.exit(1);
@@ -43,6 +143,20 @@ async function main(): Promise<void> {
 
   // Parse
   let docs;
+  if (options.format === 'props-json') {
+    // props-json needs parseAll for the full ParseResult
+    let result;
+    if (options.project) {
+      const parser = createParser(path.resolve(options.project), parserOptions);
+      result = parser.parseAll(resolvedFiles);
+    } else {
+      result = parseAll(resolvedFiles, parserOptions);
+    }
+    const output = toPropsJsonString(result, { pretty: options.pretty });
+    writeRawOutput(output, options.output);
+    return;
+  }
+
   if (options.project) {
     const parser = createParser(path.resolve(options.project), parserOptions);
     docs = parser.parse(resolvedFiles);
@@ -50,19 +164,180 @@ async function main(): Promise<void> {
     docs = parse(resolvedFiles, parserOptions);
   }
 
-  // Format
-  const formatter = options.format === 'compodoc' ? formatCompodoc : formatJson;
-  const output = formatter(docs, options.pretty);
+  // Format & Write
+  writeOutput(docs, options);
 
-  // Write
-  if (options.output) {
-    const outputPath = path.resolve(options.output);
-    fs.mkdirSync(path.dirname(outputPath), { recursive: true });
-    fs.writeFileSync(outputPath, output + '\n', 'utf-8');
-    console.error(`Wrote ${docs.length} entries to ${outputPath}`);
-  } else {
-    console.log(output);
+  // Watch mode
+  if (options.watch) {
+    if (!options.project) {
+      console.error('Error: --watch requires --project (-p) to be specified.');
+      process.exit(1);
+    }
+
+    const tsconfigPath = path.resolve(options.project);
+    const watchDir = path.dirname(tsconfigPath);
+
+    const watcher = createWatchParser(tsconfigPath, {
+      ...parserOptions,
+      watchDir,
+      onUpdate(updatedDocs) {
+        writeOutput(updatedDocs, options);
+        console.error(`[ngx-component-meta] Rebuilt — ${updatedDocs.length} entries`);
+      },
+    });
+
+    watcher.start();
+    console.error('[ngx-component-meta] Watching for changes...');
+
+    process.on('SIGINT', () => {
+      watcher.stop();
+      process.exit(0);
+    });
+
+    return;
   }
+}
+
+function writeOutput(
+  docs: (ComponentDoc | PipeDoc)[],
+  options: { format: string; pretty: boolean; split: boolean; output: string | undefined },
+): void {
+  if (options.format === 'markdown') {
+    if (options.split && options.output) {
+      const outputDir = path.resolve(options.output);
+      fs.mkdirSync(outputDir, { recursive: true });
+      for (const doc of docs) {
+        const content = formatMarkdown([doc]);
+        const filePath = path.join(outputDir, `${doc.name}.md`);
+        fs.writeFileSync(filePath, content + '\n', 'utf-8');
+      }
+      console.error(`Wrote ${docs.length} files to ${outputDir}`);
+    } else {
+      const output = formatMarkdown(docs);
+      if (options.output) {
+        const outputPath = path.resolve(options.output);
+        fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+        fs.writeFileSync(outputPath, output + '\n', 'utf-8');
+        console.error(`Wrote ${docs.length} entries to ${outputPath}`);
+      } else {
+        console.log(output);
+      }
+    }
+  } else {
+    const formatter = options.format === 'compodoc' ? formatCompodoc : formatJson;
+    const output = formatter(docs, options.pretty);
+    if (options.output) {
+      const outputPath = path.resolve(options.output);
+      fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+      fs.writeFileSync(outputPath, output + '\n', 'utf-8');
+      console.error(`Wrote ${docs.length} entries to ${outputPath}`);
+    } else {
+      console.log(output);
+    }
+  }
+}
+
+function writeRawOutput(content: string, outputPath: string | undefined): void {
+  if (outputPath) {
+    const resolved = path.resolve(outputPath);
+    fs.mkdirSync(path.dirname(resolved), { recursive: true });
+    fs.writeFileSync(resolved, content + '\n', 'utf-8');
+    console.error(`Wrote output to ${resolved}`);
+  } else {
+    console.log(content);
+  }
+}
+
+async function runLint(options: LintCliOptions): Promise<void> {
+  if (options.files.length === 0) {
+    console.error('Error: No files specified. Use --help for usage information.');
+    process.exit(1);
+  }
+
+  const resolvedFiles = await resolveGlobs(options.files);
+  if (resolvedFiles.length === 0) {
+    console.error('Error: No matching files found.');
+    process.exit(1);
+  }
+
+  const parserOptions: ParserOptions = {
+    shouldIncludeMethods: !options.noMethods,
+    shouldIncludeInherited: !options.noInherited,
+  };
+
+  let result;
+  if (options.project) {
+    const parser = createParser(path.resolve(options.project), parserOptions);
+    result = parser.parseAll(resolvedFiles);
+  } else {
+    result = parseAll(resolvedFiles, parserOptions);
+  }
+
+  const lintResult = lint(result);
+
+  let output: string;
+  switch (options.format) {
+    case 'json':
+      output = formatLintJson(lintResult);
+      break;
+    case 'text':
+      output = formatLintText(lintResult);
+      break;
+    case 'stylish':
+    default:
+      output = formatLintStylish(lintResult);
+      break;
+  }
+
+  writeRawOutput(output, options.output);
+
+  if (lintResult.summary.errors > 0) {
+    process.exit(1);
+  }
+}
+
+async function runStats(options: StatsCliOptions): Promise<void> {
+  if (options.files.length === 0) {
+    console.error('Error: No files specified. Use --help for usage information.');
+    process.exit(1);
+  }
+
+  const resolvedFiles = await resolveGlobs(options.files);
+  if (resolvedFiles.length === 0) {
+    console.error('Error: No matching files found.');
+    process.exit(1);
+  }
+
+  const parserOptions: ParserOptions = {
+    shouldIncludeMethods: !options.noMethods,
+    shouldIncludeInherited: !options.noInherited,
+  };
+
+  let result;
+  if (options.project) {
+    const parser = createParser(path.resolve(options.project), parserOptions);
+    result = parser.parseAll(resolvedFiles);
+  } else {
+    result = parseAll(resolvedFiles, parserOptions);
+  }
+
+  const stats = computeStats(result);
+
+  let output: string;
+  switch (options.format) {
+    case 'json':
+      output = formatStatsJson(stats);
+      break;
+    case 'markdown':
+      output = formatStatsMarkdown(stats);
+      break;
+    case 'text':
+    default:
+      output = formatStatsText(stats);
+      break;
+  }
+
+  writeRawOutput(output, options.output);
 }
 
 async function resolveGlobs(patterns: string[]): Promise<string[]> {

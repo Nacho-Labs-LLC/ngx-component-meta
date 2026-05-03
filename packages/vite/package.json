@@ -1,0 +1,21 @@
+{
+  "name": "ngx-component-meta-vite",
+  "version": "0.1.0",
+  "description": "Vite plugin for ngx-component-meta — virtual modules for component metadata",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./client": {
+      "types": "./client.d.ts"
+    }
+  },
+  "files": ["dist", "client.d.ts"],
+  "peerDependencies": {
+    "ngx-component-meta": ">=0.1.0",
+    "vite": ">=5.0.0",
+    "typescript": ">=5.0.0"
+  }
+}
