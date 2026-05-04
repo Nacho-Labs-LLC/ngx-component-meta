@@ -5,7 +5,7 @@ import ts from 'typescript';
  * Checks both the original import module specifier AND the resolved file path.
  * This handles tsconfig `paths` mappings where the resolved path differs from the import.
  */
-export function isImportFrom(
+function isImportFrom(
   checker: ts.TypeChecker,
   symbol: ts.Symbol,
   moduleName: string,
@@ -69,7 +69,7 @@ export function isAngularCoreCall(
   return isCallFrom(checker, callExpr, '@angular/core');
 }
 
-export function isCallFrom(
+function isCallFrom(
   checker: ts.TypeChecker,
   callExpr: ts.CallExpression,
   moduleName: string,

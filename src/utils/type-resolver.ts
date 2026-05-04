@@ -32,7 +32,7 @@ export function typeToString(
  *   OutputEmitterRef<MouseEvent> → MouseEvent
  *   ModelSignal<boolean> → boolean
  */
-export function unwrapSignalType(checker: ts.TypeChecker, type: ts.Type): ts.Type {
+function unwrapSignalType(checker: ts.TypeChecker, type: ts.Type): ts.Type {
   const typeName = type.symbol?.name ?? type.aliasSymbol?.name;
   if (!typeName || !SIGNAL_WRAPPER_TYPES.has(typeName)) return type;
 
@@ -45,7 +45,7 @@ export function unwrapSignalType(checker: ts.TypeChecker, type: ts.Type): ts.Typ
 /**
  * Get type arguments from a generic type reference.
  */
-export function getTypeArguments(checker: ts.TypeChecker, type: ts.Type): readonly ts.Type[] {
+function getTypeArguments(checker: ts.TypeChecker, type: ts.Type): readonly ts.Type[] {
   if (type.isUnionOrIntersection()) return [];
   return checker.getTypeArguments(type as ts.TypeReference);
 }

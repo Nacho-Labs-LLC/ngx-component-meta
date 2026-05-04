@@ -3,7 +3,7 @@ import type { DecoratorInfo, MethodParamDoc } from '../types.js';
 import { getParamDefaultValue } from './default-value.js';
 import { getParamDescription } from './jsdoc.js';
 
-export function getDecorators(node: ts.HasDecorators): DecoratorInfo[] {
+function getDecorators(node: ts.HasDecorators): DecoratorInfo[] {
   const decorators = ts.getDecorators(node);
   if (!decorators) return [];
 
@@ -25,7 +25,7 @@ export function findDecorator(node: ts.HasDecorators, name: string): DecoratorIn
   return getDecorators(node).find(d => d.name === name);
 }
 
-export function hasDecorator(node: ts.HasDecorators, name: string): boolean {
+function hasDecorator(node: ts.HasDecorators, name: string): boolean {
   return findDecorator(node, name) !== undefined;
 }
 
@@ -119,7 +119,7 @@ export function getCallExpressionInitializer(
   return undefined;
 }
 
-export function getNewExpressionName(
+function getNewExpressionName(
   prop: ts.PropertyDeclaration,
 ): string | undefined {
   if (!prop.initializer || !ts.isNewExpression(prop.initializer)) return undefined;
