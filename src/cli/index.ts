@@ -15,6 +15,22 @@ import { computeStats } from '../stats.js';
 import { formatStatsText, formatStatsJson, formatStatsMarkdown } from '../stats-formatters.js';
 import { toPropsJsonString } from '../props-json.js';
 
+function readJsonFile(filePath: string | URL): any {
+  try {
+    const content = fs.readFileSync(filePath, 'utf-8');
+    return JSON.parse(content);
+  } catch (err: any) {
+    if (err instanceof SyntaxError) {
+      console.error(`Error: Failed to parse JSON in file: ${filePath}`);
+      console.error(`Message: ${err.message}`);
+    } else {
+      console.error(`Error: Could not read file: ${filePath}`);
+      console.error(`Message: ${err.message}`);
+    }
+    process.exit(1);
+  }
+}
+
 async function main(): Promise<void> {
   const options = parseArgs(process.argv.slice(2));
 
@@ -25,7 +41,7 @@ async function main(): Promise<void> {
 
   if (options.version) {
     const pkgPath = new URL('../../package.json', import.meta.url);
-    const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
+    const pkg = readJsonFile(pkgPath);
     console.log(pkg.version);
     process.exit(0);
   }
@@ -60,7 +76,7 @@ async function runDiff(options: DiffCliOptions): Promise<void> {
     process.exit(1);
   }
 
-  const baseDocs: (ComponentDoc | PipeDoc)[] = JSON.parse(fs.readFileSync(basePath, 'utf-8'));
+  const baseDocs: (ComponentDoc | PipeDoc)[] = readJsonFile(basePath);
 
   let headDocs: (ComponentDoc | PipeDoc)[];
 
@@ -70,7 +86,7 @@ async function runDiff(options: DiffCliOptions): Promise<void> {
       console.error(`Error: Head file not found: ${options.head}`);
       process.exit(1);
     }
-    headDocs = JSON.parse(fs.readFileSync(headPath, 'utf-8'));
+    headDocs = readJsonFile(headPath);
   } else {
     if (!options.project) {
       console.error('Error: Either --head or --project (-p) must be specified when using diff without a head file.');
