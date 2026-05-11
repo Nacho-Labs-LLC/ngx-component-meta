@@ -514,6 +514,19 @@ function diffComponentDocs(
   }
 }
 
+function partitionDocs(docs: (ComponentDoc | PipeDoc)[]) {
+  const components: ComponentDoc[] = [];
+  const pipes: PipeDoc[] = [];
+  for (const doc of docs) {
+    if (isComponentDoc(doc)) {
+      components.push(doc);
+    } else if (isPipeDoc(doc)) {
+      pipes.push(doc);
+    }
+  }
+  return { components, pipes };
+}
+
 export function diff(
   base: (ComponentDoc | PipeDoc)[],
   head: (ComponentDoc | PipeDoc)[],
@@ -521,10 +534,8 @@ export function diff(
   const breaking: ApiChange[] = [];
   const nonBreaking: ApiChange[] = [];
 
-  const baseComponents = base.filter(isComponentDoc);
-  const headComponents = head.filter(isComponentDoc);
-  const basePipes = base.filter(isPipeDoc);
-  const headPipes = head.filter(isPipeDoc);
+  const { components: baseComponents, pipes: basePipes } = partitionDocs(base);
+  const { components: headComponents, pipes: headPipes } = partitionDocs(head);
 
   diffComponentDocs(baseComponents, headComponents, breaking, nonBreaking);
   diffPipeDocs(basePipes, headPipes, breaking, nonBreaking);
