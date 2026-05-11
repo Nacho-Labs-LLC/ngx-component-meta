@@ -343,6 +343,17 @@ function extractAllFromProgram(
   return { components, pipes, injectables, interfaces, typeAliases, enums, classes, functions, variables };
 }
 
+interface ComponentCollections {
+  inputs: InputDoc[];
+  outputs: OutputDoc[];
+  models: ModelDoc[];
+  properties: PropertyDoc[];
+  methods: MethodDoc[];
+  queries: QueryDoc[];
+  hostBindings: HostBindingDoc[];
+  hostListeners: HostListenerDoc[];
+}
+
 function extractComponentDoc(
   checker: ts.TypeChecker,
   classDecl: ts.ClassDeclaration,
@@ -359,81 +370,46 @@ function extractComponentDoc(
 
   const meta = extractComponentMetadata(decorator);
 
-  const inputs: InputDoc[] = [];
-  const outputs: OutputDoc[] = [];
-  const models: ModelDoc[] = [];
-  const properties: PropertyDoc[] = [];
-  const methods: MethodDoc[] = [];
-  const queries: QueryDoc[] = [];
-  const hostBindings: HostBindingDoc[] = [];
-  const hostListeners: HostListenerDoc[] = [];
+  const collections: ComponentCollections = {
+    inputs: [],
+    outputs: [],
+    models: [],
+    properties: [],
+    methods: [],
+    queries: [],
+    hostBindings: [],
+    hostListeners: [],
+  };
 
   // Process class members
-  for (const member of classDecl.members) {
-    if (isPrivateMember(member)) continue;
-
-    // Methods
-    if (ts.isMethodDeclaration(member)) {
-      // Check for @HostListener before falling through to regular method extraction
-      const hostListenerDecorator = findDecorator(member, 'HostListener');
-      if (hostListenerDecorator) {
-        const listenerDoc = extractHostListener(checker, member, hostListenerDecorator, sourceFile);
-        if (listenerDoc) hostListeners.push(listenerDoc);
-        continue;
-      }
-
-      if (options?.shouldIncludeMethods !== false) {
-        const methodDoc = extractMethod(checker, member, sourceFile);
-        if (methodDoc) methods.push(methodDoc);
-      }
-      continue;
-    }
-
-    // Getters with @HostBinding
-    if (ts.isGetAccessorDeclaration(member)) {
-      const hostBindingDecorator = findDecorator(member, 'HostBinding');
-      if (hostBindingDecorator) {
-        const bindingDoc = extractHostBindingFromAccessor(checker, member, hostBindingDecorator, sourceFile);
-        if (bindingDoc) hostBindings.push(bindingDoc);
-      }
-      continue;
-    }
-
-    // Properties
-    if (ts.isPropertyDeclaration(member)) {
-      extractPropertyMember(
-        checker, member, sourceFile, options,
-        inputs, outputs, models, properties, queries, hostBindings,
-      );
-    }
-  }
+  const leafNames = new Set<string>();
+  extractMembersIntoCollections(checker, classDecl, sourceFile, options, collections, leafNames);
 
   // Resolve inheritance
   if (options?.shouldIncludeInherited !== false) {
     resolveInheritance(
-      checker, classDecl, sourceFile, program, options,
-      inputs, outputs, models, properties, methods, queries, hostBindings, hostListeners,
+      checker,
+      classDecl,
+      sourceFile,
+      program,
+      options,
+      collections.inputs,
+      collections.outputs,
+      collections.models,
+      collections.properties,
+      collections.methods,
+      collections.queries,
+      collections.hostBindings,
+      collections.hostListeners,
+      leafNames,
     );
   }
 
-  // Resolve implements
-  const implementsList = classDecl.heritageClauses
-    ?.filter(h => h.token === ts.SyntaxKind.ImplementsKeyword)
-    .flatMap(h => h.types.map(t => t.getText(sourceFile)))
-    ?? [];
-
-  // Resolve extends
-  const extendsClause = classDecl.heritageClauses?.find(
-    h => h.token === ts.SyntaxKind.ExtendsKeyword,
-  );
-  const extendsName = extendsClause?.types[0]?.getText(sourceFile) ?? null;
+  // Resolve heritage info (implements, extends)
+  const { implements: implementsList, extends: extendsName } = getHeritageInfo(classDecl, sourceFile);
 
   // Apply name resolver
-  let name = classSymbol.getName();
-  if (options?.componentNameResolver) {
-    const resolved = options.componentNameResolver(classSymbol, sourceFile);
-    if (resolved) name = resolved;
-  }
+  const name = resolveComponentName(classSymbol, sourceFile, options);
 
   const doc: ComponentDoc = {
     name,
@@ -445,36 +421,125 @@ function extractComponentDoc(
     standalone: meta.standalone,
     exportAs: meta.exportAs,
     tags: getTags(classSymbol),
-    inputs,
-    outputs,
-    models,
-    properties,
-    methods,
-    queries,
-    hostBindings,
-    hostListeners,
+    ...collections,
     implements: implementsList,
     extends: extendsName,
   };
 
   // Apply prop filter
   if (options?.propFilter) {
-    doc.inputs = doc.inputs.filter(p => options.propFilter!(p, doc));
-    doc.outputs = doc.outputs.filter(p => options.propFilter!(p, doc));
-    doc.models = doc.models.filter(p => options.propFilter!(p, doc));
-    doc.properties = doc.properties.filter(p => options.propFilter!(p, doc));
-    doc.methods = doc.methods.filter(p => options.propFilter!(p, doc));
-    doc.queries = doc.queries.filter(p => options.propFilter!(p, doc));
-    doc.hostBindings = doc.hostBindings.filter(p => options.propFilter!(p, doc));
-    doc.hostListeners = doc.hostListeners.filter(p => options.propFilter!(p, doc));
+    applyPropFilters(doc, options.propFilter);
   }
 
   return doc;
 }
 
 /**
- * Classify and extract a property declaration into the right bucket.
+ * Resolves the heritage information (implements and extends) for a class.
  */
+function getHeritageInfo(classDecl: ts.ClassDeclaration, sourceFile: ts.SourceFile): { implements: string[]; extends: string | null } {
+  const implementsList = classDecl.heritageClauses
+    ?.filter(h => h.token === ts.SyntaxKind.ImplementsKeyword)
+    .flatMap(h => h.types.map(t => t.getText(sourceFile)))
+    ?? [];
+
+  const extendsClause = classDecl.heritageClauses?.find(
+    h => h.token === ts.SyntaxKind.ExtendsKeyword,
+  );
+  const extendsName = extendsClause?.types[0]?.getText(sourceFile) ?? null;
+
+  return { implements: implementsList, extends: extendsName };
+}
+
+/**
+ * Resolves the component name, potentially using a custom resolver.
+ */
+function resolveComponentName(classSymbol: ts.Symbol, sourceFile: ts.SourceFile, options: ParserOptions | undefined): string {
+  let name = classSymbol.getName();
+  if (options?.componentNameResolver) {
+    const resolved = options.componentNameResolver(classSymbol, sourceFile);
+    if (resolved) name = resolved;
+  }
+  return name;
+}
+
+/**
+ * Applies property filters to all member collections in a ComponentDoc.
+ */
+function applyPropFilters(doc: ComponentDoc, filter: (prop: any, doc: ComponentDoc) => boolean): void {
+  doc.inputs = doc.inputs.filter(p => filter(p, doc));
+  doc.outputs = doc.outputs.filter(p => filter(p, doc));
+  doc.models = doc.models.filter(p => filter(p, doc));
+  doc.properties = doc.properties.filter(p => filter(p, doc));
+  doc.methods = doc.methods.filter(p => filter(p, doc));
+  doc.queries = doc.queries.filter(p => filter(p, doc));
+  doc.hostBindings = doc.hostBindings.filter(p => filter(p, doc));
+  doc.hostListeners = doc.hostListeners.filter(p => filter(p, doc));
+}
+
+/**
+ * Processes all members of a class declaration and populates the provided collections.
+ */
+function extractMembersIntoCollections(
+  checker: ts.TypeChecker,
+  classDecl: ts.ClassDeclaration,
+  sourceFile: ts.SourceFile,
+  options: ParserOptions | undefined,
+  collections: ComponentCollections,
+  existingNames?: Set<string>,
+): void {
+  for (const member of classDecl.members) {
+    if (isPrivateMember(member)) continue;
+
+    const name = getMemberName(member);
+    if (name && existingNames?.has(name)) continue;
+    if (name) existingNames?.add(name);
+
+    // Methods
+    if (ts.isMethodDeclaration(member)) {
+      // Check for @HostListener before falling through to regular method extraction
+      const hostListenerDecorator = findDecorator(member, 'HostListener');
+      if (hostListenerDecorator) {
+        const listenerDoc = extractHostListener(checker, member, hostListenerDecorator, sourceFile);
+        if (listenerDoc) collections.hostListeners.push(listenerDoc);
+        continue;
+      }
+
+      if (options?.shouldIncludeMethods !== false) {
+        const methodDoc = extractMethod(checker, member, sourceFile);
+        if (methodDoc) collections.methods.push(methodDoc);
+      }
+      continue;
+    }
+
+    // Getters with @HostBinding
+    if (ts.isGetAccessorDeclaration(member)) {
+      const hostBindingDecorator = findDecorator(member, 'HostBinding');
+      if (hostBindingDecorator) {
+        const bindingDoc = extractHostBindingFromAccessor(checker, member, hostBindingDecorator, sourceFile);
+        if (bindingDoc) collections.hostBindings.push(bindingDoc);
+      }
+      continue;
+    }
+
+    // Properties
+    if (ts.isPropertyDeclaration(member)) {
+      extractPropertyMember(
+        checker,
+        member,
+        sourceFile,
+        options,
+        collections.inputs,
+        collections.outputs,
+        collections.models,
+        collections.properties,
+        collections.queries,
+        collections.hostBindings,
+      );
+    }
+  }
+}
+
 function extractPropertyMember(
   checker: ts.TypeChecker,
   prop: ts.PropertyDeclaration,
@@ -604,6 +669,7 @@ function resolveInheritance(
   queries: QueryDoc[],
   hostBindings?: HostBindingDoc[],
   hostListeners?: HostListenerDoc[],
+  existingNames?: Set<string>,
 ): void {
   const extendsClause = classDecl.heritageClauses?.find(
     h => h.token === ts.SyntaxKind.ExtendsKeyword,
@@ -620,53 +686,50 @@ function resolveInheritance(
   const baseSourceFile = baseDecl.getSourceFile();
 
   // Collect existing member names to avoid duplicates (child overrides parent)
-  const existingNames = new Set<string>();
-  for (const list of [inputs, outputs, models, properties, methods, queries, hostBindings ?? [], hostListeners ?? []]) {
-    for (const item of list) {
-      existingNames.add(item.name);
+  if (!existingNames) {
+    existingNames = new Set<string>();
+    for (const list of [inputs, outputs, models, properties, methods, queries, hostBindings ?? [], hostListeners ?? []]) {
+      for (const item of list) {
+        existingNames.add(item.name);
+      }
     }
   }
 
   // Extract base class members
-  for (const member of baseDecl.members) {
-    if (isPrivateMember(member)) continue;
-
-    const name = getMemberName(member);
-    if (!name || existingNames.has(name)) continue;
-
-    if (ts.isMethodDeclaration(member)) {
-      if (hostListeners) {
-        const hostListenerDecorator = findDecorator(member, 'HostListener');
-        if (hostListenerDecorator) {
-          const listenerDoc = extractHostListener(checker, member, hostListenerDecorator, baseSourceFile);
-          if (listenerDoc) hostListeners.push(listenerDoc);
-          continue;
-        }
-      }
-      if (options?.shouldIncludeMethods !== false) {
-        const methodDoc = extractMethod(checker, member, baseSourceFile);
-        if (methodDoc) methods.push(methodDoc);
-      }
-    } else if (ts.isGetAccessorDeclaration(member)) {
-      if (hostBindings) {
-        const hostBindingDecorator = findDecorator(member, 'HostBinding');
-        if (hostBindingDecorator) {
-          const bindingDoc = extractHostBindingFromAccessor(checker, member, hostBindingDecorator, baseSourceFile);
-          if (bindingDoc) hostBindings.push(bindingDoc);
-        }
-      }
-    } else if (ts.isPropertyDeclaration(member)) {
-      extractPropertyMember(
-        checker, member, baseSourceFile, options,
-        inputs, outputs, models, properties, queries, hostBindings,
-      );
-    }
-  }
+  extractMembersIntoCollections(
+    checker,
+    baseDecl,
+    baseSourceFile,
+    options,
+    {
+      inputs,
+      outputs,
+      models,
+      properties,
+      methods,
+      queries,
+      hostBindings: hostBindings ?? [],
+      hostListeners: hostListeners ?? [],
+    },
+    existingNames,
+  );
 
   // Recurse into grandparent
   resolveInheritance(
-    checker, baseDecl, baseSourceFile, program, options,
-    inputs, outputs, models, properties, methods, queries, hostBindings, hostListeners,
+    checker,
+    baseDecl,
+    baseSourceFile,
+    program,
+    options,
+    inputs,
+    outputs,
+    models,
+    properties,
+    methods,
+    queries,
+    hostBindings,
+    hostListeners,
+    existingNames,
   );
 }
 
