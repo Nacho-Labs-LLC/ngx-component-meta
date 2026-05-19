@@ -137,47 +137,54 @@ async function runDiff(options: DiffCliOptions): Promise<void> {
   }
 }
 
-async function runExtract(options: ExtractCliOptions): Promise<void> {
+async function resolveAndParse(options: {
+  files: string[];
+  project?: string;
+  noMethods?: boolean;
+  noInherited?: boolean;
+}) {
   if (options.files.length === 0) {
     console.error('Error: No files specified. Use --help for usage information.');
     process.exit(1);
   }
 
-  // Resolve glob patterns
   const resolvedFiles = await resolveGlobs(options.files);
   if (resolvedFiles.length === 0) {
     console.error('Error: No matching files found.');
     process.exit(1);
   }
 
-  // Build parser options
   const parserOptions: ParserOptions = {
     shouldIncludeMethods: !options.noMethods,
     shouldIncludeInherited: !options.noInherited,
   };
 
+  let parser: ReturnType<typeof createParser> | undefined;
+  if (options.project) {
+    parser = createParser(path.resolve(options.project), parserOptions);
+  }
+
+  return {
+    resolvedFiles,
+    parserOptions,
+    parseResult: () => parser ? parser.parseAll(resolvedFiles) : parseAll(resolvedFiles, parserOptions),
+    parseDocs: () => parser ? parser.parse(resolvedFiles) : parse(resolvedFiles, parserOptions),
+  };
+}
+
+async function runExtract(options: ExtractCliOptions): Promise<void> {
+  const { parserOptions, parseResult, parseDocs } = await resolveAndParse(options);
+
   // Parse
   let docs;
   if (options.format === 'props-json') {
-    // props-json needs parseAll for the full ParseResult
-    let result;
-    if (options.project) {
-      const parser = createParser(path.resolve(options.project), parserOptions);
-      result = parser.parseAll(resolvedFiles);
-    } else {
-      result = parseAll(resolvedFiles, parserOptions);
-    }
+    const result = parseResult();
     const output = toPropsJsonString(result, { pretty: options.pretty });
     writeRawOutput(output, options.output);
     return;
   }
 
-  if (options.project) {
-    const parser = createParser(path.resolve(options.project), parserOptions);
-    docs = parser.parse(resolvedFiles);
-  } else {
-    docs = parse(resolvedFiles, parserOptions);
-  }
+  docs = parseDocs();
 
   // Format & Write
   writeOutput(docs, options);
@@ -264,29 +271,8 @@ function writeRawOutput(content: string, outputPath: string | undefined): void {
 }
 
 async function runLint(options: LintCliOptions): Promise<void> {
-  if (options.files.length === 0) {
-    console.error('Error: No files specified. Use --help for usage information.');
-    process.exit(1);
-  }
-
-  const resolvedFiles = await resolveGlobs(options.files);
-  if (resolvedFiles.length === 0) {
-    console.error('Error: No matching files found.');
-    process.exit(1);
-  }
-
-  const parserOptions: ParserOptions = {
-    shouldIncludeMethods: !options.noMethods,
-    shouldIncludeInherited: !options.noInherited,
-  };
-
-  let result;
-  if (options.project) {
-    const parser = createParser(path.resolve(options.project), parserOptions);
-    result = parser.parseAll(resolvedFiles);
-  } else {
-    result = parseAll(resolvedFiles, parserOptions);
-  }
+  const { parseResult } = await resolveAndParse(options);
+  const result = parseResult();
 
   const lintResult = lint(result);
 
@@ -312,29 +298,8 @@ async function runLint(options: LintCliOptions): Promise<void> {
 }
 
 async function runStats(options: StatsCliOptions): Promise<void> {
-  if (options.files.length === 0) {
-    console.error('Error: No files specified. Use --help for usage information.');
-    process.exit(1);
-  }
-
-  const resolvedFiles = await resolveGlobs(options.files);
-  if (resolvedFiles.length === 0) {
-    console.error('Error: No matching files found.');
-    process.exit(1);
-  }
-
-  const parserOptions: ParserOptions = {
-    shouldIncludeMethods: !options.noMethods,
-    shouldIncludeInherited: !options.noInherited,
-  };
-
-  let result;
-  if (options.project) {
-    const parser = createParser(path.resolve(options.project), parserOptions);
-    result = parser.parseAll(resolvedFiles);
-  } else {
-    result = parseAll(resolvedFiles, parserOptions);
-  }
+  const { parseResult } = await resolveAndParse(options);
+  const result = parseResult();
 
   const stats = computeStats(result);
 
