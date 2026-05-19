@@ -33,16 +33,17 @@ interface StrictInputType {
 export function createArgTypesExtractor(
   tsconfigPath: string,
   options?: ParserOptions,
-): (component: any) => Record<string, StrictInputType> | null {
+): (component: unknown) => Record<string, StrictInputType> | null {
   const parser = createParser(tsconfigPath, options);
 
   // Cache parsed results by component name
   const cache = new Map<string, Record<string, StrictInputType>>();
 
-  return (component: any): Record<string, StrictInputType> | null => {
+  return (component: unknown): Record<string, StrictInputType> | null => {
     if (!component) return null;
 
-    const name = component.name ?? component.__annotations__?.[0]?.name;
+    const comp = component as { name?: string; __annotations__?: Array<{ name?: string }> };
+    const name = comp.name ?? comp.__annotations__?.[0]?.name;
     if (!name || typeof name !== 'string') return null;
 
     if (cache.has(name)) return cache.get(name)!;
