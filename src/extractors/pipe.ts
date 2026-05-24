@@ -48,12 +48,9 @@ export function extractPipe(
 }
 
 function findTransformMethod(classDecl: ts.ClassDeclaration): ts.MethodDeclaration | undefined {
-  for (const member of classDecl.members) {
-    if (ts.isMethodDeclaration(member) && ts.isIdentifier(member.name) && member.name.text === 'transform') {
-      return member;
-    }
-  }
-  return undefined;
+  return classDecl.members.find(
+    (member) => ts.isMethodDeclaration(member) && ts.isIdentifier(member.name) && member.name.text === 'transform'
+  ) as ts.MethodDeclaration | undefined;
 }
 
 function extractTransformSignature(
