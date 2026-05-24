@@ -19,13 +19,17 @@ function readJsonFile(filePath: string | URL): any {
   try {
     const content = fs.readFileSync(filePath, 'utf-8');
     return JSON.parse(content);
-  } catch (err: any) {
+  } catch (err: unknown) {
     if (err instanceof SyntaxError) {
       console.error(`Error: Failed to parse JSON in file: ${filePath}`);
       console.error(`Message: ${err.message}`);
     } else {
       console.error(`Error: Could not read file: ${filePath}`);
-      console.error(`Message: ${err.message}`);
+      if (err instanceof Error) {
+        console.error(`Message: ${err.message}`);
+      } else {
+        console.error(`Message: ${String(err)}`);
+      }
     }
     process.exit(1);
   }
