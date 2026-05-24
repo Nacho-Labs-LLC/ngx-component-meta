@@ -24,7 +24,7 @@ import type {
   Parser,
   WatchParser,
 } from './types.js';
-import { findDecorator, getDecoratorStringArg, isPrivateMember, getMemberName, getCallExpressionInitializer, extractParams, getReturnTypeString } from './utils/ast-helpers.js';
+import { findDecorator, getDecorators, getDecoratorStringArg, isPrivateMember, getMemberName, getCallExpressionInitializer, extractParams, getReturnTypeString } from './utils/ast-helpers.js';
 import { getDescription, getRawDescription, getTags, isInternal } from './utils/jsdoc.js';
 import { typeToString } from './utils/type-resolver.js';
 import { getDefaultValue } from './utils/default-value.js';
@@ -606,13 +606,13 @@ function extractPropertyMember(
 
   // 5. Check for decorator-based queries
   if (options?.shouldIncludeQueries) {
-    for (const [decoratorName, queryKind] of Object.entries(QUERY_DECORATORS)) {
-      const qDecorator = findDecorator(prop, decoratorName);
-      if (qDecorator) {
-        const queryDoc = extractDecoratorQuery(checker, prop, qDecorator, queryKind, sourceFile);
-        if (queryDoc) queries.push(queryDoc);
-        return;
-      }
+    const decorators = getDecorators(prop);
+    const qDecorator = decorators.find(d => d.name in QUERY_DECORATORS);
+    if (qDecorator) {
+      const queryKind = QUERY_DECORATORS[qDecorator.name];
+      const queryDoc = extractDecoratorQuery(checker, prop, qDecorator, queryKind, sourceFile);
+      if (queryDoc) queries.push(queryDoc);
+      return;
     }
   }
 

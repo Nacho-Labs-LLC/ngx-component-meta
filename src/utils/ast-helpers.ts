@@ -3,7 +3,7 @@ import type { DecoratorInfo, MethodParamDoc } from '../types.js';
 import { getParamDefaultValue } from './default-value.js';
 import { getParamDescription } from './jsdoc.js';
 
-function getDecorators(node: ts.HasDecorators): DecoratorInfo[] {
+export function getDecorators(node: ts.HasDecorators): DecoratorInfo[] {
   const decorators = ts.getDecorators(node);
   if (!decorators) return [];
 
