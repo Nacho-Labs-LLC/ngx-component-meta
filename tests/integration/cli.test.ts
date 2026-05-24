@@ -108,7 +108,7 @@ describe('CLI', () => {
     });
 
     it('creates individual .md files per component with --split', () => {
-      tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ngx-split-test-'));
+      tmpDir = fs.mkdtempSync(path.join(process.cwd(), '.tmp-ngx-split-test-'));
 
       // Parse two components from the inheritance fixture (BaseComponent + ChildComponent)
       runCli(
@@ -138,7 +138,7 @@ describe('CLI', () => {
     });
 
     function writeDiffFixtures(): { basePath: string; headPath: string } {
-      tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ngx-diff-test-'));
+      tmpDir = fs.mkdtempSync(path.join(process.cwd(), '.tmp-ngx-diff-test-'));
 
       const baseData = [
         {
@@ -302,7 +302,7 @@ describe('CLI', () => {
     });
 
     it('exits with code 0 when there are no breaking changes', () => {
-      tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ngx-diff-test-'));
+      tmpDir = fs.mkdtempSync(path.join(process.cwd(), '.tmp-ngx-diff-test-'));
       const data = [
         {
           name: 'CardComponent',
@@ -382,6 +382,38 @@ describe('CLI', () => {
       expect(parsed.summary.breaking).toBeGreaterThan(0);
       // Exit code 1 due to breaking changes
       expect(result.status).toBe(1);
+    });
+  });
+
+  describe('output path validation', () => {
+    it('errors when --output is outside the current working directory', () => {
+      // Use an absolute path or a relative path pointing outside
+      const outsidePath = path.resolve(process.cwd(), '../evil.json');
+      const result = runCliWithStatus(
+        `-p ${TEST_TSCONFIG} -f json ${FIXTURES_DIR}/decorator-basic.component.ts -o ${outsidePath}`
+      );
+      expect(result.status).toBe(1);
+      expect(result.stderr).toContain('Output path must be within the current working directory');
+    });
+
+    it('succeeds when --output is inside the current working directory', () => {
+      // Create a temporary directory inside CWD specifically for this test,
+      // to avoid leaving files around but ensure it passes the CWD check.
+      const safeDir = path.join(process.cwd(), '.tmp-safe-output-test');
+      if (!fs.existsSync(safeDir)) {
+        fs.mkdirSync(safeDir);
+      }
+      const safePath = path.join(safeDir, 'safe.json');
+
+      const result = runCliWithStatus(
+        `-p ${TEST_TSCONFIG} -f json ${FIXTURES_DIR}/decorator-basic.component.ts -o ${safePath}`
+      );
+
+      expect(result.status).toBe(0);
+      expect(fs.existsSync(safePath)).toBe(true);
+
+      // Cleanup
+      fs.rmSync(safeDir, { recursive: true, force: true });
     });
   });
 

@@ -124,7 +124,7 @@ async function runDiff(options: DiffCliOptions): Promise<void> {
   }
 
   if (options.output) {
-    const outputPath = path.resolve(options.output);
+    const outputPath = getSafeOutputPath(options.output);
     fs.mkdirSync(path.dirname(outputPath), { recursive: true });
     fs.writeFileSync(outputPath, output + '\n', 'utf-8');
     console.error(`Wrote diff output to ${outputPath}`);
@@ -226,7 +226,7 @@ function writeOutput(
 ): void {
   if (options.format === 'markdown') {
     if (options.split && options.output) {
-      const outputDir = path.resolve(options.output);
+      const outputDir = getSafeOutputPath(options.output);
       fs.mkdirSync(outputDir, { recursive: true });
       for (const doc of docs) {
         const content = formatMarkdown([doc]);
@@ -237,7 +237,7 @@ function writeOutput(
     } else {
       const output = formatMarkdown(docs);
       if (options.output) {
-        const outputPath = path.resolve(options.output);
+        const outputPath = getSafeOutputPath(options.output);
         fs.mkdirSync(path.dirname(outputPath), { recursive: true });
         fs.writeFileSync(outputPath, output + '\n', 'utf-8');
         console.error(`Wrote ${docs.length} entries to ${outputPath}`);
@@ -249,7 +249,7 @@ function writeOutput(
     const formatter = options.format === 'compodoc' ? formatCompodoc : formatJson;
     const output = formatter(docs, options.pretty);
     if (options.output) {
-      const outputPath = path.resolve(options.output);
+      const outputPath = getSafeOutputPath(options.output);
       fs.mkdirSync(path.dirname(outputPath), { recursive: true });
       fs.writeFileSync(outputPath, output + '\n', 'utf-8');
       console.error(`Wrote ${docs.length} entries to ${outputPath}`);
@@ -259,9 +259,22 @@ function writeOutput(
   }
 }
 
+function getSafeOutputPath(outputPath: string): string {
+  const resolved = path.resolve(outputPath);
+  const cwd = process.cwd();
+
+  const rel = path.relative(cwd, resolved);
+  if (rel.startsWith('..') || path.isAbsolute(rel)) {
+    console.error(`Error: Output path must be within the current working directory. Path provided resolves to: ${resolved}`);
+    process.exit(1);
+  }
+
+  return resolved;
+}
+
 function writeRawOutput(content: string, outputPath: string | undefined): void {
   if (outputPath) {
-    const resolved = path.resolve(outputPath);
+    const resolved = getSafeOutputPath(outputPath);
     fs.mkdirSync(path.dirname(resolved), { recursive: true });
     fs.writeFileSync(resolved, content + '\n', 'utf-8');
     console.error(`Wrote output to ${resolved}`);
