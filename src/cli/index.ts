@@ -321,27 +321,30 @@ async function runStats(options: StatsCliOptions): Promise<void> {
 }
 
 async function resolveGlobs(patterns: string[]): Promise<string[]> {
-  const files: string[] = [];
-
-  for (const pattern of patterns) {
-    if (pattern.includes('*')) {
-      // Use fs.glob (Node 22+) or fall back to manual resolution
-      try {
-        const matches = await globPromise(pattern);
-        files.push(...matches.map(f => path.resolve(f)));
-      } catch {
-        console.error(`Warning: Could not resolve glob pattern: ${pattern}`);
-      }
-    } else {
-      const resolved = path.resolve(pattern);
-      if (fs.existsSync(resolved)) {
-        files.push(resolved);
+  const fileArrays = await Promise.all(
+    patterns.map(async (pattern) => {
+      if (pattern.includes('*')) {
+        // Use fs.glob (Node 22+) or fall back to manual resolution
+        try {
+          const matches = await globPromise(pattern);
+          return matches.map((f) => path.resolve(f));
+        } catch {
+          console.error(`Warning: Could not resolve glob pattern: ${pattern}`);
+          return [];
+        }
       } else {
-        console.error(`Warning: File not found: ${pattern}`);
+        const resolved = path.resolve(pattern);
+        if (fs.existsSync(resolved)) {
+          return [resolved];
+        } else {
+          console.error(`Warning: File not found: ${pattern}`);
+          return [];
+        }
       }
-    }
-  }
+    })
+  );
 
+  const files = fileArrays.flat();
   return [...new Set(files)];
 }
 
