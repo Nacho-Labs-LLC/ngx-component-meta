@@ -23,6 +23,7 @@ import type {
   ParserOptions,
   Parser,
   WatchParser,
+  MemberDoc,
 } from './types.js';
 import { findDecorator, getDecoratorStringArg, isPrivateMember, getMemberName, getCallExpressionInitializer, extractParams, getReturnTypeString } from './utils/ast-helpers.js';
 import { getDescription, getRawDescription, getTags, isInternal } from './utils/jsdoc.js';
@@ -466,7 +467,7 @@ function resolveComponentName(classSymbol: ts.Symbol, sourceFile: ts.SourceFile,
 /**
  * Applies property filters to all member collections in a ComponentDoc.
  */
-function applyPropFilters(doc: ComponentDoc, filter: (prop: any, doc: ComponentDoc) => boolean): void {
+function applyPropFilters(doc: ComponentDoc, filter: (prop: MemberDoc, doc: ComponentDoc) => boolean): void {
   doc.inputs = doc.inputs.filter(p => filter(p, doc));
   doc.outputs = doc.outputs.filter(p => filter(p, doc));
   doc.models = doc.models.filter(p => filter(p, doc));
