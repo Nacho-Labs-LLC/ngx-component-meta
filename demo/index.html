@@ -211,7 +211,7 @@
 <body>
   <header>
     <h1>@nacho-labs/ngx-component-meta</h1>
-    <span>v0.1.0</span>
+    <span>v1.0.0</span>
   </header>
 
   <div class="container">
@@ -445,14 +445,16 @@ export class ButtonComponent {
         return;
       }
 
-      const pct = stats.aggregate?.adoptionPercentage ?? 0;
+      const pct = stats.signalAdoption ?? 0;
       const color = pct === 100 ? 'badge-green' : pct > 0 ? 'badge-yellow' : 'badge-red';
       let html = `<div style="margin-bottom:16px"><div style="font-size:13px;font-weight:600;color:#f0f6fc;margin-bottom:8px">Signal Adoption</div><span class="badge ${color}" style="font-size:16px;padding:4px 12px">${pct.toFixed(0)}%</span></div>`;
 
-      html += '<table><thead><tr><th>component</th><th>status</th><th>signal</th><th>decorator</th></tr></thead><tbody>';
+      html += '<table><thead><tr><th>component</th><th>status</th><th>signal</th><th>decorator</th><th>models</th></tr></thead><tbody>';
       for (const c of stats.components) {
         const statusClass = c.status === 'fully-migrated' ? 'optional' : c.status === 'legacy' ? 'required' : '';
-        html += `<tr><td class="name">${esc(c.name)}</td><td class="${statusClass}">${esc(c.status)}</td><td>${c.signalCount}</td><td>${c.decoratorCount}</td></tr>`;
+        const signalCount = (c.inputs?.signal ?? 0) + (c.outputs?.signal ?? 0);
+        const decoratorCount = (c.inputs?.decorator ?? 0) + (c.outputs?.decorator ?? 0);
+        html += `<tr><td class="name">${esc(c.name)}</td><td class="${statusClass}">${esc(c.status)}</td><td>${signalCount}</td><td>${decoratorCount}</td><td>${c.models ?? 0}</td></tr>`;
       }
       html += '</tbody></table>';
       el.innerHTML = html;

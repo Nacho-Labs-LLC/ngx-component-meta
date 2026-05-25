@@ -1,13 +1,16 @@
 {
   "name": "ngx-component-meta-demo",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "node server.js"
   },
   "dependencies": {
-    "@nacho-labs/ngx-component-meta": "^0.1.0",
+    "@angular/compiler": "^21.2.14",
+    "@angular/core": "^21.2.14",
+    "@nacho-labs/ngx-component-meta": "file:..",
+    "rxjs": "^7.8.2",
     "typescript": "~5.7.0"
   }
 }

@@ -1,8 +1,8 @@
 # Changelog
 
-## 0.1.0 (unreleased)
+## 1.0.0 (2026-05-24)
 
-Initial release.
+First stable release.
 
 - Extract component/directive/pipe metadata from TypeScript source
 - Support for both decorator (`@Input`, `@Output`) and signal (`input()`, `output()`, `model()`) APIs
@@ -27,3 +27,4 @@ Initial release.
 - Diff formatters: `formatDiffText()`, `formatDiffJson()`, `formatDiffMarkdown()`
 - `formatMarkdown()` for programmatic markdown output of parsed docs
 - `toCompodocJson()` accepts either `(ComponentDoc | PipeDoc)[]` or `ParseResult`
+- Demo and release hardening updates from post-publish fixes and micro-refactors
