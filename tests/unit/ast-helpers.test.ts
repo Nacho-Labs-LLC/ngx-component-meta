@@ -252,7 +252,7 @@ describe('Object and Expression Properties', () => {
 });
 
 describe('Complex Helpers (TypeChecker required)', () => {
-  // Helper to compile some code and get a checker
+  // Helper to compile some code and get a checker quickly
   function setupChecker(sourceText: string) {
     const filename = 'test.ts';
     const sourceFile = ts.createSourceFile(
@@ -262,12 +262,22 @@ describe('Complex Helpers (TypeChecker required)', () => {
       true
     );
 
-    // Create a real program so we have a functional type checker
-    const compilerHost = ts.createCompilerHost({});
-    const originalGetSourceFile = compilerHost.getSourceFile;
-    compilerHost.getSourceFile = (fileName, languageVersion, onError, shouldCreateNewSourceFile) => {
-      if (fileName === filename) return sourceFile;
-      return originalGetSourceFile(fileName, languageVersion, onError, shouldCreateNewSourceFile);
+    // Create a fast compiler host that doesn't read real library files
+    const compilerHost: ts.CompilerHost = {
+      getSourceFile: (fileName) => {
+        if (fileName === filename) return sourceFile;
+        // Return empty file for anything else like lib.d.ts to avoid I/O overhead
+        return ts.createSourceFile(fileName, '', ts.ScriptTarget.Latest, true);
+      },
+      getDefaultLibFileName: () => 'lib.d.ts',
+      writeFile: () => {},
+      getCurrentDirectory: () => '',
+      getDirectories: () => [],
+      getCanonicalFileName: (fileName) => fileName,
+      useCaseSensitiveFileNames: () => true,
+      getNewLine: () => '\n',
+      fileExists: (fileName) => fileName === filename,
+      readFile: (fileName) => fileName === filename ? sourceText : '',
     };
 
     const program = ts.createProgram([filename], {}, compilerHost);
