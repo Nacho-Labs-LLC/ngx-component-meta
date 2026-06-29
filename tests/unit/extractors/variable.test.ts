@@ -10,12 +10,11 @@ describe('extractVariable', () => {
   function setup(sourceCode: string) {
     const filename = 'test.ts';
     const compilerHost = ts.createCompilerHost({});
-    const originalGetSourceFile = compilerHost.getSourceFile;
-    compilerHost.getSourceFile = (fileName, languageVersion, onError, shouldCreateNewSourceFile) => {
+    compilerHost.getSourceFile = (fileName) => {
       if (fileName === filename) {
         return ts.createSourceFile(fileName, sourceCode, ts.ScriptTarget.Latest, true);
       }
-      return originalGetSourceFile(fileName, languageVersion, onError, shouldCreateNewSourceFile);
+      return ts.createSourceFile(fileName, '', ts.ScriptTarget.Latest, true);
     };
 
     program = ts.createProgram([filename], {}, compilerHost);
