@@ -84,8 +84,23 @@ const server = http.createServer(async (req, res) => {
   }
 
   if (req.method === 'GET') {
-    const urlPath = req.url === '/' ? '/index.html' : req.url;
-    servStatic(res, path.join(__dirname, urlPath));
+    try {
+      const urlPath = req.url === '/' ? '/index.html' : req.url;
+      const decodedPath = decodeURIComponent(urlPath);
+      const requestedPath = path.join(__dirname, decodedPath);
+      const resolvedPath = path.resolve(requestedPath);
+
+      if (!resolvedPath.startsWith(path.resolve(__dirname))) {
+        res.writeHead(403);
+        res.end('Forbidden');
+        return;
+      }
+
+      servStatic(res, resolvedPath);
+    } catch {
+      res.writeHead(400);
+      res.end('Bad Request');
+    }
     return;
   }
 
