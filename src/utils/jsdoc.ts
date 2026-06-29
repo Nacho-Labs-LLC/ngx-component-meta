@@ -76,7 +76,12 @@ export function getParamDescription(
 
 function getJsDocNodes(node: ts.Node): ts.JSDoc[] {
   // Access jsDoc property which exists on statement nodes
-  return (node as any).jsDoc ?? [];
+  let docs = (node as any).jsDoc ?? [];
+  if (docs.length === 0 && node.parent?.parent && ts.isVariableStatement(node.parent.parent)) {
+    // For variables, the JSDoc is attached to the VariableStatement, not the VariableDeclaration
+    docs = (node.parent.parent as any).jsDoc ?? [];
+  }
+  return docs;
 }
 
 function getJsDocCommentText(comment: string | ts.NodeArray<ts.JSDocComment>): string {
