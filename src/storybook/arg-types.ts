@@ -51,16 +51,15 @@ export function createArgTypesExtractor(
     // Find the component in the program's source files
     const program = parser.getProgram();
     const sourceFiles = program.getSourceFiles().filter(sf => !sf.isDeclarationFile);
+    const fileNames = sourceFiles.map(sf => sf.fileName);
 
-    for (const sf of sourceFiles) {
-      const docs = parser.parse(sf.fileName);
-      for (const doc of docs) {
-        if ('kind' in doc && doc.name === name) {
-          const argTypes = componentDocToArgTypes(doc as ComponentDoc);
-          cache.set(name, argTypes);
-          return argTypes;
-        }
-      }
+    const docs = parser.parseWithProgram(fileNames, program);
+    const targetDoc = docs.find(doc => 'kind' in doc && doc.name === name);
+
+    if (targetDoc) {
+      const argTypes = componentDocToArgTypes(targetDoc as ComponentDoc);
+      cache.set(name, argTypes);
+      return argTypes;
     }
 
     return null;
