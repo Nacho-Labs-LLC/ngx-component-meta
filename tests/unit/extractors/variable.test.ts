@@ -9,12 +9,22 @@ describe('extractVariable', () => {
 
   function setup(sourceCode: string) {
     const filename = 'test.ts';
-    const compilerHost = ts.createCompilerHost({});
-    compilerHost.getSourceFile = (fileName) => {
-      if (fileName === filename) {
-        return ts.createSourceFile(fileName, sourceCode, ts.ScriptTarget.Latest, true);
-      }
-      return ts.createSourceFile(fileName, '', ts.ScriptTarget.Latest, true);
+    const sourceFileObj = ts.createSourceFile(filename, sourceCode, ts.ScriptTarget.Latest, true);
+
+    const compilerHost: ts.CompilerHost = {
+      getSourceFile: (fileName) => {
+        if (fileName === filename) return sourceFileObj;
+        return ts.createSourceFile(fileName, '', ts.ScriptTarget.Latest, true);
+      },
+      getDefaultLibFileName: () => 'lib.d.ts',
+      writeFile: () => {},
+      getCurrentDirectory: () => '',
+      getDirectories: () => [],
+      getCanonicalFileName: (fileName) => fileName,
+      useCaseSensitiveFileNames: () => true,
+      getNewLine: () => '\n',
+      fileExists: (fileName) => fileName === filename,
+      readFile: (fileName) => fileName === filename ? sourceCode : '',
     };
 
     program = ts.createProgram([filename], {}, compilerHost);
