@@ -15,6 +15,10 @@ describe('extractTypeAlias', () => {
       if (fileName === filename) {
         return ts.createSourceFile(fileName, sourceCode, ts.ScriptTarget.Latest, true);
       }
+      // Return empty source files for non-test files to prevent timeouts
+      if (fileName !== filename) {
+        return ts.createSourceFile(fileName, '', ts.ScriptTarget.Latest, true);
+      }
       return originalGetSourceFile(fileName, languageVersion, onError, shouldCreateNewSourceFile);
     };
 
