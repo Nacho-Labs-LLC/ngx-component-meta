@@ -15,7 +15,8 @@ describe('extractTypeAlias', () => {
       if (fileName === filename) {
         return ts.createSourceFile(fileName, sourceCode, ts.ScriptTarget.Latest, true);
       }
-      return originalGetSourceFile(fileName, languageVersion, onError, shouldCreateNewSourceFile);
+      // Return empty source files for stdlib to prevent synchronous blocking
+      return ts.createSourceFile(fileName, '', ts.ScriptTarget.Latest, true);
     };
 
     program = ts.createProgram([filename], {}, compilerHost);
