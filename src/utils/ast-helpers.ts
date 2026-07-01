@@ -21,19 +21,35 @@ export function getDecorators(node: ts.HasDecorators): DecoratorInfo[] {
     .filter(d => d.name !== '');
 }
 
-export function findDecorator(node: ts.HasDecorators, name: string): DecoratorInfo | undefined {
-  return getDecorators(node).find(d => d.name === name);
-}
-
-function hasDecorator(node: ts.HasDecorators, name: string): boolean {
-  return findDecorator(node, name) !== undefined;
-}
-
 function getDecoratorName(call: ts.CallExpression): string | undefined {
   const expr = call.expression;
   if (ts.isIdentifier(expr)) return expr.text;
   if (ts.isPropertyAccessExpression(expr)) return expr.name.text;
   return undefined;
+}
+
+export function findDecorator(node: ts.HasDecorators, name: string): DecoratorInfo | undefined {
+  const decorators = ts.getDecorators(node);
+  if (!decorators) return undefined;
+
+  for (const d of decorators) {
+    if (ts.isCallExpression(d.expression)) {
+      const call = d.expression;
+      const decoratorName = getDecoratorName(call);
+      if (decoratorName === name) {
+        return {
+          name,
+          args: call.arguments,
+          node: d,
+        };
+      }
+    }
+  }
+  return undefined;
+}
+
+function hasDecorator(node: ts.HasDecorators, name: string): boolean {
+  return findDecorator(node, name) !== undefined;
 }
 
 export function getStringProperty(
