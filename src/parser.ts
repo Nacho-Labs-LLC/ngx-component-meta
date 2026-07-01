@@ -212,8 +212,10 @@ function extractFromProgram(
     ts.forEachChild(sourceFile, node => {
       if (!ts.isClassDeclaration(node) || !node.name) return;
 
+      const decorators = getDecorators(node);
+
       // Check for @Pipe
-      const pipeDecorator = findDecorator(node, 'Pipe');
+      const pipeDecorator = decorators.find(d => d.name === 'Pipe');
       if (pipeDecorator) {
         const pipeDoc = extractPipe(checker, node, pipeDecorator, sourceFile);
         if (pipeDoc) results.push(pipeDoc);
@@ -221,8 +223,8 @@ function extractFromProgram(
       }
 
       // Check for @Component or @Directive
-      const componentDecorator = findDecorator(node, 'Component');
-      const directiveDecorator = findDecorator(node, 'Directive');
+      const componentDecorator = decorators.find(d => d.name === 'Component');
+      const directiveDecorator = decorators.find(d => d.name === 'Directive');
       const decorator = componentDecorator ?? directiveDecorator;
       if (!decorator) return;
 
@@ -268,7 +270,9 @@ function extractAllFromProgram(
     ts.forEachChild(sourceFile, node => {
       // Class declarations: components, directives, pipes, injectables, or plain classes
       if (ts.isClassDeclaration(node) && node.name) {
-        const pipeDecorator = findDecorator(node, 'Pipe');
+        const decorators = getDecorators(node);
+
+        const pipeDecorator = decorators.find(d => d.name === 'Pipe');
         if (pipeDecorator) {
           const pipeDoc = extractPipe(checker, node, pipeDecorator, sourceFile);
           if (pipeDoc) pipes.push(pipeDoc);
@@ -277,8 +281,8 @@ function extractAllFromProgram(
 
         // Check Component/Directive before Injectable — a class with both
         // decorators should be treated as a component, not an injectable.
-        const componentDecorator = findDecorator(node, 'Component');
-        const directiveDecorator = findDecorator(node, 'Directive');
+        const componentDecorator = decorators.find(d => d.name === 'Component');
+        const directiveDecorator = decorators.find(d => d.name === 'Directive');
         const decorator = componentDecorator ?? directiveDecorator;
         if (decorator) {
           const doc = extractComponentDoc(checker, node, decorator, sourceFile, program, options);
@@ -286,7 +290,7 @@ function extractAllFromProgram(
           return;
         }
 
-        const injectableDecorator = findDecorator(node, 'Injectable');
+        const injectableDecorator = decorators.find(d => d.name === 'Injectable');
         if (injectableDecorator) {
           const injectableDoc = extractInjectable(checker, node, injectableDecorator, sourceFile);
           if (injectableDoc) injectables.push(injectableDoc);
