@@ -53,7 +53,7 @@ export function createArgTypesExtractor(
     const sourceFiles = program.getSourceFiles().filter(sf => !sf.isDeclarationFile);
 
     for (const sf of sourceFiles) {
-      const docs = parser.parse(sf.fileName);
+      const docs = parser.parseWithProgram(sf.fileName, program);
       for (const doc of docs) {
         if ('kind' in doc && doc.name === name) {
           const argTypes = componentDocToArgTypes(doc as ComponentDoc);
