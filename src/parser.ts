@@ -581,9 +581,11 @@ function extractPropertyMember(
     }
   }
 
+  const decorators = getDecorators(prop);
+
   // 2. Check for @HostBinding before falling through to plain property
   if (hostBindings) {
-    const hostBindingDecorator = findDecorator(prop, 'HostBinding');
+    const hostBindingDecorator = decorators.find(d => d.name === 'HostBinding');
     if (hostBindingDecorator) {
       const bindingDoc = extractHostBindingFromProperty(checker, prop, hostBindingDecorator, sourceFile);
       if (bindingDoc) hostBindings.push(bindingDoc);
@@ -592,14 +594,14 @@ function extractPropertyMember(
   }
 
   // 3. Check for decorator-based @Input
-  const inputDecorator = findDecorator(prop, 'Input');
+  const inputDecorator = decorators.find(d => d.name === 'Input');
   if (inputDecorator) {
     inputs.push(extractDecoratorInput(checker, prop, inputDecorator, sourceFile));
     return;
   }
 
   // 4. Check for decorator-based @Output
-  const outputDecorator = findDecorator(prop, 'Output');
+  const outputDecorator = decorators.find(d => d.name === 'Output');
   if (outputDecorator) {
     outputs.push(extractDecoratorOutput(checker, prop, outputDecorator));
     return;
@@ -607,7 +609,6 @@ function extractPropertyMember(
 
   // 5. Check for decorator-based queries
   if (options?.shouldIncludeQueries) {
-    const decorators = getDecorators(prop);
     const qDecorator = decorators.find(d => d.name in QUERY_DECORATORS);
     if (qDecorator) {
       const queryKind = QUERY_DECORATORS[qDecorator.name];
