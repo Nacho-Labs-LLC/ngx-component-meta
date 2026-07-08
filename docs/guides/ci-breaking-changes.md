@@ -72,9 +72,44 @@ jobs:
 
 This fails the job if any breaking changes are found. No action required -- just the CLI.
 
-## Step 4: Using the GitHub Action
+## Step 4: Optional GitHub Action Wrapper
 
-The `ngx-component-meta/diff` GitHub Action wraps the CLI and adds PR comments. It checks out your baseline, runs the diff, and posts a Markdown summary directly on the pull request.
+The repository also contains `action/`, a thin wrapper around the diff CLI that can post PR comments. Use the CLI when you want the leanest setup. Use the action when you want structured outputs and idempotent PR comments.
+
+### Published action ref
+
+```yaml
+name: API Diff
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  api-diff:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - run: npm ci
+
+      - uses: Nacho-Labs-LLC/ngx-component-meta/action@v1
+        id: diff
+        with:
+          base: baseline.json
+          project: tsconfig.lib.json
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
+
+Use an immutable ref like `@v1.0.0` if you want to pin a specific release.
+
+### Local-path / vendored usage
+
+If you are working inside this repository or have vendored the `action/` directory into your own repository, reference it by local path:
 
 ```yaml
 name: API Diff
@@ -103,10 +138,11 @@ jobs:
       - run: |
           cd base-ref
           npm ci
+          npm run build
           npx ngx-component-meta -p tsconfig.lib.json -f json -o ../baseline.json "src/**/*.ts"
 
       # Run the diff and post a PR comment
-      - uses: nickcash/ngx-component-meta/action@v1
+      - uses: ./action
         id: diff
         with:
           base: baseline.json
@@ -119,6 +155,8 @@ jobs:
           echo "Breaking: ${{ steps.diff.outputs.breaking-count }}"
           echo "Non-breaking: ${{ steps.diff.outputs.non-breaking-count }}"
 ```
+
+The release workflow updates the moving major tag after each semver release, so the published `@v1` ref can track the latest compatible action build.
 
 ### Action Inputs
 
@@ -202,11 +240,17 @@ These are reported but do not fail CI:
 If you need custom logic (e.g., allowlisting certain changes or integrating with a different CI tool), use the API directly:
 
 ```typescript
-import { parse, diff, formatDiffText, formatDiffMarkdown } from 'ngx-component-meta';
+import { createParser, diff, formatDiffText, formatDiffMarkdown } from '@nacho-labs/ngx-component-meta';
 import { readFileSync } from 'fs';
 
 const baseline = JSON.parse(readFileSync('baseline.json', 'utf-8'));
-const current = parse('tsconfig.lib.json', ['src/**/*.ts']);
+const parser = createParser('./tsconfig.lib.json');
+const sourceFiles = parser
+  .getProgram()
+  .getSourceFiles()
+  .filter((sf) => !sf.isDeclarationFile && !sf.fileName.includes('node_modules'))
+  .map((sf) => sf.fileName);
+const current = parser.parse(sourceFiles);
 
 const result = diff(baseline, current);
 
