@@ -1,4 +1,4 @@
-import ts from 'typescript';
+import ts from '@typescript/typescript6';
 
 /**
  * Verify that a symbol originates from a specific module (e.g., '@angular/core').

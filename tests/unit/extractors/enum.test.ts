@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import ts from 'typescript';
+import ts from '@typescript/typescript6';
 import { extractEnum } from '../../../src/extractors/enum.js';
 
 describe('extractEnum', () => {

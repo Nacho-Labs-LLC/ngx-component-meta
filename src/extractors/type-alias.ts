@@ -1,4 +1,4 @@
-import ts from 'typescript';
+import ts from '@typescript/typescript6';
 import type { TypeAliasDoc } from '../types.js';
 import { getDescription, getRawDescription, getTags, isInternal } from '../utils/jsdoc.js';
 

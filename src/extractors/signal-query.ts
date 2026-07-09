@@ -1,4 +1,4 @@
-import ts from 'typescript';
+import ts from '@typescript/typescript6';
 import type { QueryDoc } from '../types.js';
 import { getCallName, getSignalBaseName } from '../utils/import-tracker.js';
 import { getUnwrappedReturnType } from '../utils/type-resolver.js';

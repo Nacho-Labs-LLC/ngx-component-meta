@@ -2,7 +2,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import * as ts from 'typescript';
+import * as ts from '@typescript/typescript6';
 import { parse, parseAll, createParser, createWatchParser } from '../parser.js';
 import type { ComponentDoc, PipeDoc, ParserOptions } from '../types.js';
 import { parseArgs, printHelp } from './options.js';
