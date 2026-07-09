@@ -2,7 +2,7 @@ import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { parse, parseAll, lint, computeStats } from '@nacho-labs/ngx-component-meta';
+import { parse, parseAll, lint, computeStats } from '../dist/index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT || 3000;
