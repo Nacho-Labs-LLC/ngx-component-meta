@@ -941,7 +941,7 @@ export function createWatchParser(
     start(): void {
       if (watcher) return;
 
-      watcher = fs.watch(watchDir, { recursive: true }, (_eventType, filename) => {
+      watcher = fs.watch(watchDir, { recursive: true }, (_eventType: string, filename: string | null) => {
         if (!filename || !filename.endsWith('.ts')) return;
 
         if (debounceTimer) clearTimeout(debounceTimer);
@@ -957,7 +957,7 @@ export function createWatchParser(
         }, DEBOUNCE_MS);
       });
 
-      watcher.on('error', (err) => {
+      watcher.on('error', (err: Error) => {
         console.warn('[ngx-component-meta] File watcher error:', err instanceof Error ? err.message : err);
       });
     },

@@ -2,6 +2,7 @@
 
 import fs from 'fs';
 import path from 'path';
+import * as ts from 'typescript';
 import { parse, parseAll, createParser, createWatchParser } from '../parser.js';
 import type { ComponentDoc, PipeDoc, ParserOptions } from '../types.js';
 import { parseArgs, printHelp } from './options.js';
@@ -106,8 +107,8 @@ async function runDiff(options: DiffCliOptions): Promise<void> {
     const parser = createParser(tsconfigPath, parserOptions);
     const program = parser.getProgram();
     const sourceFiles = program.getSourceFiles()
-      .filter(sf => !sf.isDeclarationFile && !sf.fileName.includes('node_modules'))
-      .map(sf => sf.fileName);
+      .filter((sf: ts.SourceFile) => !sf.isDeclarationFile && !sf.fileName.includes('node_modules'))
+      .map((sf: ts.SourceFile) => sf.fileName);
     headDocs = parser.parse(sourceFiles);
   }
 
