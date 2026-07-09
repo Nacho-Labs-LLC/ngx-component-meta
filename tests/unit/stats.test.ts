@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import path from 'path';
-import ts from 'typescript';
+import ts from '@typescript/typescript6';
 import { createParserFromOptions } from '../../src/parser.js';
 import { computeStats } from '../../src/stats.js';
 import { formatStatsText, formatStatsJson, formatStatsMarkdown } from '../../src/stats-formatters.js';

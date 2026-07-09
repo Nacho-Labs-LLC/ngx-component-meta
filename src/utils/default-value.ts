@@ -1,4 +1,4 @@
-import ts from 'typescript';
+import ts from '@typescript/typescript6';
 
 /**
  * Extract the default value as raw source text from a property initializer.

@@ -1,4 +1,4 @@
-import ts from 'typescript';
+import ts from '@typescript/typescript6';
 import type { FunctionDoc } from '../types.js';
 import { extractParams, getReturnTypeString } from '../utils/ast-helpers.js';
 import { getDescription, getRawDescription, getTags, isInternal } from '../utils/jsdoc.js';

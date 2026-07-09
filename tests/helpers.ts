@@ -1,4 +1,4 @@
-import ts from 'typescript';
+import ts from '@typescript/typescript6';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';

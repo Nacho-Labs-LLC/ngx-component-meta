@@ -1,4 +1,4 @@
-import ts from 'typescript';
+import ts from '@typescript/typescript6';
 import type { DecoratorInfo, MethodParamDoc } from '../types.js';
 import { getParamDefaultValue } from './default-value.js';
 import { getParamDescription } from './jsdoc.js';

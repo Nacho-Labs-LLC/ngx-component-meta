@@ -1,4 +1,4 @@
-import ts from 'typescript';
+import ts from '@typescript/typescript6';
 
 /** Known Angular signal wrapper type names that should be unwrapped. */
 const SIGNAL_WRAPPER_TYPES = new Set([

@@ -1,4 +1,4 @@
-import ts from 'typescript';
+import ts from '@typescript/typescript6';
 import type { InputDoc, DecoratorInfo } from '../types.js';
 import {
   getDecoratorObjectArg,

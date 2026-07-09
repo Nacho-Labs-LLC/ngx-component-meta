@@ -1,4 +1,4 @@
-import ts from 'typescript';
+import ts from '@typescript/typescript6';
 
 /**
  * Extract JSDoc description from a symbol.
