@@ -168,11 +168,17 @@ export function extractParams(
     const paramType = paramSymbol
       ? checker.getTypeOfSymbolAtLocation(paramSymbol, param)
       : checker.getTypeAtLocation(param);
+    const optional = !!param.questionToken || !!param.initializer;
+    let type = checker.typeToString(paramType, param, ts.TypeFormatFlags.NoTruncation);
+
+    if (param.questionToken && type.endsWith(' | undefined')) {
+      type = type.slice(0, -' | undefined'.length);
+    }
 
     return {
       name: paramName,
-      type: checker.typeToString(paramType, param, ts.TypeFormatFlags.NoTruncation),
-      optional: !!param.questionToken || !!param.initializer,
+      type,
+      optional,
       defaultValue: getParamDefaultValue(param, sourceFile),
       description: getParamDescription(checker, parentSymbol, paramName),
     };
