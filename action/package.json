@@ -2,6 +2,9 @@
   "name": "ngx-component-meta-action",
   "private": true,
   "type": "module",
+  "scripts": {
+    "build": "node ../scripts/build-action.mjs"
+  },
   "dependencies": {
     "@actions/core": "^1.10.0",
     "@actions/github": "^6.0.0"
