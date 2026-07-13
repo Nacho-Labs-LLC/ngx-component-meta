@@ -42,7 +42,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "build:action": "node scripts/build-action.mjs"
   },
   "peerDependencies": {
     "typescript": ">=5.0.0"
@@ -51,8 +52,11 @@
     "@typescript/typescript6": "^6.0.2"
   },
   "devDependencies": {
+    "@actions/core": "^1.11.1",
+    "@actions/github": "^6.0.1",
     "@playwright/test": "^1.59.1",
     "@types/node": "^26.1.0",
+    "esbuild": "^0.28.1",
     "typescript": "^7.0.2",
     "vitest": "^4.1.10"
   },
