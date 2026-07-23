@@ -52,8 +52,8 @@
     "@typescript/typescript6": "^6.0.2"
   },
   "devDependencies": {
-    "@actions/core": "^1.11.1",
-    "@actions/github": "^6.0.1",
+    "@actions/core": "^3.0.1",
+    "@actions/github": "^9.1.1",
     "@playwright/test": "^1.59.1",
     "@types/node": "^26.1.0",
     "esbuild": "^0.28.1",
