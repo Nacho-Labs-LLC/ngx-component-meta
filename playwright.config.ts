@@ -18,7 +18,5 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     cwd: __dirname,
   },
-  projects: [
-    { name: 'chromium', use: { browserName: 'chromium' } },
-  ],
+  projects: [{ name: 'chromium', use: { browserName: 'chromium' } }],
 });

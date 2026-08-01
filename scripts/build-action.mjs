@@ -36,8 +36,13 @@ await build({
 // The dependency bundle can contain whitespace-only lines. Normalize them so
 // the tracked action artifact is deterministic and passes repository diff checks.
 const bundlePath = path.join(outdir, 'index.cjs');
-const bundle = fs.readFileSync(bundlePath, 'utf8');
+const bundle = fs
+  .readFileSync(bundlePath, 'utf8')
+  .replaceAll(String.fromCharCode(13, 10), '\n');
 fs.writeFileSync(
   bundlePath,
-  bundle.split('\n').map((line) => line.replace(/[ \t]+$/, '')).join('\n'),
+  bundle
+    .split('\n')
+    .map((line) => line.replace(/[ \t]+$/, ''))
+    .join('\n'),
 );

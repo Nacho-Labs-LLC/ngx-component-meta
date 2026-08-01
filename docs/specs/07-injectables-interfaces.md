@@ -3,6 +3,7 @@
 ## Problem
 
 Compodoc's `documentation.json` includes `injectables`, `interfaces`, and `miscellaneous` (type aliases, enums, variables) sections. Some consumers read these:
+
 - Storybook reads `miscellaneous.enumerations` to generate enum controls
 - Storybook reads `miscellaneous.typealiases` for type resolution
 - Custom doc sites display service APIs alongside component APIs
@@ -11,6 +12,7 @@ Compodoc's `documentation.json` includes `injectables`, `interfaces`, and `misce
 ## Solution
 
 Extend `ngx-component-meta` to extract:
+
 1. `@Injectable()` classes → `InjectableDoc`
 2. Exported interfaces → `InterfaceDoc`
 3. Exported type aliases → `TypeAliasDoc`
@@ -62,7 +64,7 @@ export interface InterfaceMethodDoc {
 export interface TypeAliasDoc {
   name: string;
   filePath: string;
-  type: string;             // The resolved type as a string
+  type: string; // The resolved type as a string
   description: string;
   rawDescription: string;
   tags: Record<string, string>;
@@ -98,21 +100,31 @@ export interface EnumMemberDoc {
 `src/parser.ts` needs to iterate more than just class declarations:
 
 ```typescript
-ts.forEachChild(sourceFile, node => {
+ts.forEachChild(sourceFile, (node) => {
   // Existing: class declarations (@Component, @Directive, @Pipe)
-  if (ts.isClassDeclaration(node)) { /* ... */ }
-  
+  if (ts.isClassDeclaration(node)) {
+    /* ... */
+  }
+
   // New: @Injectable classes
-  if (ts.isClassDeclaration(node) && findDecorator(node, 'Injectable')) { /* ... */ }
-  
+  if (ts.isClassDeclaration(node) && findDecorator(node, 'Injectable')) {
+    /* ... */
+  }
+
   // New: exported interfaces
-  if (ts.isInterfaceDeclaration(node) && isExported(node)) { /* ... */ }
-  
+  if (ts.isInterfaceDeclaration(node) && isExported(node)) {
+    /* ... */
+  }
+
   // New: exported type aliases
-  if (ts.isTypeAliasDeclaration(node) && isExported(node)) { /* ... */ }
-  
+  if (ts.isTypeAliasDeclaration(node) && isExported(node)) {
+    /* ... */
+  }
+
   // New: exported enums
-  if (ts.isEnumDeclaration(node) && isExported(node)) { /* ... */ }
+  if (ts.isEnumDeclaration(node) && isExported(node)) {
+    /* ... */
+  }
 });
 ```
 
@@ -132,6 +144,7 @@ export interface ParseResult {
 ```
 
 **Breaking change consideration:** We could either:
+
 - A) Change the return type (breaking) — cleaner API
 - B) Add a separate `parseAll()` function — backwards compatible
 - C) Return a union type with a discriminator
@@ -141,6 +154,7 @@ export interface ParseResult {
 ### Storybook compat updates
 
 The `toCompodocJson()` mapper needs to include:
+
 - `injectables` array from `InjectableDoc[]`
 - `miscellaneous.typealiases` from `TypeAliasDoc[]`
 - `miscellaneous.enumerations` from `EnumDoc[]`
@@ -152,7 +166,7 @@ This is important because Storybook reads enumerations and type aliases to resol
 ```typescript
 interface ParserOptions {
   // ... existing options
-  
+
   /** Extract injectables, interfaces, type aliases, and enums. Default: false */
   shouldIncludeTypes?: boolean;
 }

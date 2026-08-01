@@ -39,7 +39,7 @@ describe('plain exported classes', () => {
   });
 
   it('does not include @internal class', () => {
-    const internal = result.classes.find(c => c.name === 'InternalHelper');
+    const internal = result.classes.find((c) => c.name === 'InternalHelper');
     expect(internal).toBeUndefined();
   });
 });
@@ -66,7 +66,7 @@ describe('exported functions', () => {
   });
 
   it('does not include @internal function', () => {
-    const internal = result.functions.find(f => f.name === 'internalFn');
+    const internal = result.functions.find((f) => f.name === 'internalFn');
     expect(internal).toBeUndefined();
   });
 });
@@ -76,27 +76,27 @@ describe('exported variables', () => {
 
   it('extracts exported variables', () => {
     expect(result.variables).toHaveLength(2);
-    const names = result.variables.map(v => v.name);
+    const names = result.variables.map((v) => v.name);
     expect(names).toContain('MAX_PAGE_SIZE');
     expect(names).toContain('DEFAULT_CONFIG');
   });
 
   it('extracts variable type and isConst', () => {
-    const maxPage = result.variables.find(v => v.name === 'MAX_PAGE_SIZE')!;
+    const maxPage = result.variables.find((v) => v.name === 'MAX_PAGE_SIZE')!;
     expect(maxPage.isConst).toBe(true);
     expect(maxPage.type).toBe('100');
 
-    const config = result.variables.find(v => v.name === 'DEFAULT_CONFIG')!;
+    const config = result.variables.find((v) => v.name === 'DEFAULT_CONFIG')!;
     expect(config.isConst).toBe(true);
   });
 
   it('extracts variable default value', () => {
-    const maxPage = result.variables.find(v => v.name === 'MAX_PAGE_SIZE')!;
+    const maxPage = result.variables.find((v) => v.name === 'MAX_PAGE_SIZE')!;
     expect(maxPage.defaultValue).toBe('100');
   });
 
   it('extracts variable description', () => {
-    const maxPage = result.variables.find(v => v.name === 'MAX_PAGE_SIZE')!;
+    const maxPage = result.variables.find((v) => v.name === 'MAX_PAGE_SIZE')!;
     expect(maxPage.description).toContain('maximum page size');
   });
 });
@@ -118,7 +118,7 @@ describe('Storybook compodoc-mapper with classes/functions/variables', () => {
 
   it('maps variables to miscellaneous.variables', () => {
     expect(json.miscellaneous?.variables).toHaveLength(2);
-    const names = json.miscellaneous!.variables!.map(v => v.name);
+    const names = json.miscellaneous!.variables!.map((v) => v.name);
     expect(names).toContain('MAX_PAGE_SIZE');
     expect(names).toContain('DEFAULT_CONFIG');
   });

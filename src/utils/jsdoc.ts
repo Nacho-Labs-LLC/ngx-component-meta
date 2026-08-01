@@ -3,7 +3,10 @@ import ts from '@typescript/typescript6';
 /**
  * Extract JSDoc description from a symbol.
  */
-export function getDescription(checker: ts.TypeChecker, symbol: ts.Symbol): string {
+export function getDescription(
+  checker: ts.TypeChecker,
+  symbol: ts.Symbol,
+): string {
   const docs = symbol.getDocumentationComment(checker);
   return ts.displayPartsToString(docs);
 }
@@ -19,7 +22,7 @@ export function getRawDescription(symbol: ts.Symbol): string {
     const jsDocs = getJsDocNodes(decl);
     if (jsDocs.length > 0) {
       return jsDocs
-        .map(doc => doc.comment ? getJsDocCommentText(doc.comment) : '')
+        .map((doc) => (doc.comment ? getJsDocCommentText(doc.comment) : ''))
         .filter(Boolean)
         .join('\n');
     }
@@ -50,7 +53,7 @@ export function getTags(symbol: ts.Symbol): Record<string, string> {
 }
 
 export function isInternal(symbol: ts.Symbol): boolean {
-  return symbol.getJsDocTags().some(t => t.name === 'internal');
+  return symbol.getJsDocTags().some((t) => t.name === 'internal');
 }
 
 /**
@@ -62,12 +65,15 @@ export function getParamDescription(
   paramName: string,
 ): string {
   const tags = methodSymbol.getJsDocTags();
-  const paramTag = tags.find(t => t.name === 'param' && t.text?.some(p => p.text.startsWith(paramName)));
+  const paramTag = tags.find(
+    (t) =>
+      t.name === 'param' && t.text?.some((p) => p.text.startsWith(paramName)),
+  );
   if (!paramTag?.text) return '';
 
   const parts = paramTag.text;
   // Format is: [{ text: "paramName" }, { text: " - description" }] or similar
-  const textParts = parts.map(p => p.text).join('');
+  const textParts = parts.map((p) => p.text).join('');
   // Remove the param name prefix
   const afterName = textParts.slice(paramName.length).trim();
   // Remove leading dash/hyphen
@@ -77,14 +83,20 @@ export function getParamDescription(
 function getJsDocNodes(node: ts.Node): ts.JSDoc[] {
   // Access jsDoc property which exists on statement nodes
   let docs = (node as any).jsDoc ?? [];
-  if (docs.length === 0 && node.parent?.parent && ts.isVariableStatement(node.parent.parent)) {
+  if (
+    docs.length === 0 &&
+    node.parent?.parent &&
+    ts.isVariableStatement(node.parent.parent)
+  ) {
     // For variables, the JSDoc is attached to the VariableStatement, not the VariableDeclaration
     docs = (node.parent.parent as any).jsDoc ?? [];
   }
   return docs;
 }
 
-function getJsDocCommentText(comment: string | ts.NodeArray<ts.JSDocComment>): string {
+function getJsDocCommentText(
+  comment: string | ts.NodeArray<ts.JSDocComment>,
+): string {
   if (typeof comment === 'string') return comment;
-  return comment.map(c => c.getText()).join('');
+  return comment.map((c) => c.getText()).join('');
 }

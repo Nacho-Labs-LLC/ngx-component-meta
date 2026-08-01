@@ -18,20 +18,29 @@ export function extractPipe(
   decorator: DecoratorInfo,
   sourceFile: ts.SourceFile,
 ): PipeDoc | null {
-  const classSymbol = classDecl.name ? checker.getSymbolAtLocation(classDecl.name) : undefined;
+  const classSymbol = classDecl.name
+    ? checker.getSymbolAtLocation(classDecl.name)
+    : undefined;
   if (!classSymbol) return null;
 
   const obj = getDecoratorObjectArg(decorator);
   const pipeName = obj ? getStringProperty(obj, 'name') : undefined;
   if (!pipeName) return null;
 
-  const standalone = obj ? (getBooleanProperty(obj, 'standalone') ?? true) : true;
+  const standalone = obj
+    ? (getBooleanProperty(obj, 'standalone') ?? true)
+    : true;
   const pure = obj ? (getBooleanProperty(obj, 'pure') ?? true) : true;
 
   // Find the transform() method
   const transformMethod = findTransformMethod(classDecl);
   const transformDoc = transformMethod
-    ? extractTransformSignature(checker, transformMethod, classSymbol, sourceFile)
+    ? extractTransformSignature(
+        checker,
+        transformMethod,
+        classSymbol,
+        sourceFile,
+      )
     : { params: [], returnType: 'any' };
 
   return {
@@ -47,9 +56,14 @@ export function extractPipe(
   };
 }
 
-function findTransformMethod(classDecl: ts.ClassDeclaration): ts.MethodDeclaration | undefined {
+function findTransformMethod(
+  classDecl: ts.ClassDeclaration,
+): ts.MethodDeclaration | undefined {
   return classDecl.members.find(
-    (member) => ts.isMethodDeclaration(member) && ts.isIdentifier(member.name) && member.name.text === 'transform'
+    (member) =>
+      ts.isMethodDeclaration(member) &&
+      ts.isIdentifier(member.name) &&
+      member.name.text === 'transform',
   ) as ts.MethodDeclaration | undefined;
 }
 
@@ -59,7 +73,9 @@ function extractTransformSignature(
   classSymbol: ts.Symbol,
   sourceFile: ts.SourceFile,
 ): { params: MethodParamDoc[]; returnType: string } {
-  const methodSymbol = method.name ? checker.getSymbolAtLocation(method.name) : undefined;
+  const methodSymbol = method.name
+    ? checker.getSymbolAtLocation(method.name)
+    : undefined;
   const signature = checker.getSignatureFromDeclaration(method);
   const params = methodSymbol
     ? extractParams(checker, method.parameters, sourceFile, methodSymbol)

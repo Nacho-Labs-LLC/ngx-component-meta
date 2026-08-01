@@ -11,11 +11,26 @@ describe('tryExtractSignalQuery', () => {
     const filename = 'test.ts';
     const compilerHost = ts.createCompilerHost({});
     const originalGetSourceFile = compilerHost.getSourceFile;
-    compilerHost.getSourceFile = (fileName, languageVersion, onError, shouldCreateNewSourceFile) => {
+    compilerHost.getSourceFile = (
+      fileName,
+      languageVersion,
+      onError,
+      shouldCreateNewSourceFile,
+    ) => {
       if (fileName === filename) {
-        return ts.createSourceFile(fileName, sourceCode, ts.ScriptTarget.Latest, true);
+        return ts.createSourceFile(
+          fileName,
+          sourceCode,
+          ts.ScriptTarget.Latest,
+          true,
+        );
       }
-      return originalGetSourceFile(fileName, languageVersion, onError, shouldCreateNewSourceFile);
+      return originalGetSourceFile(
+        fileName,
+        languageVersion,
+        onError,
+        shouldCreateNewSourceFile,
+      );
     };
 
     program = ts.createProgram([filename], {}, compilerHost);
@@ -24,13 +39,13 @@ describe('tryExtractSignalQuery', () => {
 
     // Find the class declaration to get the property declaration
     let classNode: ts.ClassDeclaration | undefined;
-    ts.forEachChild(sourceFile, node => {
+    ts.forEachChild(sourceFile, (node) => {
       if (ts.isClassDeclaration(node)) {
         classNode = node;
       }
     });
 
-    if (!classNode) throw new Error("No class found in source code");
+    if (!classNode) throw new Error('No class found in source code');
 
     let propNode: ts.PropertyDeclaration | undefined;
     for (const member of classNode.members) {
@@ -40,14 +55,15 @@ describe('tryExtractSignalQuery', () => {
       }
     }
 
-    if (!propNode) throw new Error("No property found in source code");
+    if (!propNode) throw new Error('No property found in source code');
 
     let callExpr: ts.CallExpression | undefined;
     if (propNode.initializer && ts.isCallExpression(propNode.initializer)) {
       callExpr = propNode.initializer;
     }
 
-    if (!callExpr) throw new Error("No call expression found in property initializer");
+    if (!callExpr)
+      throw new Error('No call expression found in property initializer');
 
     return { checker, propNode, callExpr, sourceFile };
   }

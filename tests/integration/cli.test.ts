@@ -1,5 +1,8 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { execSync, type ExecSyncOptionsWithStringEncoding } from 'child_process';
+import {
+  execSync,
+  type ExecSyncOptionsWithStringEncoding,
+} from 'child_process';
 import path from 'path';
 import fs from 'fs';
 import os from 'os';
@@ -36,13 +39,24 @@ function runCli(args: string): string {
   });
 }
 
-function runCliWithStatus(args: string): { stdout: string; stderr: string; status: number } {
-  const opts: ExecSyncOptionsWithStringEncoding = { encoding: 'utf-8', timeout: 30000 };
+function runCliWithStatus(args: string): {
+  stdout: string;
+  stderr: string;
+  status: number;
+} {
+  const opts: ExecSyncOptionsWithStringEncoding = {
+    encoding: 'utf-8',
+    timeout: 30000,
+  };
   try {
     const stdout = execSync(`node ${CLI_PATH} ${args}`, opts);
     return { stdout, stderr: '', status: 0 };
   } catch (e: any) {
-    return { stdout: e.stdout ?? '', stderr: e.stderr ?? '', status: e.status ?? 1 };
+    return {
+      stdout: e.stdout ?? '',
+      stderr: e.stderr ?? '',
+      status: e.status ?? 1,
+    };
   }
 }
 
@@ -50,7 +64,9 @@ describe('CLI', () => {
   setupTestTsconfig();
 
   it('outputs JSON by default', () => {
-    const output = runCli(`-p ${TEST_TSCONFIG} ${FIXTURES_DIR}/decorator-basic.component.ts`);
+    const output = runCli(
+      `-p ${TEST_TSCONFIG} ${FIXTURES_DIR}/decorator-basic.component.ts`,
+    );
     const parsed = JSON.parse(output);
     expect(Array.isArray(parsed)).toBe(true);
     expect(parsed).toHaveLength(1);
@@ -58,7 +74,9 @@ describe('CLI', () => {
   });
 
   it('outputs Compodoc format with -f compodoc', () => {
-    const output = runCli(`-p ${TEST_TSCONFIG} -f compodoc ${FIXTURES_DIR}/decorator-basic.component.ts`);
+    const output = runCli(
+      `-p ${TEST_TSCONFIG} -f compodoc ${FIXTURES_DIR}/decorator-basic.component.ts`,
+    );
     const parsed = JSON.parse(output);
     expect(parsed.components).toBeDefined();
     expect(parsed.components).toHaveLength(1);
@@ -66,7 +84,9 @@ describe('CLI', () => {
   });
 
   it('handles signal components', () => {
-    const output = runCli(`-p ${TEST_TSCONFIG} ${FIXTURES_DIR}/signal-basic.component.ts`);
+    const output = runCli(
+      `-p ${TEST_TSCONFIG} ${FIXTURES_DIR}/signal-basic.component.ts`,
+    );
     const parsed = JSON.parse(output);
     expect(parsed).toHaveLength(1);
     expect(parsed[0].inputs.length).toBeGreaterThan(0);
@@ -81,7 +101,9 @@ describe('CLI', () => {
   });
 
   it('respects --no-methods', () => {
-    const output = runCli(`-p ${TEST_TSCONFIG} --no-methods ${FIXTURES_DIR}/decorator-basic.component.ts`);
+    const output = runCli(
+      `-p ${TEST_TSCONFIG} --no-methods ${FIXTURES_DIR}/decorator-basic.component.ts`,
+    );
     const parsed = JSON.parse(output);
     expect(parsed[0].methods).toHaveLength(0);
   });
@@ -115,15 +137,21 @@ describe('CLI', () => {
         `-p ${TEST_TSCONFIG} --split -f markdown -o ${tmpDir} ${FIXTURES_DIR}/inheritance.component.ts`,
       );
 
-      const files = fs.readdirSync(tmpDir).filter(f => f.endsWith('.md'));
+      const files = fs.readdirSync(tmpDir).filter((f) => f.endsWith('.md'));
       expect(files.length).toBeGreaterThanOrEqual(2);
       expect(files).toContain('BaseComponent.md');
       expect(files).toContain('ChildComponent.md');
 
-      const baseContent = fs.readFileSync(path.join(tmpDir, 'BaseComponent.md'), 'utf-8');
+      const baseContent = fs.readFileSync(
+        path.join(tmpDir, 'BaseComponent.md'),
+        'utf-8',
+      );
       expect(baseContent).toContain('## BaseComponent');
 
-      const childContent = fs.readFileSync(path.join(tmpDir, 'ChildComponent.md'), 'utf-8');
+      const childContent = fs.readFileSync(
+        path.join(tmpDir, 'ChildComponent.md'),
+        'utf-8',
+      );
       expect(childContent).toContain('## ChildComponent');
     });
   });
@@ -254,7 +282,9 @@ describe('CLI', () => {
 
     it('outputs text diff by default', () => {
       const { basePath, headPath } = writeDiffFixtures();
-      const result = runCliWithStatus(`diff --base ${basePath} --head ${headPath}`);
+      const result = runCliWithStatus(
+        `diff --base ${basePath} --head ${headPath}`,
+      );
 
       expect(result.stdout).toContain('ngx-component-meta API diff:');
       expect(result.stdout).toContain('BREAKING:');
@@ -269,7 +299,9 @@ describe('CLI', () => {
 
     it('outputs JSON format with --format json', () => {
       const { basePath, headPath } = writeDiffFixtures();
-      const result = runCliWithStatus(`diff --base ${basePath} --head ${headPath} --format json`);
+      const result = runCliWithStatus(
+        `diff --base ${basePath} --head ${headPath} --format json`,
+      );
 
       const parsed = JSON.parse(result.stdout);
       expect(parsed.breaking).toBeDefined();
@@ -278,11 +310,15 @@ describe('CLI', () => {
       expect(parsed.summary.breaking).toBeGreaterThan(0);
       expect(parsed.summary.nonBreaking).toBeGreaterThan(0);
 
-      const removedInput = parsed.breaking.find((c: any) => c.change === 'input-removed');
+      const removedInput = parsed.breaking.find(
+        (c: any) => c.change === 'input-removed',
+      );
       expect(removedInput).toBeDefined();
       expect(removedInput.name).toBe('variant');
 
-      const addedInput = parsed.nonBreaking.find((c: any) => c.change === 'input-added');
+      const addedInput = parsed.nonBreaking.find(
+        (c: any) => c.change === 'input-added',
+      );
       expect(addedInput).toBeDefined();
       expect(addedInput.name).toBe('size');
 
@@ -291,7 +327,9 @@ describe('CLI', () => {
 
     it('outputs markdown format with --format markdown', () => {
       const { basePath, headPath } = writeDiffFixtures();
-      const result = runCliWithStatus(`diff --base ${basePath} --head ${headPath} --format markdown`);
+      const result = runCliWithStatus(
+        `diff --base ${basePath} --head ${headPath} --format markdown`,
+      );
 
       expect(result.stdout).toContain('## API Diff:');
       expect(result.stdout).toContain('### Breaking Changes');
@@ -347,7 +385,9 @@ describe('CLI', () => {
       fs.writeFileSync(basePath, JSON.stringify(data));
       fs.writeFileSync(headPath, JSON.stringify(headData));
 
-      const result = runCliWithStatus(`diff --base ${basePath} --head ${headPath} --format json`);
+      const result = runCliWithStatus(
+        `diff --base ${basePath} --head ${headPath} --format json`,
+      );
       const parsed = JSON.parse(result.stdout);
 
       expect(parsed.summary.breaking).toBe(0);
@@ -362,7 +402,9 @@ describe('CLI', () => {
     });
 
     it('errors when base file does not exist', () => {
-      const result = runCliWithStatus('diff --base /nonexistent/file.json --head /nonexistent/other.json');
+      const result = runCliWithStatus(
+        'diff --base /nonexistent/file.json --head /nonexistent/other.json',
+      );
       expect(result.status).toBe(1);
       expect(result.stderr).toContain('Base file not found');
     });
@@ -390,10 +432,12 @@ describe('CLI', () => {
       // Use an absolute path or a relative path pointing outside
       const outsidePath = path.resolve(process.cwd(), '../evil.json');
       const result = runCliWithStatus(
-        `-p ${TEST_TSCONFIG} -f json ${FIXTURES_DIR}/decorator-basic.component.ts -o ${outsidePath}`
+        `-p ${TEST_TSCONFIG} -f json ${FIXTURES_DIR}/decorator-basic.component.ts -o ${outsidePath}`,
       );
       expect(result.status).toBe(1);
-      expect(result.stderr).toContain('Output path must be within the current working directory');
+      expect(result.stderr).toContain(
+        'Output path must be within the current working directory',
+      );
     });
 
     it('succeeds when --output is inside the current working directory', () => {
@@ -406,7 +450,7 @@ describe('CLI', () => {
       const safePath = path.join(safeDir, 'safe.json');
 
       const result = runCliWithStatus(
-        `-p ${TEST_TSCONFIG} -f json ${FIXTURES_DIR}/decorator-basic.component.ts -o ${safePath}`
+        `-p ${TEST_TSCONFIG} -f json ${FIXTURES_DIR}/decorator-basic.component.ts -o ${safePath}`,
       );
 
       expect(result.status).toBe(0);
@@ -419,7 +463,9 @@ describe('CLI', () => {
 
   describe('lint subcommand', () => {
     it('outputs stylish format by default', () => {
-      const result = runCliWithStatus(`lint -p ${TEST_TSCONFIG} ${FIXTURES_DIR}/decorator-basic.component.ts`);
+      const result = runCliWithStatus(
+        `lint -p ${TEST_TSCONFIG} ${FIXTURES_DIR}/decorator-basic.component.ts`,
+      );
       // All rules should pass on well-documented fixtures — exit 0
       expect(result.status).toBe(0);
       expect(result.stdout).toContain('passed all checks');
@@ -427,13 +473,17 @@ describe('CLI', () => {
 
     it('reports violations in text format', () => {
       // pipe-basic.ts has description so it should pass; use text format to verify formatting
-      const result = runCliWithStatus(`lint -p ${TEST_TSCONFIG} -f text ${FIXTURES_DIR}/pipe-basic.ts`);
+      const result = runCliWithStatus(
+        `lint -p ${TEST_TSCONFIG} -f text ${FIXTURES_DIR}/pipe-basic.ts`,
+      );
       expect(result.status).toBe(0);
       expect(result.stdout).toContain('passed lint checks');
     });
 
     it('outputs JSON format', () => {
-      const result = runCliWithStatus(`lint -p ${TEST_TSCONFIG} -f json ${FIXTURES_DIR}/decorator-basic.component.ts`);
+      const result = runCliWithStatus(
+        `lint -p ${TEST_TSCONFIG} -f json ${FIXTURES_DIR}/decorator-basic.component.ts`,
+      );
       expect(result.status).toBe(0);
       const parsed = JSON.parse(result.stdout);
       expect(parsed.violations).toBeDefined();
@@ -447,21 +497,27 @@ describe('CLI', () => {
       // Instead, parse multiple files — if any violations show up, we see exit 1.
       // For a reliable test, use a file that has components without selectors
       // We'll just verify the mechanism works by using decorator-basic which should pass.
-      const result = runCliWithStatus(`lint -p ${TEST_TSCONFIG} -f json ${FIXTURES_DIR}/decorator-basic.component.ts`);
+      const result = runCliWithStatus(
+        `lint -p ${TEST_TSCONFIG} -f json ${FIXTURES_DIR}/decorator-basic.component.ts`,
+      );
       expect(result.status).toBe(0);
     });
   });
 
   describe('stats subcommand', () => {
     it('outputs text format by default', () => {
-      const output = runCli(`stats -p ${TEST_TSCONFIG} ${FIXTURES_DIR}/signal-basic.component.ts`);
+      const output = runCli(
+        `stats -p ${TEST_TSCONFIG} ${FIXTURES_DIR}/signal-basic.component.ts`,
+      );
       expect(output).toContain('Signal Migration:');
       expect(output).toContain('100%');
       expect(output).toContain('Fully migrated');
     });
 
     it('outputs JSON format', () => {
-      const output = runCli(`stats -p ${TEST_TSCONFIG} -f json ${FIXTURES_DIR}/signal-basic.component.ts`);
+      const output = runCli(
+        `stats -p ${TEST_TSCONFIG} -f json ${FIXTURES_DIR}/signal-basic.component.ts`,
+      );
       const parsed = JSON.parse(output);
       expect(parsed.signalAdoption).toBe(100);
       expect(parsed.inputs).toBeDefined();
@@ -470,13 +526,17 @@ describe('CLI', () => {
     });
 
     it('outputs markdown format', () => {
-      const output = runCli(`stats -p ${TEST_TSCONFIG} -f markdown ${FIXTURES_DIR}/signal-basic.component.ts`);
+      const output = runCli(
+        `stats -p ${TEST_TSCONFIG} -f markdown ${FIXTURES_DIR}/signal-basic.component.ts`,
+      );
       expect(output).toContain('## Signal Migration:');
       expect(output).toContain('| Metric |');
     });
 
     it('reports legacy components', () => {
-      const output = runCli(`stats -p ${TEST_TSCONFIG} ${FIXTURES_DIR}/decorator-basic.component.ts`);
+      const output = runCli(
+        `stats -p ${TEST_TSCONFIG} ${FIXTURES_DIR}/decorator-basic.component.ts`,
+      );
       expect(output).toContain('0%');
       expect(output).toContain('Legacy');
       expect(output).toContain('ButtonComponent');
@@ -496,7 +556,9 @@ describe('CLI', () => {
 
   describe('props-json format', () => {
     it('outputs props-json format', () => {
-      const output = runCli(`-p ${TEST_TSCONFIG} -f props-json ${FIXTURES_DIR}/decorator-basic.component.ts`);
+      const output = runCli(
+        `-p ${TEST_TSCONFIG} -f props-json ${FIXTURES_DIR}/decorator-basic.component.ts`,
+      );
       const parsed = JSON.parse(output);
       expect(parsed.components).toBeDefined();
       expect(parsed.generatedAt).toBeDefined();
@@ -508,7 +570,9 @@ describe('CLI', () => {
     });
 
     it('includes pipes in props-json output', () => {
-      const output = runCli(`-p ${TEST_TSCONFIG} -f props-json ${FIXTURES_DIR}/pipe-basic.ts`);
+      const output = runCli(
+        `-p ${TEST_TSCONFIG} -f props-json ${FIXTURES_DIR}/pipe-basic.ts`,
+      );
       const parsed = JSON.parse(output);
       expect(parsed.components).toHaveLength(1);
       expect(parsed.components[0].kind).toBe('pipe');

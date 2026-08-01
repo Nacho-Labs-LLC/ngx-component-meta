@@ -4,23 +4,23 @@ A GitHub Action that detects breaking changes in Angular component APIs using [n
 
 ## Inputs
 
-| Input | Required | Default | Description |
-|-------|----------|---------|-------------|
-| `base` | Yes | | Path to baseline JSON file |
-| `head` | No | | Path to head JSON file. If omitted, parses live source via `project` |
-| `project` | No | | Path to tsconfig.json (used when `head` is omitted) |
-| `format` | No | `markdown` | Output format: `text`, `json`, `markdown` |
-| `fail-on-breaking` | No | `true` | Fail the action when breaking changes are found |
-| `comment-on-pr` | No | `true` | Post/update a PR comment with the diff |
+| Input              | Required | Default    | Description                                                          |
+| ------------------ | -------- | ---------- | -------------------------------------------------------------------- |
+| `base`             | Yes      |            | Path to baseline JSON file                                           |
+| `head`             | No       |            | Path to head JSON file. If omitted, parses live source via `project` |
+| `project`          | No       |            | Path to tsconfig.json (used when `head` is omitted)                  |
+| `format`           | No       | `markdown` | Output format: `text`, `json`, `markdown`                            |
+| `fail-on-breaking` | No       | `true`     | Fail the action when breaking changes are found                      |
+| `comment-on-pr`    | No       | `true`     | Post/update a PR comment with the diff                               |
 
 ## Outputs
 
-| Output | Description |
-|--------|-------------|
-| `breaking-count` | Number of breaking changes |
-| `non-breaking-count` | Number of non-breaking changes |
-| `has-breaking` | `'true'` or `'false'` |
-| `diff-output` | The formatted diff output string |
+| Output               | Description                      |
+| -------------------- | -------------------------------- |
+| `breaking-count`     | Number of breaking changes       |
+| `non-breaking-count` | Number of non-breaking changes   |
+| `has-breaking`       | `'true'` or `'false'`            |
+| `diff-output`        | The formatted diff output string |
 
 ## Usage
 

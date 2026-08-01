@@ -19,6 +19,7 @@ Today, Angular Storybook projects configure Compodoc in `angular.json`:
 Storybook's `@storybook/angular` builder detects `compodoc: true`, spawns Compodoc as a child process, waits for `documentation.json`, then loads it via `setCompodocJson()`. There's no way to swap in a different extractor at the builder level.
 
 Users who want to use `ngx-component-meta` must currently:
+
 1. Disable `compodoc: true` in angular.json
 2. Manually wire up `toCompodocJson()` or `createArgTypesExtractor()` in preview.ts
 3. Either call `parse()` at import time (slow cold start) or run the CLI as a prebuild script
@@ -30,6 +31,7 @@ We want a **drop-in replacement** that works at the builder level.
 Create a Storybook preset package: `ngx-component-meta-storybook`
 
 This preset:
+
 1. Provides a `previewAnnotations` hook that auto-wires `extractArgTypes`
 2. Runs `ngx-component-meta` parsing once at Storybook startup
 3. Watches for file changes in dev mode and re-parses incrementally (depends on Spec 03)
@@ -52,6 +54,7 @@ packages/storybook/
 ### How Storybook presets work
 
 A preset is an npm package that exports from `preset.js`:
+
 - `previewAnnotations` — array of file paths injected into the preview iframe
 - `viteFinal` / `webpackFinal` — config transforms (not needed for this)
 
@@ -69,16 +72,22 @@ import { toCompodocJson } from 'ngx-component-meta/storybook';
 import type { CompodocJson } from 'ngx-component-meta/storybook';
 
 export interface ExtractOptions {
-  tsconfig?: string;           // default: './tsconfig.json'
-  include?: string[];          // default: ['src/**/*.component.ts', 'src/**/*.directive.ts', 'src/**/*.pipe.ts']
-  disablePrivate?: boolean;    // default: true
-  disableInternal?: boolean;   // default: true
-  disableMethods?: boolean;    // default: false
+  tsconfig?: string; // default: './tsconfig.json'
+  include?: string[]; // default: ['src/**/*.component.ts', 'src/**/*.directive.ts', 'src/**/*.pipe.ts']
+  disablePrivate?: boolean; // default: true
+  disableInternal?: boolean; // default: true
+  disableMethods?: boolean; // default: false
 }
 
-export function extractDocumentation(options: ExtractOptions = {}): CompodocJson {
-  const files = options.include ?? ['src/**/*.component.ts', 'src/**/*.directive.ts', 'src/**/*.pipe.ts'];
-  
+export function extractDocumentation(
+  options: ExtractOptions = {},
+): CompodocJson {
+  const files = options.include ?? [
+    'src/**/*.component.ts',
+    'src/**/*.directive.ts',
+    'src/**/*.pipe.ts',
+  ];
+
   const docs = parse(files, {
     shouldIncludeMethods: !options.disableMethods,
     // propFilter handles disablePrivate/disableInternal
@@ -104,19 +113,22 @@ export const previewAnnotations: PresetProperty<'previewAnnotations'> = (
 
 // Optionally: hook into viteFinal to define a virtual module
 // that exposes the extracted JSON to the browser
-export const viteFinal: PresetProperty<'viteFinal'> = async (config, options) => {
+export const viteFinal: PresetProperty<'viteFinal'> = async (
+  config,
+  options,
+) => {
   const { extractDocumentation } = await import('./extract.js');
-  
+
   // Read user options from main.ts
   const userOptions = (options as any).ngxComponentMeta ?? {};
   const docJson = extractDocumentation(userOptions);
-  
+
   // Inject as a virtual module so preview.ts can import it
   config.define = {
     ...config.define,
-    '__NGX_COMPONENT_META_JSON__': JSON.stringify(JSON.stringify(docJson)),
+    __NGX_COMPONENT_META_JSON__: JSON.stringify(JSON.stringify(docJson)),
   };
-  
+
   return config;
 };
 ```

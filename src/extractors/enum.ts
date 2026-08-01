@@ -1,6 +1,11 @@
 import ts from '@typescript/typescript6';
 import type { EnumDoc, EnumMemberDoc } from '../types.js';
-import { getDescription, getRawDescription, getTags, isInternal } from '../utils/jsdoc.js';
+import {
+  getDescription,
+  getRawDescription,
+  getTags,
+  isInternal,
+} from '../utils/jsdoc.js';
 
 /**
  * Extract an exported enum declaration into an EnumDoc.
@@ -16,7 +21,9 @@ export function extractEnum(
 
   const members: EnumMemberDoc[] = [];
   for (const member of node.members) {
-    const memberSymbol = member.name ? checker.getSymbolAtLocation(member.name) : undefined;
+    const memberSymbol = member.name
+      ? checker.getSymbolAtLocation(member.name)
+      : undefined;
     const name = member.name ? member.name.getText(sourceFile) : '';
 
     let value = '';
@@ -34,7 +41,9 @@ export function extractEnum(
       }
     }
 
-    const memberDescription = memberSymbol ? getDescription(checker, memberSymbol) : '';
+    const memberDescription = memberSymbol
+      ? getDescription(checker, memberSymbol)
+      : '';
 
     members.push({ name, value, description: memberDescription });
   }

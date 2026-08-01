@@ -38,7 +38,11 @@ export class TestComponent {
 }
 `;
 
-function createTempProject(): { tmpDir: string; componentPath: string; tsconfigPath: string } {
+function createTempProject(): {
+  tmpDir: string;
+  componentPath: string;
+  tsconfigPath: string;
+} {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ngx-watch-test-'));
   const srcDir = path.join(tmpDir, 'src');
   fs.mkdirSync(srcDir, { recursive: true });
@@ -120,13 +124,18 @@ describe('createWatchParser', () => {
     });
 
     // Wait a tick for the watcher to be ready, then write the updated file
-    await new Promise(r => setTimeout(r, 100));
+    await new Promise((r) => setTimeout(r, 100));
     fs.writeFileSync(project.componentPath, UPDATED_COMPONENT, 'utf-8');
 
     // Wait for the update callback (with a timeout)
     await Promise.race([
       updatePromise,
-      new Promise((_, reject) => setTimeout(() => reject(new Error('onUpdate not called within 5s')), 5000)),
+      new Promise((_, reject) =>
+        setTimeout(
+          () => reject(new Error('onUpdate not called within 5s')),
+          5000,
+        ),
+      ),
     ]);
 
     expect(updatedDocs).toBeDefined();
@@ -134,9 +143,9 @@ describe('createWatchParser', () => {
 
     const comp = updatedDocs![0] as ComponentDoc;
     expect(comp.inputs).toHaveLength(2);
-    expect(comp.inputs.find(i => i.name === 'label')).toBeDefined();
-    expect(comp.inputs.find(i => i.name === 'count')).toBeDefined();
-    expect(comp.inputs.find(i => i.name === 'count')!.defaultValue).toBe('0');
+    expect(comp.inputs.find((i) => i.name === 'label')).toBeDefined();
+    expect(comp.inputs.find((i) => i.name === 'count')).toBeDefined();
+    expect(comp.inputs.find((i) => i.name === 'count')!.defaultValue).toBe('0');
   }, 10000);
 
   it('stop() prevents further callbacks', async () => {
@@ -157,11 +166,11 @@ describe('createWatchParser', () => {
     stopFn = undefined;
 
     // Write a change after stopping
-    await new Promise(r => setTimeout(r, 50));
+    await new Promise((r) => setTimeout(r, 50));
     fs.writeFileSync(project.componentPath, UPDATED_COMPONENT, 'utf-8');
 
     // Wait long enough for debounce + processing
-    await new Promise(r => setTimeout(r, 400));
+    await new Promise((r) => setTimeout(r, 400));
     expect(callCount).toBe(0);
   });
 
@@ -200,13 +209,19 @@ export class TestComponent {
 
     let recoveredDocs: (ComponentDoc | PipeDoc)[] | undefined;
     let recoveryResolve: (() => void) | undefined;
-    const recoveryPromise = new Promise<void>(resolve => { recoveryResolve = resolve; });
+    const recoveryPromise = new Promise<void>((resolve) => {
+      recoveryResolve = resolve;
+    });
 
     const watcher = createWatchParser(project.tsconfigPath, {
       watchDir: project.tmpDir,
       onUpdate(docs) {
         // Resolve when we get valid docs with 2 inputs (the recovery write)
-        if (docs.length === 1 && 'inputs' in docs[0] && (docs[0] as ComponentDoc).inputs.length === 2) {
+        if (
+          docs.length === 1 &&
+          'inputs' in docs[0] &&
+          (docs[0] as ComponentDoc).inputs.length === 2
+        ) {
           recoveredDocs = docs;
           recoveryResolve?.();
         }
@@ -222,18 +237,23 @@ export class TestComponent {
     watcher.start();
 
     // Write broken file — the watcher should not crash
-    await new Promise(r => setTimeout(r, 100));
+    await new Promise((r) => setTimeout(r, 100));
     fs.writeFileSync(project.componentPath, BROKEN_SYNTAX, 'utf-8');
 
     // Wait for debounce + rebuild attempt
-    await new Promise(r => setTimeout(r, 500));
+    await new Promise((r) => setTimeout(r, 500));
 
     // The watcher is still alive — write valid content and verify it recovers
     fs.writeFileSync(project.componentPath, UPDATED_COMPONENT, 'utf-8');
 
     await Promise.race([
       recoveryPromise,
-      new Promise((_, reject) => setTimeout(() => reject(new Error('recovery not called within 5s')), 5000)),
+      new Promise((_, reject) =>
+        setTimeout(
+          () => reject(new Error('recovery not called within 5s')),
+          5000,
+        ),
+      ),
     ]);
 
     expect(recoveredDocs).toBeDefined();

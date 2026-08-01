@@ -21,23 +21,23 @@ A basic button component using decorator-based inputs.
 
 ### Inputs
 
-| Name | Binding | Type | Required | Default | Description |
-|------|---------|------|----------|---------|-------------|
-| `label` | `label` | `string` | no | `'Click me'` | The button label text. |
-| `disabled` | `disabled` | `boolean` | yes | — | Whether the button is disabled. |
-| `variant` | `btnVariant` | `'primary' \| 'secondary' \| 'danger'` | no | `'primary'` | Visual variant of the button. |
+| Name       | Binding      | Type                                   | Required | Default      | Description                     |
+| ---------- | ------------ | -------------------------------------- | -------- | ------------ | ------------------------------- |
+| `label`    | `label`      | `string`                               | no       | `'Click me'` | The button label text.          |
+| `disabled` | `disabled`   | `boolean`                              | yes      | —            | Whether the button is disabled. |
+| `variant`  | `btnVariant` | `'primary' \| 'secondary' \| 'danger'` | no       | `'primary'`  | Visual variant of the button.   |
 
 ### Outputs
 
-| Name | Binding | Type | Description |
-|------|---------|------|-------------|
-| `clicked` | `clicked` | `MouseEvent` | Emits when the button is clicked. |
+| Name      | Binding    | Type         | Description                       |
+| --------- | ---------- | ------------ | --------------------------------- |
+| `clicked` | `clicked`  | `MouseEvent` | Emits when the button is clicked. |
 | `focused` | `btnFocus` | `FocusEvent` | Emits when the button is focused. |
 
 ### Methods
 
-| Name | Signature | Description |
-|------|-----------|-------------|
+| Name    | Signature    | Description              |
+| ------- | ------------ | ------------------------ |
 | `reset` | `() => void` | Reset the click counter. |
 ```
 
@@ -51,10 +51,12 @@ Truncates a string to a maximum length.
 **Pipe name:** `truncate` | **Pure:** yes | **Standalone:** yes
 
 ### Transform
+```
+
+transform(value: string, maxLength?: number = 100, suffix?: string = '...'): string
 
 ```
-transform(value: string, maxLength?: number = 100, suffix?: string = '...'): string
-```
+
 ```
 
 ### Models section (when present)
@@ -62,9 +64,9 @@ transform(value: string, maxLength?: number = 100, suffix?: string = '...'): str
 ```markdown
 ### Two-Way Bindings
 
-| Name | Binding | Type | Required | Default | Description |
-|------|---------|------|----------|---------|-------------|
-| `expanded` | `expanded` | `boolean` | no | `false` | Whether expanded. |
+| Name       | Binding    | Type      | Required | Default | Description       |
+| ---------- | ---------- | --------- | -------- | ------- | ----------------- |
+| `expanded` | `expanded` | `boolean` | no       | `false` | Whether expanded. |
 ```
 
 ## Implementation
@@ -79,14 +81,17 @@ transform(value: string, maxLength?: number = 100, suffix?: string = '...'): str
 
 ```typescript
 export function formatMarkdown(docs: (ComponentDoc | PipeDoc)[]): string {
-  return docs.map(doc => {
-    if ('pipeName' in doc) return formatPipeMarkdown(doc);
-    return formatComponentMarkdown(doc);
-  }).join('\n\n---\n\n');
+  return docs
+    .map((doc) => {
+      if ('pipeName' in doc) return formatPipeMarkdown(doc);
+      return formatComponentMarkdown(doc);
+    })
+    .join('\n\n---\n\n');
 }
 ```
 
 Keep it simple:
+
 - One function per section (inputs table, outputs table, methods table, etc.)
 - Escape pipe characters in type strings (`|` → `\|` inside table cells)
 - Skip empty sections (no "### Methods" header if there are no methods)

@@ -6,14 +6,31 @@ import * as ts from '@typescript/typescript6';
 import { parse, parseAll, createParser, createWatchParser } from '../parser.js';
 import type { ComponentDoc, PipeDoc, ParserOptions } from '../types.js';
 import { parseArgs, printHelp } from './options.js';
-import type { ExtractCliOptions, DiffCliOptions, LintCliOptions, StatsCliOptions } from './options.js';
+import type {
+  ExtractCliOptions,
+  DiffCliOptions,
+  LintCliOptions,
+  StatsCliOptions,
+} from './options.js';
 import { formatJson, formatCompodoc, formatMarkdown } from './formatters.js';
 import { diff } from '../diff.js';
-import { formatDiffText, formatDiffJson, formatDiffMarkdown } from '../diff-formatters.js';
+import {
+  formatDiffText,
+  formatDiffJson,
+  formatDiffMarkdown,
+} from '../diff-formatters.js';
 import { lint } from '../lint.js';
-import { formatLintText, formatLintJson, formatLintStylish } from '../lint-formatters.js';
+import {
+  formatLintText,
+  formatLintJson,
+  formatLintStylish,
+} from '../lint-formatters.js';
 import { computeStats } from '../stats.js';
-import { formatStatsText, formatStatsJson, formatStatsMarkdown } from '../stats-formatters.js';
+import {
+  formatStatsText,
+  formatStatsJson,
+  formatStatsMarkdown,
+} from '../stats-formatters.js';
 import { toPropsJsonString } from '../props-json.js';
 
 function readJsonFile(filePath: string | URL): any {
@@ -71,7 +88,9 @@ async function main(): Promise<void> {
 
 async function runDiff(options: DiffCliOptions): Promise<void> {
   if (!options.base) {
-    console.error('Error: --base is required for the diff command. Use --help for usage information.');
+    console.error(
+      'Error: --base is required for the diff command. Use --help for usage information.',
+    );
     process.exit(1);
   }
 
@@ -94,7 +113,9 @@ async function runDiff(options: DiffCliOptions): Promise<void> {
     headDocs = readJsonFile(headPath);
   } else {
     if (!options.project) {
-      console.error('Error: Either --head or --project (-p) must be specified when using diff without a head file.');
+      console.error(
+        'Error: Either --head or --project (-p) must be specified when using diff without a head file.',
+      );
       process.exit(1);
     }
 
@@ -106,8 +127,12 @@ async function runDiff(options: DiffCliOptions): Promise<void> {
     const tsconfigPath = path.resolve(options.project);
     const parser = createParser(tsconfigPath, parserOptions);
     const program = parser.getProgram();
-    const sourceFiles = program.getSourceFiles()
-      .filter((sf: ts.SourceFile) => !sf.isDeclarationFile && !sf.fileName.includes('node_modules'))
+    const sourceFiles = program
+      .getSourceFiles()
+      .filter(
+        (sf: ts.SourceFile) =>
+          !sf.isDeclarationFile && !sf.fileName.includes('node_modules'),
+      )
       .map((sf: ts.SourceFile) => sf.fileName);
     headDocs = parser.parse(sourceFiles);
   }
@@ -149,7 +174,9 @@ async function resolveAndParse(options: {
   noInherited?: boolean;
 }) {
   if (options.files.length === 0) {
-    console.error('Error: No files specified. Use --help for usage information.');
+    console.error(
+      'Error: No files specified. Use --help for usage information.',
+    );
     process.exit(1);
   }
 
@@ -172,13 +199,20 @@ async function resolveAndParse(options: {
   return {
     resolvedFiles,
     parserOptions,
-    parseResult: () => parser ? parser.parseAll(resolvedFiles) : parseAll(resolvedFiles, parserOptions),
-    parseDocs: () => parser ? parser.parse(resolvedFiles) : parse(resolvedFiles, parserOptions),
+    parseResult: () =>
+      parser
+        ? parser.parseAll(resolvedFiles)
+        : parseAll(resolvedFiles, parserOptions),
+    parseDocs: () =>
+      parser
+        ? parser.parse(resolvedFiles)
+        : parse(resolvedFiles, parserOptions),
   };
 }
 
 async function runExtract(options: ExtractCliOptions): Promise<void> {
-  const { parserOptions, parseResult, parseDocs } = await resolveAndParse(options);
+  const { parserOptions, parseResult, parseDocs } =
+    await resolveAndParse(options);
 
   // Parse
   let docs;
@@ -209,7 +243,9 @@ async function runExtract(options: ExtractCliOptions): Promise<void> {
       watchDir,
       onUpdate(updatedDocs) {
         writeOutput(updatedDocs, options);
-        console.error(`[ngx-component-meta] Rebuilt — ${updatedDocs.length} entries`);
+        console.error(
+          `[ngx-component-meta] Rebuilt — ${updatedDocs.length} entries`,
+        );
       },
     });
 
@@ -227,7 +263,12 @@ async function runExtract(options: ExtractCliOptions): Promise<void> {
 
 function writeOutput(
   docs: (ComponentDoc | PipeDoc)[],
-  options: { format: string; pretty: boolean; split: boolean; output: string | undefined },
+  options: {
+    format: string;
+    pretty: boolean;
+    split: boolean;
+    output: string | undefined;
+  },
 ): void {
   if (options.format === 'markdown') {
     if (options.split && options.output) {
@@ -251,7 +292,8 @@ function writeOutput(
       }
     }
   } else {
-    const formatter = options.format === 'compodoc' ? formatCompodoc : formatJson;
+    const formatter =
+      options.format === 'compodoc' ? formatCompodoc : formatJson;
     const output = formatter(docs, options.pretty);
     if (options.output) {
       const outputPath = getSafeOutputPath(options.output);
@@ -270,7 +312,9 @@ function getSafeOutputPath(outputPath: string): string {
 
   const rel = path.relative(cwd, resolved);
   if (rel.startsWith('..') || path.isAbsolute(rel)) {
-    console.error(`Error: Output path must be within the current working directory. Path provided resolves to: ${resolved}`);
+    console.error(
+      `Error: Output path must be within the current working directory. Path provided resolves to: ${resolved}`,
+    );
     process.exit(1);
   }
 
@@ -359,7 +403,7 @@ async function resolveGlobs(patterns: string[]): Promise<string[]> {
           return [];
         }
       }
-    })
+    }),
   );
 
   const files = fileArrays.flat();
@@ -396,7 +440,11 @@ function simpleGlob(pattern: string): string[] {
       const entries = fs.readdirSync(dir, { withFileTypes: true });
       for (const entry of entries) {
         const fullPath = path.join(dir, entry.name);
-        if (entry.isDirectory() && !entry.name.startsWith('.') && entry.name !== 'node_modules') {
+        if (
+          entry.isDirectory() &&
+          !entry.name.startsWith('.') &&
+          entry.name !== 'node_modules'
+        ) {
           walk(fullPath);
         } else if (entry.isFile() && entry.name.endsWith(ext)) {
           results.push(fullPath);
@@ -411,7 +459,7 @@ function simpleGlob(pattern: string): string[] {
   return results;
 }
 
-main().catch(err => {
+main().catch((err) => {
   console.error(err);
   process.exit(1);
 });

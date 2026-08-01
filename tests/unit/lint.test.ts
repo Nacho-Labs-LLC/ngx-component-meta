@@ -1,7 +1,11 @@
 import { describe, it, expect } from 'vitest';
 import { lint } from '../../src/lint.js';
 import type { LintRuleConfig } from '../../src/lint.js';
-import { formatLintText, formatLintJson, formatLintStylish } from '../../src/lint-formatters.js';
+import {
+  formatLintText,
+  formatLintJson,
+  formatLintStylish,
+} from '../../src/lint-formatters.js';
 import { parseAllFixture, parseInlineAll } from '../helpers.js';
 import type { ParseResult } from '../../src/types.js';
 
@@ -23,9 +27,13 @@ describe('lint', () => {
   describe('require-input-description', () => {
     it('passes when all inputs have descriptions', () => {
       const docs = parseAllFixture('decorator-basic.component.ts');
-      const result = lint(docs, { rules: { 'require-input-description': 'error' } });
+      const result = lint(docs, {
+        rules: { 'require-input-description': 'error' },
+      });
 
-      const inputDescViolations = result.violations.filter(v => v.rule === 'require-input-description');
+      const inputDescViolations = result.violations.filter(
+        (v) => v.rule === 'require-input-description',
+      );
       expect(inputDescViolations).toHaveLength(0);
     });
 
@@ -39,8 +47,12 @@ describe('lint', () => {
         }
       `);
 
-      const result = lint(docs, { rules: { 'require-input-description': 'error' } });
-      const violations = result.violations.filter(v => v.rule === 'require-input-description');
+      const result = lint(docs, {
+        rules: { 'require-input-description': 'error' },
+      });
+      const violations = result.violations.filter(
+        (v) => v.rule === 'require-input-description',
+      );
 
       expect(violations).toHaveLength(1);
       expect(violations[0].severity).toBe('error');
@@ -53,9 +65,13 @@ describe('lint', () => {
   describe('require-output-description', () => {
     it('passes when all outputs have descriptions', () => {
       const docs = parseAllFixture('decorator-basic.component.ts');
-      const result = lint(docs, { rules: { 'require-output-description': 'error' } });
+      const result = lint(docs, {
+        rules: { 'require-output-description': 'error' },
+      });
 
-      const outputDescViolations = result.violations.filter(v => v.rule === 'require-output-description');
+      const outputDescViolations = result.violations.filter(
+        (v) => v.rule === 'require-output-description',
+      );
       expect(outputDescViolations).toHaveLength(0);
     });
 
@@ -69,8 +85,12 @@ describe('lint', () => {
         }
       `);
 
-      const result = lint(docs, { rules: { 'require-output-description': 'error' } });
-      const violations = result.violations.filter(v => v.rule === 'require-output-description');
+      const result = lint(docs, {
+        rules: { 'require-output-description': 'error' },
+      });
+      const violations = result.violations.filter(
+        (v) => v.rule === 'require-output-description',
+      );
 
       expect(violations).toHaveLength(1);
       expect(violations[0].severity).toBe('error');
@@ -81,10 +101,14 @@ describe('lint', () => {
   describe('require-component-description', () => {
     it('passes when component has a description', () => {
       const docs = parseAllFixture('decorator-basic.component.ts');
-      const result = lint(docs, { rules: { 'require-component-description': 'warn' } });
+      const result = lint(docs, {
+        rules: { 'require-component-description': 'warn' },
+      });
 
       const compDescViolations = result.violations.filter(
-        v => v.rule === 'require-component-description' && v.component === 'ButtonComponent',
+        (v) =>
+          v.rule === 'require-component-description' &&
+          v.component === 'ButtonComponent',
       );
       expect(compDescViolations).toHaveLength(0);
     });
@@ -97,8 +121,12 @@ describe('lint', () => {
         export class TestComponent {}
       `);
 
-      const result = lint(docs, { rules: { 'require-component-description': 'warn' } });
-      const violations = result.violations.filter(v => v.rule === 'require-component-description');
+      const result = lint(docs, {
+        rules: { 'require-component-description': 'warn' },
+      });
+      const violations = result.violations.filter(
+        (v) => v.rule === 'require-component-description',
+      );
 
       expect(violations).toHaveLength(1);
       expect(violations[0].severity).toBe('warn');
@@ -115,8 +143,12 @@ describe('lint', () => {
         }
       `);
 
-      const result = lint(docs, { rules: { 'require-component-description': 'warn' } });
-      const violations = result.violations.filter(v => v.rule === 'require-component-description');
+      const result = lint(docs, {
+        rules: { 'require-component-description': 'warn' },
+      });
+      const violations = result.violations.filter(
+        (v) => v.rule === 'require-component-description',
+      );
 
       expect(violations).toHaveLength(1);
       expect(violations[0].message).toContain('Pipe is missing');
@@ -124,10 +156,14 @@ describe('lint', () => {
 
     it('passes when pipe has a description', () => {
       const docs = parseAllFixture('pipe-basic.ts');
-      const result = lint(docs, { rules: { 'require-component-description': 'warn' } });
+      const result = lint(docs, {
+        rules: { 'require-component-description': 'warn' },
+      });
 
       const pipeViolations = result.violations.filter(
-        v => v.rule === 'require-component-description' && v.component === 'TruncatePipe',
+        (v) =>
+          v.rule === 'require-component-description' &&
+          v.component === 'TruncatePipe',
       );
       expect(pipeViolations).toHaveLength(0);
     });
@@ -138,7 +174,9 @@ describe('lint', () => {
       const docs = parseAllFixture('decorator-basic.component.ts');
       const result = lint(docs, { rules: { 'no-any-inputs': 'warn' } });
 
-      const anyViolations = result.violations.filter(v => v.rule === 'no-any-inputs');
+      const anyViolations = result.violations.filter(
+        (v) => v.rule === 'no-any-inputs',
+      );
       expect(anyViolations).toHaveLength(0);
     });
 
@@ -155,7 +193,9 @@ describe('lint', () => {
       `);
 
       const result = lint(docs, { rules: { 'no-any-inputs': 'error' } });
-      const violations = result.violations.filter(v => v.rule === 'no-any-inputs');
+      const violations = result.violations.filter(
+        (v) => v.rule === 'no-any-inputs',
+      );
 
       expect(violations).toHaveLength(1);
       expect(violations[0].severity).toBe('error');
@@ -177,7 +217,9 @@ describe('lint', () => {
       `);
 
       const result = lint(docs, { rules: { 'no-any-outputs': 'error' } });
-      const violations = result.violations.filter(v => v.rule === 'no-any-outputs');
+      const violations = result.violations.filter(
+        (v) => v.rule === 'no-any-outputs',
+      );
 
       expect(violations).toHaveLength(1);
       expect(violations[0].member).toBe('changed');
@@ -189,7 +231,9 @@ describe('lint', () => {
       const docs = parseAllFixture('decorator-basic.component.ts');
       const result = lint(docs, { rules: { 'require-selector': 'error' } });
 
-      const selectorViolations = result.violations.filter(v => v.rule === 'require-selector');
+      const selectorViolations = result.violations.filter(
+        (v) => v.rule === 'require-selector',
+      );
       expect(selectorViolations).toHaveLength(0);
     });
 
@@ -203,7 +247,9 @@ describe('lint', () => {
       `);
 
       const result = lint(docs, { rules: { 'require-selector': 'error' } });
-      const violations = result.violations.filter(v => v.rule === 'require-selector');
+      const violations = result.violations.filter(
+        (v) => v.rule === 'require-selector',
+      );
 
       expect(violations).toHaveLength(1);
       expect(violations[0].severity).toBe('error');
@@ -224,8 +270,12 @@ describe('lint', () => {
         }
       `);
 
-      const result = lint(docs, { rules: { 'no-required-with-default': 'warn' } });
-      const violations = result.violations.filter(v => v.rule === 'no-required-with-default');
+      const result = lint(docs, {
+        rules: { 'no-required-with-default': 'warn' },
+      });
+      const violations = result.violations.filter(
+        (v) => v.rule === 'no-required-with-default',
+      );
 
       expect(violations).toHaveLength(1);
       expect(violations[0].severity).toBe('warn');
@@ -234,9 +284,13 @@ describe('lint', () => {
 
     it('passes when required input has no default', () => {
       const docs = parseAllFixture('decorator-basic.component.ts');
-      const result = lint(docs, { rules: { 'no-required-with-default': 'warn' } });
+      const result = lint(docs, {
+        rules: { 'no-required-with-default': 'warn' },
+      });
 
-      const violations = result.violations.filter(v => v.rule === 'no-required-with-default');
+      const violations = result.violations.filter(
+        (v) => v.rule === 'no-required-with-default',
+      );
       expect(violations).toHaveLength(0);
     });
   });
@@ -256,7 +310,9 @@ describe('lint', () => {
         rules: { 'require-input-description': 'off' },
       });
 
-      const violations = result.violations.filter(v => v.rule === 'require-input-description');
+      const violations = result.violations.filter(
+        (v) => v.rule === 'require-input-description',
+      );
       expect(violations).toHaveLength(0);
     });
 
@@ -274,7 +330,9 @@ describe('lint', () => {
         rules: { 'require-input-description': 'warn' },
       });
 
-      const violations = result.violations.filter(v => v.rule === 'require-input-description');
+      const violations = result.violations.filter(
+        (v) => v.rule === 'require-input-description',
+      );
       expect(violations).toHaveLength(1);
       expect(violations[0].severity).toBe('warn');
     });
@@ -312,7 +370,9 @@ describe('lint', () => {
       expect(result.summary.passed).toBe(1);
       expect(result.summary.errors).toBeGreaterThan(0);
       expect(result.summary.warnings).toBeGreaterThan(0);
-      expect(result.summary.errors + result.summary.warnings).toBe(result.violations.length);
+      expect(result.summary.errors + result.summary.warnings).toBe(
+        result.violations.length,
+      );
     });
   });
 
@@ -345,7 +405,12 @@ describe('lint', () => {
       const result = lint(emptyResult());
 
       expect(result.violations).toHaveLength(0);
-      expect(result.summary).toEqual({ errors: 0, warnings: 0, components: 0, passed: 0 });
+      expect(result.summary).toEqual({
+        errors: 0,
+        warnings: 0,
+        components: 0,
+        passed: 0,
+      });
     });
   });
 
@@ -363,12 +428,16 @@ describe('lint', () => {
       const result = lint(docs);
 
       // require-input-description defaults to 'error'
-      const inputViolations = result.violations.filter(v => v.rule === 'require-input-description');
+      const inputViolations = result.violations.filter(
+        (v) => v.rule === 'require-input-description',
+      );
       expect(inputViolations).toHaveLength(1);
       expect(inputViolations[0].severity).toBe('error');
 
       // require-component-description defaults to 'warn'
-      const compViolations = result.violations.filter(v => v.rule === 'require-component-description');
+      const compViolations = result.violations.filter(
+        (v) => v.rule === 'require-component-description',
+      );
       expect(compViolations).toHaveLength(1);
       expect(compViolations[0].severity).toBe('warn');
     });

@@ -1,4 +1,12 @@
-import { Component, Input, Output, EventEmitter, input, output, model } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  input,
+  output,
+  model,
+} from '@angular/core';
 
 /**
  * Component mixing both decorator and signal APIs.

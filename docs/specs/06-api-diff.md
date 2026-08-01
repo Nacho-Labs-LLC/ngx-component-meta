@@ -38,7 +38,7 @@ BREAKING:
     ✗ input removed: variant (type: 'primary' | 'secondary' | 'danger')
     ✗ input type changed: disabled (boolean → string)
 
-  CardComponent  
+  CardComponent
     ✗ input became required: title (was optional)
 
 NON-BREAKING:
@@ -61,7 +61,7 @@ NON-BREAKING:
       "details": { "type": "'primary' | 'secondary' | 'danger'" }
     },
     {
-      "component": "ButtonComponent", 
+      "component": "ButtonComponent",
       "change": "input-type-changed",
       "name": "disabled",
       "details": { "before": "boolean", "after": "string" }
@@ -70,7 +70,10 @@ NON-BREAKING:
       "component": "CardComponent",
       "change": "input-became-required",
       "name": "title",
-      "details": { "before": { "required": false }, "after": { "required": true } }
+      "details": {
+        "before": { "required": false },
+        "after": { "required": true }
+      }
     }
   ],
   "nonBreaking": [
@@ -78,7 +81,11 @@ NON-BREAKING:
       "component": "ButtonComponent",
       "change": "input-added",
       "name": "size",
-      "details": { "type": "'sm' | 'md' | 'lg'", "required": false, "default": "'md'" }
+      "details": {
+        "type": "'sm' | 'md' | 'lg'",
+        "required": false,
+        "default": "'md'"
+      }
     },
     {
       "component": "CardComponent",
@@ -98,23 +105,24 @@ NON-BREAKING:
 
 ### Breaking Changes
 
-| Component | Change | Name | Details |
-|-----------|--------|------|---------|
-| `ButtonComponent` | Input removed | `variant` | type: `'primary' \| 'secondary' \| 'danger'` |
-| `ButtonComponent` | Input type changed | `disabled` | `boolean` → `string` |
-| `CardComponent` | Input became required | `title` | was optional |
+| Component         | Change                | Name       | Details                                      |
+| ----------------- | --------------------- | ---------- | -------------------------------------------- |
+| `ButtonComponent` | Input removed         | `variant`  | type: `'primary' \| 'secondary' \| 'danger'` |
+| `ButtonComponent` | Input type changed    | `disabled` | `boolean` → `string`                         |
+| `CardComponent`   | Input became required | `title`    | was optional                                 |
 
 ### Non-Breaking Changes
 
-| Component | Change | Name | Details |
-|-----------|--------|------|---------|
-| `ButtonComponent` | Input added | `size` | type: `'sm' \| 'md' \| 'lg'`, default: `'md'` |
-| `CardComponent` | Output added | `closed` | type: `void` |
+| Component         | Change       | Name     | Details                                       |
+| ----------------- | ------------ | -------- | --------------------------------------------- |
+| `ButtonComponent` | Input added  | `size`   | type: `'sm' \| 'md' \| 'lg'`, default: `'md'` |
+| `CardComponent`   | Output added | `closed` | type: `void`                                  |
 ```
 
 ## Change classification
 
 ### Breaking changes
+
 - Input removed
 - Output removed
 - Model removed
@@ -130,6 +138,7 @@ NON-BREAKING:
 - Method return type changed
 
 ### Non-breaking changes
+
 - Input added (optional)
 - Input added (required) — debatable, flagged as "potentially breaking"
 - Output added
@@ -177,6 +186,7 @@ export function diff(
 ### How git-based diffing works
 
 When `--base main` is specified:
+
 1. Run `git stash` (if uncommitted changes) or use a temp worktree
 2. `git show main:tsconfig.json` → parse base tsconfig
 3. `git ls-tree -r main --name-only '*.component.ts'` → get base file list

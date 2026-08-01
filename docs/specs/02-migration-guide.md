@@ -3,6 +3,7 @@
 ## Problem
 
 Users evaluating `ngx-component-meta` need:
+
 1. A clear README explaining what it is and why it exists
 2. A migration guide showing exactly how to replace Compodoc in each use case
 3. API documentation for the programmatic interface
@@ -83,53 +84,62 @@ Cover these migration scenarios with before/after code:
 #### Scenario A: Storybook (manual wiring)
 
 Before:
+
 ```bash
 npx compodoc -p tsconfig.json -e json -d .
 ```
+
 ```ts
 // preview.ts
-import docJson from "../documentation.json";
+import docJson from '../documentation.json';
 setCompodocJson(docJson);
 ```
 
 After (Mode A — drop-in):
+
 ```ts
-import { parse } from "ngx-component-meta";
-import { toCompodocJson } from "ngx-component-meta/storybook";
-setCompodocJson(toCompodocJson(parse(["src/**/*.component.ts"])));
+import { parse } from 'ngx-component-meta';
+import { toCompodocJson } from 'ngx-component-meta/storybook';
+setCompodocJson(toCompodocJson(parse(['src/**/*.component.ts'])));
 ```
 
 After (Mode B — direct):
+
 ```ts
-import { createArgTypesExtractor } from "ngx-component-meta/storybook";
+import { createArgTypesExtractor } from 'ngx-component-meta/storybook';
 export default {
   parameters: {
-    docs: { extractArgTypes: createArgTypesExtractor("./tsconfig.json") }
-  }
+    docs: { extractArgTypes: createArgTypesExtractor('./tsconfig.json') },
+  },
 };
 ```
 
 #### Scenario B: Storybook (angular.json builder)
 
 Before:
+
 ```json
 { "compodoc": true, "compodocArgs": [...] }
 ```
 
 After:
+
 ```json
 { "compodoc": false }
 ```
-+ add `ngx-component-meta-storybook` preset (link to Spec 01)
+
+- add `ngx-component-meta-storybook` preset (link to Spec 01)
 
 #### Scenario C: CI/CD pipeline generating documentation.json
 
 Before:
+
 ```bash
 npx compodoc -p tsconfig.json -e json -d docs/
 ```
 
 After:
+
 ```bash
 npx ngx-component-meta -p tsconfig.json -f compodoc -o docs/documentation.json
 ```
@@ -137,22 +147,30 @@ npx ngx-component-meta -p tsconfig.json -f compodoc -o docs/documentation.json
 #### Scenario D: Custom doc site reading documentation.json
 
 Before:
+
 ```ts
 import docs from './documentation.json';
-const comp = docs.components.find(c => c.name === 'MyComponent');
-comp.inputsClass.forEach(input => { /* render */ });
+const comp = docs.components.find((c) => c.name === 'MyComponent');
+comp.inputsClass.forEach((input) => {
+  /* render */
+});
 ```
 
 After (compat mode — zero changes needed):
+
 ```bash
 # Generate Compodoc-compatible JSON
 npx ngx-component-meta -f compodoc -o documentation.json "src/**/*.ts"
 ```
+
 Existing code continues to work. For new code, use the native format directly:
+
 ```ts
 import { parse } from 'ngx-component-meta';
 const docs = parse(['src/my.component.ts']);
-docs[0].inputs.forEach(input => { /* render */ });
+docs[0].inputs.forEach((input) => {
+  /* render */
+});
 ```
 
 #### Scenario E: IDE/language server consuming metadata
@@ -166,24 +184,25 @@ const docs = parser.parse(['src/button/button.component.ts']);
 
 #### Compodoc CLI flag mapping
 
-| Compodoc flag | ngx-component-meta equivalent |
-|---|---|
-| `-p tsconfig.json` | `-p tsconfig.json` |
-| `-e json` | `-f json` (default) |
-| `-d outputDir` | `-o outputDir/documentation.json` |
-| `--disablePrivate` | Default behavior (private members always excluded) |
-| `--disableInternal` | Default behavior (@internal always excluded) |
-| `--disableLifeCycleHooks` | Default behavior (lifecycle hooks always excluded) |
-| `--disableProtected` | Use `propFilter` to exclude protected members |
-| `--disableRoutesGraph` | N/A (no route analysis — this is a focused metadata tool) |
-| `-s` / `--serve` | N/A (no built-in server — use any static server) |
-| `-w` / `--watch` | `--watch` (Spec 03) |
+| Compodoc flag             | ngx-component-meta equivalent                             |
+| ------------------------- | --------------------------------------------------------- |
+| `-p tsconfig.json`        | `-p tsconfig.json`                                        |
+| `-e json`                 | `-f json` (default)                                       |
+| `-d outputDir`            | `-o outputDir/documentation.json`                         |
+| `--disablePrivate`        | Default behavior (private members always excluded)        |
+| `--disableInternal`       | Default behavior (@internal always excluded)              |
+| `--disableLifeCycleHooks` | Default behavior (lifecycle hooks always excluded)        |
+| `--disableProtected`      | Use `propFilter` to exclude protected members             |
+| `--disableRoutesGraph`    | N/A (no route analysis — this is a focused metadata tool) |
+| `-s` / `--serve`          | N/A (no built-in server — use any static server)          |
+| `-w` / `--watch`          | `--watch` (Spec 03)                                       |
 
 ### 3. docs/signal-support.md
 
 A focused document showing how `ngx-component-meta` handles every Angular signal pattern, with input source code and expected JSON output side by side. This is the key differentiator vs Compodoc.
 
 Cover:
+
 - `input<T>()` — optional, no default
 - `input<T>(defaultValue)` — optional with default
 - `input.required<T>()` — required
@@ -199,6 +218,7 @@ Cover:
 ### 4. CHANGELOG.md
 
 Start with:
+
 ```
 # Changelog
 

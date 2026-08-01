@@ -17,6 +17,7 @@ ngx-component-meta --watch -p tsconfig.json -f compodoc -o documentation.json "s
 ```
 
 Behavior:
+
 1. Initial parse → write output
 2. Watch all matched `.ts` files using `fs.watch` (or `chokidar` if we want cross-platform reliability)
 3. On change: re-parse only the changed file(s) using an incremental `ts.Program`
@@ -56,7 +57,7 @@ The TypeScript compiler API supports incremental program creation:
 const newProgram = ts.createProgram({
   rootNames: allFiles,
   options: compilerOptions,
-  oldProgram: previousProgram,  // reuses unchanged source files
+  oldProgram: previousProgram, // reuses unchanged source files
 });
 ```
 
@@ -65,11 +66,13 @@ This is significantly faster than creating a fresh program — only changed file
 #### File watching strategy
 
 Option A: Node.js `fs.watch` (zero deps)
+
 - Works on macOS (FSEvents), Linux (inotify), Windows (ReadDirectoryChangesW)
 - Known quirks: may fire multiple events per save, doesn't support recursive on all platforms
 - Requires debouncing (100ms) to coalesce rapid saves
 
 Option B: `chokidar` (battle-tested, but adds a dependency)
+
 - Used by Vite, Webpack, Storybook itself
 - Handles cross-platform edge cases
 - ~50KB dep

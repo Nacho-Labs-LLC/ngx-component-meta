@@ -3,7 +3,12 @@ import fs from 'fs';
 import os from 'os';
 import path from 'path';
 import { createParserFromOptions } from '../src/parser.js';
-import type { ComponentDoc, PipeDoc, ParseResult, ParserOptions } from '../src/types.js';
+import type {
+  ComponentDoc,
+  PipeDoc,
+  ParseResult,
+  ParserOptions,
+} from '../src/types.js';
 
 const STUBS_DIR = path.join(import.meta.dirname, 'stubs');
 const FIXTURES_DIR = path.join(import.meta.dirname, 'fixtures');
@@ -41,7 +46,8 @@ export function parseComponents(
   options?: ParserOptions,
 ): ComponentDoc[] {
   return parseFixture(fixtureName, options).filter(
-    (d): d is ComponentDoc => 'kind' in d && (d.kind === 'component' || d.kind === 'directive'),
+    (d): d is ComponentDoc =>
+      'kind' in d && (d.kind === 'component' || d.kind === 'directive'),
   );
 }
 
@@ -65,7 +71,8 @@ export function parseFirstComponent(
   options?: ParserOptions,
 ): ComponentDoc {
   const docs = parseComponents(fixtureName, options);
-  if (docs.length === 0) throw new Error(`No components found in fixture: ${fixtureName}`);
+  if (docs.length === 0)
+    throw new Error(`No components found in fixture: ${fixtureName}`);
   return docs[0];
 }
 
@@ -85,7 +92,10 @@ export function parseAllFixture(
  * Parse an inline component string and return the full ParseResult.
  * Writes a temp file, parses it, and cleans up.
  */
-export function parseInlineAll(source: string, options?: ParserOptions): ParseResult {
+export function parseInlineAll(
+  source: string,
+  options?: ParserOptions,
+): ParseResult {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ngx-meta-lint-'));
   const tmpFile = path.join(tmpDir, 'inline.component.ts');
   fs.writeFileSync(tmpFile, source, 'utf-8');

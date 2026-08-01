@@ -1,4 +1,12 @@
-import type { ComponentDoc, PipeDoc, InputDoc, OutputDoc, ModelDoc, MethodDoc, PropertyDoc } from './types.js';
+import type {
+  ComponentDoc,
+  PipeDoc,
+  InputDoc,
+  OutputDoc,
+  ModelDoc,
+  MethodDoc,
+  PropertyDoc,
+} from './types.js';
 
 export interface ApiDiff {
   breaking: ApiChange[];
@@ -16,7 +24,9 @@ export interface ApiChange {
 type DocEntry = ComponentDoc | PipeDoc;
 
 function isComponentDoc(doc: DocEntry): doc is ComponentDoc {
-  return 'kind' in doc && (doc.kind === 'component' || doc.kind === 'directive');
+  return (
+    'kind' in doc && (doc.kind === 'component' || doc.kind === 'directive')
+  );
 }
 
 function buildNameMap<T extends { name: string }>(items: T[]): Map<string, T> {
@@ -77,14 +87,20 @@ function diffInputs(
     }
 
     if (baseInput.defaultValue !== headInput.defaultValue) {
-      if (baseInput.defaultValue !== undefined && headInput.defaultValue === undefined) {
+      if (
+        baseInput.defaultValue !== undefined &&
+        headInput.defaultValue === undefined
+      ) {
         breaking.push({
           component,
           change: 'input-default-removed',
           name,
           details: { before: baseInput.defaultValue, after: undefined },
         });
-      } else if (baseInput.defaultValue === undefined && headInput.defaultValue !== undefined) {
+      } else if (
+        baseInput.defaultValue === undefined &&
+        headInput.defaultValue !== undefined
+      ) {
         nonBreaking.push({
           component,
           change: 'input-default-added',
@@ -96,7 +112,10 @@ function diffInputs(
           component,
           change: 'default-changed',
           name,
-          details: { before: baseInput.defaultValue, after: headInput.defaultValue },
+          details: {
+            before: baseInput.defaultValue,
+            after: headInput.defaultValue,
+          },
         });
       }
     }
@@ -106,7 +125,10 @@ function diffInputs(
         component,
         change: 'description-changed',
         name,
-        details: { before: baseInput.description, after: headInput.description },
+        details: {
+          before: baseInput.description,
+          after: headInput.description,
+        },
       });
     }
   }
@@ -233,14 +255,20 @@ function diffModels(
     }
 
     if (baseModel.defaultValue !== headModel.defaultValue) {
-      if (baseModel.defaultValue !== undefined && headModel.defaultValue === undefined) {
+      if (
+        baseModel.defaultValue !== undefined &&
+        headModel.defaultValue === undefined
+      ) {
         breaking.push({
           component,
           change: 'model-default-removed',
           name,
           details: { before: baseModel.defaultValue, after: undefined },
         });
-      } else if (baseModel.defaultValue === undefined && headModel.defaultValue !== undefined) {
+      } else if (
+        baseModel.defaultValue === undefined &&
+        headModel.defaultValue !== undefined
+      ) {
         nonBreaking.push({
           component,
           change: 'model-default-added',
@@ -252,7 +280,10 @@ function diffModels(
           component,
           change: 'model-default-changed',
           name,
-          details: { before: baseModel.defaultValue, after: headModel.defaultValue },
+          details: {
+            before: baseModel.defaultValue,
+            after: headModel.defaultValue,
+          },
         });
       }
     }
@@ -297,7 +328,10 @@ function diffMethods(
         component,
         change: 'method-return-type-changed',
         name,
-        details: { before: baseMethod.returnType, after: headMethod.returnType },
+        details: {
+          before: baseMethod.returnType,
+          after: headMethod.returnType,
+        },
       });
     }
 
@@ -311,7 +345,11 @@ function diffMethods(
           component,
           change: 'method-param-type-changed',
           name,
-          details: { param: paramName, before: baseParam.type, after: headParam.type },
+          details: {
+            param: paramName,
+            before: baseParam.type,
+            after: headParam.type,
+          },
         });
       }
     }
@@ -394,7 +432,13 @@ function diffProperties(
 }
 
 function isPipeDoc(doc: DocEntry): doc is PipeDoc {
-  return 'pipeName' in doc && !('kind' in doc && ((doc as any).kind === 'component' || (doc as any).kind === 'directive'));
+  return (
+    'pipeName' in doc &&
+    !(
+      'kind' in doc &&
+      ((doc as any).kind === 'component' || (doc as any).kind === 'directive')
+    )
+  );
 }
 
 function diffPipeDocs(
@@ -433,7 +477,10 @@ function diffPipeDocs(
       signatureChanged = true;
     } else {
       for (let i = 0; i < baseParams.length; i++) {
-        if (baseParams[i].type !== headParams[i].type || baseParams[i].name !== headParams[i].name) {
+        if (
+          baseParams[i].type !== headParams[i].type ||
+          baseParams[i].name !== headParams[i].name
+        ) {
           signatureChanged = true;
           break;
         }
@@ -499,7 +546,13 @@ function diffComponentDocs(
     diffOutputs(name, baseDoc.outputs, headDoc.outputs, breaking, nonBreaking);
     diffModels(name, baseDoc.models, headDoc.models, breaking, nonBreaking);
     diffMethods(name, baseDoc.methods, headDoc.methods, breaking, nonBreaking);
-    diffProperties(name, baseDoc.properties, headDoc.properties, breaking, nonBreaking);
+    diffProperties(
+      name,
+      baseDoc.properties,
+      headDoc.properties,
+      breaking,
+      nonBreaking,
+    );
   }
 
   for (const [name] of headMap) {

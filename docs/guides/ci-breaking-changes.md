@@ -122,23 +122,23 @@ jobs:
 
 ### Action Inputs
 
-| Input | Required | Default | Description |
-|-------|----------|---------|-------------|
-| `base` | Yes | | Path to baseline JSON file |
-| `head` | No | | Path to head JSON file (omit to parse live source) |
-| `project` | No | | Path to tsconfig.json (used when `head` is omitted) |
-| `format` | No | `markdown` | Output format: `text`, `json`, `markdown` |
-| `fail-on-breaking` | No | `true` | Fail the action when breaking changes are found |
-| `comment-on-pr` | No | `true` | Post/update a PR comment with the diff |
+| Input              | Required | Default    | Description                                         |
+| ------------------ | -------- | ---------- | --------------------------------------------------- |
+| `base`             | Yes      |            | Path to baseline JSON file                          |
+| `head`             | No       |            | Path to head JSON file (omit to parse live source)  |
+| `project`          | No       |            | Path to tsconfig.json (used when `head` is omitted) |
+| `format`           | No       | `markdown` | Output format: `text`, `json`, `markdown`           |
+| `fail-on-breaking` | No       | `true`     | Fail the action when breaking changes are found     |
+| `comment-on-pr`    | No       | `true`     | Post/update a PR comment with the diff              |
 
 ### Action Outputs
 
-| Output | Description |
-|--------|-------------|
-| `breaking-count` | Number of breaking changes |
-| `non-breaking-count` | Number of non-breaking changes |
-| `has-breaking` | `'true'` or `'false'` |
-| `diff-output` | The formatted diff output string |
+| Output               | Description                      |
+| -------------------- | -------------------------------- |
+| `breaking-count`     | Number of breaking changes       |
+| `non-breaking-count` | Number of non-breaking changes   |
+| `has-breaking`       | `'true'` or `'false'`            |
+| `diff-output`        | The formatted diff output string |
 
 ### What the PR Comment Looks Like
 
@@ -154,55 +154,60 @@ The comment is idempotent -- it updates in place on each push, so the PR never a
 
 These changes will fail CI when `fail-on-breaking` is true:
 
-| Change | Example |
-|--------|---------|
-| `component-removed` | `ButtonComponent` deleted entirely |
-| `selector-changed` | `app-button` changed to `ui-button` |
-| `input-removed` | `@Input() variant` deleted |
-| `input-type-changed` | `variant: string` changed to `variant: number` |
-| `input-became-required` | Optional input is now `input.required<string>()` |
-| `input-added-required` | New required input with no default |
-| `input-default-removed` | Default value removed from an existing input |
-| `output-removed` | `@Output() clicked` deleted |
-| `output-type-changed` | `EventEmitter<void>` changed to `EventEmitter<MouseEvent>` |
-| `model-removed` | `model()` binding deleted |
-| `model-type-changed` | `model<string>()` changed to `model<number>()` |
-| `model-became-required` | Optional model is now `model.required<string>()` |
-| `model-default-removed` | Default value removed from a model |
-| `method-removed` | Public method deleted |
-| `method-return-type-changed` | Return type changed |
-| `method-param-type-changed` | Parameter type changed |
-| `method-param-added-required` | New required parameter added to existing method |
-| `pipe-removed` | Pipe class deleted |
-| `pipe-transform-changed` | Transform signature changed (params or return type) |
+| Change                        | Example                                                    |
+| ----------------------------- | ---------------------------------------------------------- |
+| `component-removed`           | `ButtonComponent` deleted entirely                         |
+| `selector-changed`            | `app-button` changed to `ui-button`                        |
+| `input-removed`               | `@Input() variant` deleted                                 |
+| `input-type-changed`          | `variant: string` changed to `variant: number`             |
+| `input-became-required`       | Optional input is now `input.required<string>()`           |
+| `input-added-required`        | New required input with no default                         |
+| `input-default-removed`       | Default value removed from an existing input               |
+| `output-removed`              | `@Output() clicked` deleted                                |
+| `output-type-changed`         | `EventEmitter<void>` changed to `EventEmitter<MouseEvent>` |
+| `model-removed`               | `model()` binding deleted                                  |
+| `model-type-changed`          | `model<string>()` changed to `model<number>()`             |
+| `model-became-required`       | Optional model is now `model.required<string>()`           |
+| `model-default-removed`       | Default value removed from a model                         |
+| `method-removed`              | Public method deleted                                      |
+| `method-return-type-changed`  | Return type changed                                        |
+| `method-param-type-changed`   | Parameter type changed                                     |
+| `method-param-added-required` | New required parameter added to existing method            |
+| `pipe-removed`                | Pipe class deleted                                         |
+| `pipe-transform-changed`      | Transform signature changed (params or return type)        |
 
 ## What Counts as Non-Breaking
 
 These are reported but do not fail CI:
 
-| Change | Example |
-|--------|---------|
-| `component-added` | New component introduced |
-| `input-added` | New optional input |
-| `input-became-optional` | Required input is now optional |
-| `input-default-added` | Default value added |
-| `default-changed` | Default value changed |
-| `description-changed` | JSDoc description updated |
-| `output-added` | New output |
-| `model-added` | New model binding |
-| `model-became-optional` | Required model is now optional |
-| `model-default-added` / `model-default-changed` | Model default changed |
-| `method-added` | New public method |
-| `method-param-added` (optional) | New optional parameter |
-| `property-added` / `property-removed` / `property-changed` | Public property changes |
-| `pipe-added` | New pipe introduced |
+| Change                                                     | Example                        |
+| ---------------------------------------------------------- | ------------------------------ |
+| `component-added`                                          | New component introduced       |
+| `input-added`                                              | New optional input             |
+| `input-became-optional`                                    | Required input is now optional |
+| `input-default-added`                                      | Default value added            |
+| `default-changed`                                          | Default value changed          |
+| `description-changed`                                      | JSDoc description updated      |
+| `output-added`                                             | New output                     |
+| `model-added`                                              | New model binding              |
+| `model-became-optional`                                    | Required model is now optional |
+| `model-default-added` / `model-default-changed`            | Model default changed          |
+| `method-added`                                             | New public method              |
+| `method-param-added` (optional)                            | New optional parameter         |
+| `property-added` / `property-removed` / `property-changed` | Public property changes        |
+| `pipe-added`                                               | New pipe introduced            |
 
 ## Programmatic Usage
 
 If you need custom logic (e.g., allowlisting certain changes or integrating with a different CI tool), use the API directly:
 
 ```typescript
-import { parse, diff, formatDiffText, formatDiffMarkdown } from 'ngx-component-meta';
+import {
+  parse,
+  diff,
+  formatDiffText,
+  formatDiffMarkdown,
+} from 'ngx-component-meta';
 import { readFileSync } from 'fs';
 
 const baseline = JSON.parse(readFileSync('baseline.json', 'utf-8'));

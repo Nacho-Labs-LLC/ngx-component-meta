@@ -192,6 +192,7 @@ activeTab = model.required<string>();
 ### Models in Compodoc-compatible output
 
 When using `toCompodocJson()`, each model generates two entries:
+
 - An input in `inputsClass` (e.g., `expanded`)
 - An output in `outputsClass` with a `Change` suffix (e.g., `expandedChange`)
 
@@ -202,6 +203,7 @@ This matches Angular's two-way binding convention where `[(expanded)]` desugars 
 Signal queries are extracted when `shouldIncludeQueries: true` is set in parser options.
 
 Supported query functions:
+
 - `viewChild()`
 - `viewChild.required()`
 - `viewChildren()`
@@ -319,6 +321,7 @@ export class ChildComponent extends BaseComponent {
 ```
 
 `ChildComponent` will include:
+
 - `visible` (inherited signal input from `BaseComponent`, `source: 'signal'`)
 - `label` (own signal input)
 - `reset` (inherited method)
@@ -328,6 +331,7 @@ Child class overrides take precedence. Set `shouldIncludeInherited: false` in pa
 ## How This Differs from Compodoc
 
 Compodoc has known issues with signal APIs:
+
 - `input()` calls are often not recognized or produce incorrect types
 - `input.required()` is not detected as required
 - `model()` signals are not supported at all

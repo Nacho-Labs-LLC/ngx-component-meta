@@ -4,7 +4,11 @@ import * as core from '@actions/core';
 import * as github from '@actions/github';
 import { diff } from '../../src/diff.js';
 import { createParser } from '../../src/parser.js';
-import { formatDiffText, formatDiffJson, formatDiffMarkdown } from '../../src/diff-formatters.js';
+import {
+  formatDiffText,
+  formatDiffJson,
+  formatDiffMarkdown,
+} from '../../src/diff-formatters.js';
 import type { ComponentDoc, PipeDoc } from '../../src/types.js';
 
 const COMMENT_MARKER = '<!-- ngx-component-meta-diff -->';
@@ -22,7 +26,9 @@ async function run(): Promise<void> {
     return;
   }
 
-  const baseDocs: (ComponentDoc | PipeDoc)[] = JSON.parse(fs.readFileSync(basePath, 'utf-8'));
+  const baseDocs: (ComponentDoc | PipeDoc)[] = JSON.parse(
+    fs.readFileSync(basePath, 'utf-8'),
+  );
 
   let headDocs: (ComponentDoc | PipeDoc)[];
 
@@ -49,7 +55,9 @@ async function run(): Promise<void> {
     const program = parser.getProgram();
     const sourceFiles = program
       .getSourceFiles()
-      .filter((sf) => !sf.isDeclarationFile && !sf.fileName.includes('node_modules'))
+      .filter(
+        (sf) => !sf.isDeclarationFile && !sf.fileName.includes('node_modules'),
+      )
       .map((sf) => sf.fileName);
     headDocs = parser.parse(sourceFiles);
   }
@@ -72,11 +80,18 @@ async function run(): Promise<void> {
 
   core.setOutput('breaking-count', String(result.summary.breaking));
   core.setOutput('non-breaking-count', String(result.summary.nonBreaking));
-  core.setOutput('has-breaking', result.summary.breaking > 0 ? 'true' : 'false');
+  core.setOutput(
+    'has-breaking',
+    result.summary.breaking > 0 ? 'true' : 'false',
+  );
   core.setOutput('diff-output', output);
 
   if (commentOnPr) {
-    await postPrComment(result.summary.breaking, result.summary.nonBreaking, output);
+    await postPrComment(
+      result.summary.breaking,
+      result.summary.nonBreaking,
+      output,
+    );
   }
 
   if (failOnBreaking && result.summary.breaking > 0) {
@@ -139,9 +154,7 @@ async function postPrComment(
     issue_number: issueNumber,
   });
 
-  const existing = comments.find(
-    (c) => c.body?.includes(COMMENT_MARKER),
-  );
+  const existing = comments.find((c) => c.body?.includes(COMMENT_MARKER));
 
   if (existing) {
     await octokit.rest.issues.updateComment({

@@ -41,14 +41,22 @@ function getImportModuleSpecifier(decl: ts.Declaration): string | undefined {
   // ImportSpecifier → NamedImports → ImportClause → ImportDeclaration
   if (ts.isImportSpecifier(decl)) {
     const importDecl = decl.parent?.parent?.parent;
-    if (importDecl && ts.isImportDeclaration(importDecl) && ts.isStringLiteral(importDecl.moduleSpecifier)) {
+    if (
+      importDecl &&
+      ts.isImportDeclaration(importDecl) &&
+      ts.isStringLiteral(importDecl.moduleSpecifier)
+    ) {
       return importDecl.moduleSpecifier.text;
     }
   }
   // NamespaceImport: import * as core from '@angular/core'
   if (ts.isNamespaceImport(decl)) {
     const importDecl = decl.parent?.parent;
-    if (importDecl && ts.isImportDeclaration(importDecl) && ts.isStringLiteral(importDecl.moduleSpecifier)) {
+    if (
+      importDecl &&
+      ts.isImportDeclaration(importDecl) &&
+      ts.isStringLiteral(importDecl.moduleSpecifier)
+    ) {
       return importDecl.moduleSpecifier.text;
     }
   }
@@ -92,7 +100,8 @@ function isCallFrom(
  */
 function getBaseIdentifier(node: ts.Expression): ts.Identifier | undefined {
   if (ts.isIdentifier(node)) return node;
-  if (ts.isPropertyAccessExpression(node)) return getBaseIdentifier(node.expression);
+  if (ts.isPropertyAccessExpression(node))
+    return getBaseIdentifier(node.expression);
   return undefined;
 }
 
@@ -115,16 +124,24 @@ export function getCallName(callExpr: ts.CallExpression): string | undefined {
  * - `input.required()` → 'input'
  * - `model.required()` → 'model'
  */
-export function getSignalBaseName(callExpr: ts.CallExpression): string | undefined {
+export function getSignalBaseName(
+  callExpr: ts.CallExpression,
+): string | undefined {
   const callee = callExpr.expression;
   if (ts.isIdentifier(callee)) return callee.text;
-  if (ts.isPropertyAccessExpression(callee) && ts.isIdentifier(callee.expression)) {
+  if (
+    ts.isPropertyAccessExpression(callee) &&
+    ts.isIdentifier(callee.expression)
+  ) {
     return callee.expression.text;
   }
   return undefined;
 }
 
-function resolveAliasedSymbol(checker: ts.TypeChecker, symbol: ts.Symbol): ts.Symbol {
+function resolveAliasedSymbol(
+  checker: ts.TypeChecker,
+  symbol: ts.Symbol,
+): ts.Symbol {
   while (symbol.flags & ts.SymbolFlags.Alias) {
     symbol = checker.getAliasedSymbol(symbol);
   }

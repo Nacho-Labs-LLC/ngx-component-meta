@@ -9,7 +9,12 @@ describe('extractTypeAlias', () => {
 
   function setup(sourceCode: string) {
     const filename = 'test.ts';
-    const sourceFileObj = ts.createSourceFile(filename, sourceCode, ts.ScriptTarget.Latest, true);
+    const sourceFileObj = ts.createSourceFile(
+      filename,
+      sourceCode,
+      ts.ScriptTarget.Latest,
+      true,
+    );
 
     const compilerHost: ts.CompilerHost = {
       getSourceFile: (fileName) => {
@@ -24,7 +29,7 @@ describe('extractTypeAlias', () => {
       useCaseSensitiveFileNames: () => true,
       getNewLine: () => '\n',
       fileExists: (fileName) => fileName === filename,
-      readFile: (fileName) => fileName === filename ? sourceCode : '',
+      readFile: (fileName) => (fileName === filename ? sourceCode : ''),
     };
 
     program = ts.createProgram([filename], {}, compilerHost);
@@ -33,13 +38,13 @@ describe('extractTypeAlias', () => {
 
     // Find the TypeAliasDeclaration
     let typeAliasNode: ts.TypeAliasDeclaration | undefined;
-    ts.forEachChild(sourceFile, node => {
+    ts.forEachChild(sourceFile, (node) => {
       if (ts.isTypeAliasDeclaration(node)) {
         typeAliasNode = node;
       }
     });
 
-    if (!typeAliasNode) throw new Error("No type alias found in source code");
+    if (!typeAliasNode) throw new Error('No type alias found in source code');
 
     return { checker, typeAliasNode, sourceFile };
   }
@@ -112,7 +117,7 @@ describe('extractTypeAlias', () => {
     // Create a fake node without a name
     const fakeNode = {
       ...typeAliasNode,
-      name: undefined
+      name: undefined,
     } as unknown as ts.TypeAliasDeclaration;
 
     const doc = extractTypeAlias(checker, fakeNode, sourceFile);

@@ -399,7 +399,15 @@ export interface ParseResult {
 // =============================================================================
 
 /** Union type for any member doc — used in propFilter. */
-export type MemberDoc = InputDoc | OutputDoc | ModelDoc | PropertyDoc | MethodDoc | QueryDoc | HostBindingDoc | HostListenerDoc;
+export type MemberDoc =
+  | InputDoc
+  | OutputDoc
+  | ModelDoc
+  | PropertyDoc
+  | MethodDoc
+  | QueryDoc
+  | HostBindingDoc
+  | HostListenerDoc;
 
 export interface ParserOptions {
   /**

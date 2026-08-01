@@ -1,6 +1,11 @@
 import ts from '@typescript/typescript6';
 import type { TypeAliasDoc } from '../types.js';
-import { getDescription, getRawDescription, getTags, isInternal } from '../utils/jsdoc.js';
+import {
+  getDescription,
+  getRawDescription,
+  getTags,
+  isInternal,
+} from '../utils/jsdoc.js';
 
 /**
  * Extract an exported type alias declaration into a TypeAliasDoc.

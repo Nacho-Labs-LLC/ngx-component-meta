@@ -45,7 +45,10 @@ function unwrapSignalType(checker: ts.TypeChecker, type: ts.Type): ts.Type {
 /**
  * Get type arguments from a generic type reference.
  */
-function getTypeArguments(checker: ts.TypeChecker, type: ts.Type): readonly ts.Type[] {
+function getTypeArguments(
+  checker: ts.TypeChecker,
+  type: ts.Type,
+): readonly ts.Type[] {
   if (type.isUnionOrIntersection()) return [];
   return checker.getTypeArguments(type as ts.TypeReference);
 }
@@ -78,11 +81,19 @@ export function getEmitterEventType(
   if (name === 'EventEmitter' || name === 'OutputEmitterRef') {
     const typeArgs = getTypeArguments(checker, type);
     if (typeArgs.length > 0) {
-      return checker.typeToString(typeArgs[0], enclosingDecl, ts.TypeFormatFlags.NoTruncation);
+      return checker.typeToString(
+        typeArgs[0],
+        enclosingDecl,
+        ts.TypeFormatFlags.NoTruncation,
+      );
     }
     return 'void';
   }
-  return checker.typeToString(type, enclosingDecl, ts.TypeFormatFlags.NoTruncation);
+  return checker.typeToString(
+    type,
+    enclosingDecl,
+    ts.TypeFormatFlags.NoTruncation,
+  );
 }
 
 /**
@@ -101,7 +112,7 @@ export function getPropertyType(
  */
 export function isOptionalType(type: ts.Type): boolean {
   if (type.isUnion()) {
-    return type.types.some(t => t.flags & ts.TypeFlags.Undefined);
+    return type.types.some((t) => t.flags & ts.TypeFlags.Undefined);
   }
   return false;
 }

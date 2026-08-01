@@ -20,7 +20,7 @@ describe('Storybook Compodoc compatibility', () => {
     const comp = json.components[0];
 
     expect(comp.inputsClass.length).toBeGreaterThan(0);
-    const labelInput = comp.inputsClass.find(i => i.name === 'label');
+    const labelInput = comp.inputsClass.find((i) => i.name === 'label');
     expect(labelInput).toBeDefined();
     expect(labelInput!.type).toBe('string');
     expect(labelInput!.optional).toBe(true);
@@ -33,7 +33,7 @@ describe('Storybook Compodoc compatibility', () => {
     const json = toCompodocJson(docs);
     const comp = json.components[0];
 
-    const variant = comp.inputsClass.find(i => i.name === 'btnVariant');
+    const variant = comp.inputsClass.find((i) => i.name === 'btnVariant');
     expect(variant).toBeDefined();
     expect(variant!.type).toBe('"primary" | "secondary" | "danger"');
   });
@@ -44,7 +44,7 @@ describe('Storybook Compodoc compatibility', () => {
     const comp = json.components[0];
 
     expect(comp.outputsClass.length).toBeGreaterThan(0);
-    const clicked = comp.outputsClass.find(o => o.name === 'clicked');
+    const clicked = comp.outputsClass.find((o) => o.name === 'clicked');
     expect(clicked).toBeDefined();
     expect(clicked!.decorators).toEqual([{ name: 'Output' }]);
   });
@@ -55,12 +55,12 @@ describe('Storybook Compodoc compatibility', () => {
     const comp = json.components[0];
 
     // Signal inputs should appear in inputsClass with synthetic decorator
-    const title = comp.inputsClass.find(i => i.name === 'title');
+    const title = comp.inputsClass.find((i) => i.name === 'title');
     expect(title).toBeDefined();
     expect(title!.decorators).toEqual([{ name: 'Input' }]);
     expect(title!.optional).toBe(false); // required
 
-    const size = comp.inputsClass.find(i => i.name === 'cardSize');
+    const size = comp.inputsClass.find((i) => i.name === 'cardSize');
     expect(size).toBeDefined();
     expect(size!.optional).toBe(true);
   });
@@ -71,11 +71,13 @@ describe('Storybook Compodoc compatibility', () => {
     const comp = json.components[0];
 
     // Model as input
-    const expandedInput = comp.inputsClass.find(i => i.name === 'expanded');
+    const expandedInput = comp.inputsClass.find((i) => i.name === 'expanded');
     expect(expandedInput).toBeDefined();
 
     // Model as output (with Change suffix)
-    const expandedOutput = comp.outputsClass.find(o => o.name === 'expandedChange');
+    const expandedOutput = comp.outputsClass.find(
+      (o) => o.name === 'expandedChange',
+    );
     expect(expandedOutput).toBeDefined();
     expect(expandedOutput!.decorators).toEqual([{ name: 'Output' }]);
   });
@@ -104,7 +106,7 @@ describe('Storybook Compodoc compatibility', () => {
     const json = toCompodocJson(docs);
     const comp = json.components[0];
 
-    const reset = comp.methodsClass.find(m => m.name === 'reset');
+    const reset = comp.methodsClass.find((m) => m.name === 'reset');
     expect(reset).toBeDefined();
     expect(reset!.returnType).toBe('void');
   });

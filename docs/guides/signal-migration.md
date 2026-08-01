@@ -116,7 +116,11 @@ Produces a Markdown report with tables -- useful for posting in PRs or team dash
 ## Programmatic Usage
 
 ```typescript
-import { createParser, computeStats, formatStatsText } from 'ngx-component-meta';
+import {
+  createParser,
+  computeStats,
+  formatStatsText,
+} from 'ngx-component-meta';
 
 const parser = createParser('./tsconfig.lib.json');
 const result = parser.parseAll(['src/**/*.ts']);
@@ -130,12 +134,12 @@ console.log(`Signal adoption: ${stats.signalAdoption}%`);
 
 Each component is classified into one of four statuses:
 
-| Status | Meaning |
-|--------|---------|
-| `fully-migrated` | All inputs and outputs use signals. Zero decorator bindings. |
-| `partially-migrated` | Mix of decorator and signal bindings. Migration in progress. |
-| `legacy` | All inputs and outputs use decorators. No signals adopted yet. |
-| `no-bindings` | Component has no inputs, outputs, or models (e.g., a layout wrapper). |
+| Status               | Meaning                                                               |
+| -------------------- | --------------------------------------------------------------------- |
+| `fully-migrated`     | All inputs and outputs use signals. Zero decorator bindings.          |
+| `partially-migrated` | Mix of decorator and signal bindings. Migration in progress.          |
+| `legacy`             | All inputs and outputs use decorators. No signals adopted yet.        |
+| `no-bindings`        | Component has no inputs, outputs, or models (e.g., a layout wrapper). |
 
 Models (`model()`) are always signal-based, so they always count toward signal adoption.
 
@@ -213,7 +217,7 @@ const stats = computeStats(result);
 
 // Components that need migration, sorted by most decorator bindings
 const needsWork = stats.components
-  .filter(c => c.status === 'legacy' || c.status === 'partially-migrated')
+  .filter((c) => c.status === 'legacy' || c.status === 'partially-migrated')
   .sort((a, b) => {
     const aTotal = a.inputs.decorator + a.outputs.decorator;
     const bTotal = b.inputs.decorator + b.outputs.decorator;
@@ -222,7 +226,9 @@ const needsWork = stats.components
 
 for (const comp of needsWork) {
   const decoratorCount = comp.inputs.decorator + comp.outputs.decorator;
-  console.log(`${comp.name} — ${decoratorCount} decorator bindings (${comp.filePath})`);
+  console.log(
+    `${comp.name} — ${decoratorCount} decorator bindings (${comp.filePath})`,
+  );
 }
 ```
 

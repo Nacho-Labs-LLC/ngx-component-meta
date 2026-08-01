@@ -38,38 +38,63 @@ export declare function Injectable(meta?: {
   providedIn?: 'root' | 'platform' | 'any' | null;
 }): ClassDecorator;
 
-export declare function Input(opts?: string | {
-  required?: boolean;
-  alias?: string;
-  transform?: (value: any) => any;
-}): PropertyDecorator;
+export declare function Input(
+  opts?:
+    | string
+    | {
+        required?: boolean;
+        alias?: string;
+        transform?: (value: any) => any;
+      },
+): PropertyDecorator;
 
-export declare function Output(opts?: string | {
-  alias?: string;
-}): PropertyDecorator;
+export declare function Output(
+  opts?:
+    | string
+    | {
+        alias?: string;
+      },
+): PropertyDecorator;
 
-export declare function ViewChild(selector: any, opts?: {
-  read?: any;
-  static?: boolean;
-}): PropertyDecorator;
+export declare function ViewChild(
+  selector: any,
+  opts?: {
+    read?: any;
+    static?: boolean;
+  },
+): PropertyDecorator;
 
-export declare function ViewChildren(selector: any, opts?: {
-  read?: any;
-}): PropertyDecorator;
+export declare function ViewChildren(
+  selector: any,
+  opts?: {
+    read?: any;
+  },
+): PropertyDecorator;
 
-export declare function ContentChild(selector: any, opts?: {
-  read?: any;
-  static?: boolean;
-  descendants?: boolean;
-}): PropertyDecorator;
+export declare function ContentChild(
+  selector: any,
+  opts?: {
+    read?: any;
+    static?: boolean;
+    descendants?: boolean;
+  },
+): PropertyDecorator;
 
-export declare function ContentChildren(selector: any, opts?: {
-  read?: any;
-  descendants?: boolean;
-}): PropertyDecorator;
+export declare function ContentChildren(
+  selector: any,
+  opts?: {
+    read?: any;
+    descendants?: boolean;
+  },
+): PropertyDecorator;
 
-export declare function HostBinding(hostPropertyName?: string): PropertyDecorator;
-export declare function HostListener(eventName: string, args?: string[]): MethodDecorator;
+export declare function HostBinding(
+  hostPropertyName?: string,
+): PropertyDecorator;
+export declare function HostListener(
+  eventName: string,
+  args?: string[],
+): MethodDecorator;
 
 // --- Event Emitter ---
 
@@ -105,10 +130,13 @@ export interface Signal<T> {
 // --- Signal functions ---
 
 export declare function input<T>(): InputSignal<T | undefined>;
-export declare function input<T>(initialValue: T, opts?: {
-  alias?: string;
-  transform?: (value: any) => T;
-}): InputSignal<T>;
+export declare function input<T>(
+  initialValue: T,
+  opts?: {
+    alias?: string;
+    transform?: (value: any) => T;
+  },
+): InputSignal<T>;
 export declare namespace input {
   function required<T>(opts?: {
     alias?: string;
@@ -121,60 +149,98 @@ export declare function output<T = void>(opts?: {
 }): OutputEmitterRef<T>;
 
 export declare function model<T>(): ModelSignal<T | undefined>;
-export declare function model<T>(initialValue: T, opts?: {
-  alias?: string;
-}): ModelSignal<T>;
-export declare namespace model {
-  function required<T>(opts?: {
+export declare function model<T>(
+  initialValue: T,
+  opts?: {
     alias?: string;
-  }): ModelSignal<T>;
+  },
+): ModelSignal<T>;
+export declare namespace model {
+  function required<T>(opts?: { alias?: string }): ModelSignal<T>;
 }
 
-export declare function viewChild<T>(locator: string | any, opts?: {
-  read?: any;
-}): Signal<T | undefined>;
-export declare namespace viewChild {
-  function required<T>(locator: string | any, opts?: {
+export declare function viewChild<T>(
+  locator: string | any,
+  opts?: {
     read?: any;
-  }): Signal<T>;
+  },
+): Signal<T | undefined>;
+export declare namespace viewChild {
+  function required<T>(
+    locator: string | any,
+    opts?: {
+      read?: any;
+    },
+  ): Signal<T>;
 }
 
-export declare function viewChildren<T>(locator: string | any, opts?: {
-  read?: any;
-}): Signal<readonly T[]>;
+export declare function viewChildren<T>(
+  locator: string | any,
+  opts?: {
+    read?: any;
+  },
+): Signal<readonly T[]>;
 
-export declare function contentChild<T>(locator: string | any, opts?: {
-  read?: any;
-  descendants?: boolean;
-}): Signal<T | undefined>;
-export declare namespace contentChild {
-  function required<T>(locator: string | any, opts?: {
+export declare function contentChild<T>(
+  locator: string | any,
+  opts?: {
     read?: any;
     descendants?: boolean;
-  }): Signal<T>;
+  },
+): Signal<T | undefined>;
+export declare namespace contentChild {
+  function required<T>(
+    locator: string | any,
+    opts?: {
+      read?: any;
+      descendants?: boolean;
+    },
+  ): Signal<T>;
 }
 
-export declare function contentChildren<T>(locator: string | any, opts?: {
-  read?: any;
-  descendants?: boolean;
-}): Signal<readonly T[]>;
+export declare function contentChildren<T>(
+  locator: string | any,
+  opts?: {
+    read?: any;
+    descendants?: boolean;
+  },
+): Signal<readonly T[]>;
 
 // --- Built-in transforms ---
 
 export declare function booleanAttribute(value: unknown): boolean;
 export declare function numberAttribute(value: unknown): number;
-export declare function numberAttribute(value: unknown, fallback: number): number;
+export declare function numberAttribute(
+  value: unknown,
+  fallback: number,
+): number;
 
 // --- Lifecycle interfaces ---
 
-export interface OnInit { ngOnInit(): void; }
-export interface OnDestroy { ngOnDestroy(): void; }
-export interface OnChanges { ngOnChanges(changes: SimpleChanges): void; }
-export interface AfterViewInit { ngAfterViewInit(): void; }
-export interface AfterContentInit { ngAfterContentInit(): void; }
-export interface DoCheck { ngDoCheck(): void; }
-export interface AfterViewChecked { ngAfterViewChecked(): void; }
-export interface AfterContentChecked { ngAfterContentChecked(): void; }
+export interface OnInit {
+  ngOnInit(): void;
+}
+export interface OnDestroy {
+  ngOnDestroy(): void;
+}
+export interface OnChanges {
+  ngOnChanges(changes: SimpleChanges): void;
+}
+export interface AfterViewInit {
+  ngAfterViewInit(): void;
+}
+export interface AfterContentInit {
+  ngAfterContentInit(): void;
+}
+export interface DoCheck {
+  ngDoCheck(): void;
+}
+export interface AfterViewChecked {
+  ngAfterViewChecked(): void;
+}
+export interface AfterContentChecked {
+  ngAfterContentChecked(): void;
+}
 
 export interface SimpleChanges {
   [propName: string]: SimpleChange;

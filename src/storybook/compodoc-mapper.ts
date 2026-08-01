@@ -1,4 +1,13 @@
-import type { ComponentDoc, PipeDoc, InputDoc, OutputDoc, ModelDoc, PropertyDoc, MethodDoc, ParseResult } from '../types.js';
+import type {
+  ComponentDoc,
+  PipeDoc,
+  InputDoc,
+  OutputDoc,
+  ModelDoc,
+  PropertyDoc,
+  MethodDoc,
+  ParseResult,
+} from '../types.js';
 import type {
   CompodocJson,
   CompodocComponent,
@@ -20,7 +29,9 @@ import type {
  * Accepts either the legacy array format or the full ParseResult.
  * Drop-in replacement for Compodoc's documentation.json — use with setCompodocJson().
  */
-export function toCompodocJson(docs: (ComponentDoc | PipeDoc)[] | ParseResult): CompodocJson {
+export function toCompodocJson(
+  docs: (ComponentDoc | PipeDoc)[] | ParseResult,
+): CompodocJson {
   if (isParseResult(docs)) {
     return toCompodocJsonFromParseResult(docs);
   }
@@ -53,7 +64,12 @@ export function toCompodocJson(docs: (ComponentDoc | PipeDoc)[] | ParseResult): 
 }
 
 function isParseResult(input: unknown): input is ParseResult {
-  return input !== null && typeof input === 'object' && !Array.isArray(input) && 'components' in input;
+  return (
+    input !== null &&
+    typeof input === 'object' &&
+    !Array.isArray(input) &&
+    'components' in input
+  );
 }
 
 function toCompodocJsonFromParseResult(result: ParseResult): CompodocJson {
@@ -73,31 +89,31 @@ function toCompodocJsonFromParseResult(result: ParseResult): CompodocJson {
     pipes.push(mapPipe(doc));
   }
 
-  const injectables: CompodocInjectable[] = result.injectables.map(i => ({
+  const injectables: CompodocInjectable[] = result.injectables.map((i) => ({
     name: i.name,
     type: 'injectable' as const,
   }));
 
-  const typealiases: CompodocTypeAlias[] = result.typeAliases.map(t => ({
+  const typealiases: CompodocTypeAlias[] = result.typeAliases.map((t) => ({
     name: t.name,
     rawtype: t.type,
   }));
 
-  const enumerations: CompodocEnum[] = result.enums.map(e => ({
+  const enumerations: CompodocEnum[] = result.enums.map((e) => ({
     name: e.name,
-    childs: e.members.map(m => ({ name: m.name, value: m.value })),
+    childs: e.members.map((m) => ({ name: m.name, value: m.value })),
   }));
 
-  const classes: CompodocClass[] = result.classes.map(c => ({
+  const classes: CompodocClass[] = result.classes.map((c) => ({
     name: c.name,
   }));
 
-  const functions: CompodocFunction[] = result.functions.map(f => ({
+  const functions: CompodocFunction[] = result.functions.map((f) => ({
     name: f.name,
     type: 'function' as const,
   }));
 
-  const variables: CompodocVariable[] = result.variables.map(v => ({
+  const variables: CompodocVariable[] = result.variables.map((v) => ({
     name: v.name,
     type: v.type,
   }));
@@ -117,7 +133,10 @@ function toCompodocJsonFromParseResult(result: ParseResult): CompodocJson {
   };
 }
 
-function mapComponentOrDirective(doc: ComponentDoc, type: 'component' | 'directive'): CompodocComponent | CompodocDirective {
+function mapComponentOrDirective(
+  doc: ComponentDoc,
+  type: 'component' | 'directive',
+): CompodocComponent | CompodocDirective {
   return {
     name: doc.name,
     type,
@@ -199,7 +218,9 @@ function mapModelAsOutput(model: ModelDoc): CompodocProperty {
     type: model.type,
     optional: true,
     decorators: [{ name: 'Output' }],
-    description: model.description ? `${model.description} (change event)` : undefined,
+    description: model.description
+      ? `${model.description} (change event)`
+      : undefined,
     rawdescription: model.rawDescription || undefined,
     jsdoctags: tagsToJsDocTags(model.tags),
   };
@@ -220,7 +241,7 @@ function mapProperty(prop: PropertyDoc): CompodocProperty {
 function mapMethod(method: MethodDoc): CompodocMethod {
   return {
     name: method.name,
-    args: method.params.map(p => ({
+    args: method.params.map((p) => ({
       name: p.name,
       type: p.type,
       optional: p.optional || undefined,
@@ -232,8 +253,13 @@ function mapMethod(method: MethodDoc): CompodocMethod {
   };
 }
 
-function tagsToJsDocTags(tags: Record<string, string>): CompodocJsDocTag[] | undefined {
+function tagsToJsDocTags(
+  tags: Record<string, string>,
+): CompodocJsDocTag[] | undefined {
   const entries = Object.entries(tags);
   if (entries.length === 0) return undefined;
-  return entries.map(([name, comment]) => ({ name, comment: comment || undefined }));
+  return entries.map(([name, comment]) => ({
+    name,
+    comment: comment || undefined,
+  }));
 }

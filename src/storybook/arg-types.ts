@@ -1,4 +1,12 @@
-import type { ParserOptions, ComponentDoc, InputDoc, OutputDoc, ModelDoc, PropertyDoc, MethodDoc } from '../types.js';
+import type {
+  ParserOptions,
+  ComponentDoc,
+  InputDoc,
+  OutputDoc,
+  ModelDoc,
+  PropertyDoc,
+  MethodDoc,
+} from '../types.js';
 import { createParser } from '../parser.js';
 
 interface StrictInputType {
@@ -42,7 +50,10 @@ export function createArgTypesExtractor(
   return (component: unknown): Record<string, StrictInputType> | null => {
     if (!component) return null;
 
-    const comp = component as { name?: string; __annotations__?: Array<{ name?: string }> };
+    const comp = component as {
+      name?: string;
+      __annotations__?: Array<{ name?: string }>;
+    };
     const name = comp.name ?? comp.__annotations__?.[0]?.name;
     if (!name || typeof name !== 'string') return null;
 
@@ -50,7 +61,9 @@ export function createArgTypesExtractor(
 
     // Find the component in the program's source files
     const program = parser.getProgram();
-    const sourceFiles = program.getSourceFiles().filter(sf => !sf.isDeclarationFile);
+    const sourceFiles = program
+      .getSourceFiles()
+      .filter((sf) => !sf.isDeclarationFile);
 
     for (const sf of sourceFiles) {
       const docs = parser.parseWithProgram(sf.fileName, program);
@@ -67,7 +80,9 @@ export function createArgTypesExtractor(
   };
 }
 
-function componentDocToArgTypes(doc: ComponentDoc): Record<string, StrictInputType> {
+function componentDocToArgTypes(
+  doc: ComponentDoc,
+): Record<string, StrictInputType> {
   const argTypes: Record<string, StrictInputType> = {};
 
   for (const input of doc.inputs) {
@@ -102,7 +117,9 @@ function inputToArgType(input: InputDoc): StrictInputType {
     table: {
       category: 'inputs',
       type: { summary: input.type, required: input.required },
-      defaultValue: input.defaultValue ? { summary: input.defaultValue } : undefined,
+      defaultValue: input.defaultValue
+        ? { summary: input.defaultValue }
+        : undefined,
     },
     control: inferControl(input.type),
   };
@@ -129,7 +146,9 @@ function modelToArgType(model: ModelDoc): StrictInputType {
     table: {
       category: 'two-way bindings',
       type: { summary: model.type, required: model.required },
-      defaultValue: model.defaultValue ? { summary: model.defaultValue } : undefined,
+      defaultValue: model.defaultValue
+        ? { summary: model.defaultValue }
+        : undefined,
     },
     control: inferControl(model.type),
   };
@@ -155,14 +174,16 @@ function propertyToArgType(prop: PropertyDoc): StrictInputType {
     table: {
       category: 'properties',
       type: { summary: prop.type },
-      defaultValue: prop.defaultValue ? { summary: prop.defaultValue } : undefined,
+      defaultValue: prop.defaultValue
+        ? { summary: prop.defaultValue }
+        : undefined,
     },
     control: false,
   };
 }
 
 function methodToArgType(method: MethodDoc): StrictInputType {
-  const sig = `(${method.params.map(p => `${p.name}: ${p.type}`).join(', ')}) => ${method.returnType}`;
+  const sig = `(${method.params.map((p) => `${p.name}: ${p.type}`).join(', ')}) => ${method.returnType}`;
   return {
     name: method.name,
     description: method.description,
@@ -183,7 +204,9 @@ function inferSBType(typeStr: string): { name: string; value?: any[] } {
   // Union of string literals: "a" | "b" | "c"
   const literalMatch = trimmed.match(/^"[^"]*"(\s*\|\s*"[^"]*")*$/);
   if (literalMatch) {
-    const values = trimmed.split('|').map(s => s.trim().replace(/^"|"$/g, ''));
+    const values = trimmed
+      .split('|')
+      .map((s) => s.trim().replace(/^"|"$/g, ''));
     return { name: 'enum', value: values };
   }
 

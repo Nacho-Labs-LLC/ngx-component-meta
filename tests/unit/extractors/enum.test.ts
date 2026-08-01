@@ -6,9 +6,19 @@ describe('extractEnum', () => {
   function setup(sourceCode: string) {
     const filename = 'test.ts';
     const compilerHost = ts.createCompilerHost({});
-    compilerHost.getSourceFile = (fileName, languageVersion, onError, shouldCreateNewSourceFile) => {
+    compilerHost.getSourceFile = (
+      fileName,
+      languageVersion,
+      onError,
+      shouldCreateNewSourceFile,
+    ) => {
       if (fileName === filename) {
-        return ts.createSourceFile(fileName, sourceCode, ts.ScriptTarget.Latest, true);
+        return ts.createSourceFile(
+          fileName,
+          sourceCode,
+          ts.ScriptTarget.Latest,
+          true,
+        );
       }
       return ts.createSourceFile(fileName, '', ts.ScriptTarget.Latest, true);
     };
@@ -18,13 +28,13 @@ describe('extractEnum', () => {
     const sourceFile = program.getSourceFile(filename)!;
 
     let enumNode: ts.EnumDeclaration | undefined;
-    ts.forEachChild(sourceFile, node => {
+    ts.forEachChild(sourceFile, (node) => {
       if (ts.isEnumDeclaration(node)) {
         enumNode = node;
       }
     });
 
-    if (!enumNode) throw new Error("No enum found in source code");
+    if (!enumNode) throw new Error('No enum found in source code');
 
     return { checker, enumNode, sourceFile };
   }
@@ -145,7 +155,7 @@ describe('extractEnum', () => {
     // Create a fake node without a name
     const fakeNode = {
       ...enumNode,
-      name: undefined
+      name: undefined,
     } as unknown as ts.EnumDeclaration;
 
     const doc = extractEnum(checker, fakeNode, sourceFile);

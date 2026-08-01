@@ -1,6 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import ts from '@typescript/typescript6';
-import { tryExtractModel, tryExtractSignalInput } from '../../../src/extractors/signal-input.js';
+import {
+  tryExtractModel,
+  tryExtractSignalInput,
+} from '../../../src/extractors/signal-input.js';
 
 describe('signal-input extractor', () => {
   function setupChecker(sourceText: string) {
@@ -9,7 +12,7 @@ describe('signal-input extractor', () => {
       filename,
       sourceText,
       ts.ScriptTarget.Latest,
-      true
+      true,
     );
 
     const compilerHost: ts.CompilerHost = {
@@ -17,9 +20,9 @@ describe('signal-input extractor', () => {
         if (fileName === filename) return sourceFile;
         // mock angular core types
         if (fileName === 'angular-core.d.ts') {
-            return ts.createSourceFile(
-                fileName,
-                `export declare function model<T>(initialValue?: T, opts?: { alias?: string }): ModelSignal<T>;
+          return ts.createSourceFile(
+            fileName,
+            `export declare function model<T>(initialValue?: T, opts?: { alias?: string }): ModelSignal<T>;
                  export declare interface ModelSignal<T> { readonly value: T; }
                  export declare namespace model {
                      export function required<T>(opts?: { alias?: string }): ModelSignal<T>;
@@ -29,9 +32,9 @@ describe('signal-input extractor', () => {
                  export declare namespace input {
                      export function required<T>(opts?: { alias?: string, transform?: any }): InputSignal<T>;
                  }`,
-                ts.ScriptTarget.Latest,
-                true
-            );
+            ts.ScriptTarget.Latest,
+            true,
+          );
         }
         return ts.createSourceFile(fileName, '', ts.ScriptTarget.Latest, true);
       },
@@ -42,14 +45,19 @@ describe('signal-input extractor', () => {
       getCanonicalFileName: (fileName) => fileName,
       useCaseSensitiveFileNames: () => true,
       getNewLine: () => '\n',
-      fileExists: (fileName) => fileName === filename || fileName === 'angular-core.d.ts',
+      fileExists: (fileName) =>
+        fileName === filename || fileName === 'angular-core.d.ts',
       readFile: (fileName) => {
-          if (fileName === filename) return sourceText;
-          return '';
+        if (fileName === filename) return sourceText;
+        return '';
       },
     };
 
-    const program = ts.createProgram([filename], { paths: { '@angular/core': ['angular-core.d.ts'] }, baseUrl: '.' }, compilerHost);
+    const program = ts.createProgram(
+      [filename],
+      { paths: { '@angular/core': ['angular-core.d.ts'] }, baseUrl: '.' },
+      compilerHost,
+    );
     const checker = program.getTypeChecker();
     return { checker, sourceFile, program };
   }
@@ -159,7 +167,12 @@ describe('signal-input extractor', () => {
       const propNode = classNode.members.find(ts.isPropertyDeclaration)!;
       const callExpr = propNode.initializer as ts.CallExpression;
 
-      const doc = tryExtractSignalInput(checker, propNode, callExpr, sourceFile);
+      const doc = tryExtractSignalInput(
+        checker,
+        propNode,
+        callExpr,
+        sourceFile,
+      );
       expect(doc).toBeNull();
     });
   });

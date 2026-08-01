@@ -146,6 +146,7 @@ export default config;
 ```
 
 The preset does two things:
+
 1. At build time (`viteFinal`), it parses your components and injects the Compodoc-compatible JSON as a Vite `define` constant.
 2. At runtime (`previewAnnotations`), it calls `setCompodocJson()` with the injected data.
 
@@ -219,18 +220,18 @@ The plugin watches for changes to `.component.ts`, `.directive.ts`, and `.pipe.t
 
 ## What Works Better Than Compodoc
 
-| Feature | Compodoc | ngx-component-meta |
-|---------|----------|--------------------|
-| `input()` signals | Not recognized | Full support, type unwrapped |
-| `output()` signals | Not recognized | Full support |
-| `model()` two-way bindings | Not recognized | Mapped to input + output pair |
-| `input.required<T>()` | Not recognized | Shown as required with correct type |
-| Union type inputs | Shows raw type string | Generates `select` control automatically |
-| Boolean inputs | Sometimes misdetected | Correct `boolean` control |
-| Build speed (100 components) | ~8-15 seconds | ~1-2 seconds |
-| Incremental rebuilds | Full reparse | Cached, sub-second |
-| Inherited members | Inconsistent | Included by default, configurable |
-| `@HostBinding` / `@HostListener` | In separate section | Extracted with full types |
+| Feature                          | Compodoc              | ngx-component-meta                       |
+| -------------------------------- | --------------------- | ---------------------------------------- |
+| `input()` signals                | Not recognized        | Full support, type unwrapped             |
+| `output()` signals               | Not recognized        | Full support                             |
+| `model()` two-way bindings       | Not recognized        | Mapped to input + output pair            |
+| `input.required<T>()`            | Not recognized        | Shown as required with correct type      |
+| Union type inputs                | Shows raw type string | Generates `select` control automatically |
+| Boolean inputs                   | Sometimes misdetected | Correct `boolean` control                |
+| Build speed (100 components)     | ~8-15 seconds         | ~1-2 seconds                             |
+| Incremental rebuilds             | Full reparse          | Cached, sub-second                       |
+| Inherited members                | Inconsistent          | Included by default, configurable        |
+| `@HostBinding` / `@HostListener` | In separate section   | Extracted with full types                |
 
 ## Troubleshooting
 

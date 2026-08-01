@@ -27,9 +27,12 @@ describe('cli/options', () => {
 
       it('should parse long flags', () => {
         const result = parseArgs([
-          '--project', 'tsconfig.json',
-          '--output', 'out.json',
-          '--format', 'compodoc',
+          '--project',
+          'tsconfig.json',
+          '--output',
+          'out.json',
+          '--format',
+          'compodoc',
           '--pretty',
           '--split',
           '--watch',
@@ -38,7 +41,7 @@ describe('cli/options', () => {
           '--version',
           '--help',
           'src/app.ts',
-          'src/comp.ts'
+          'src/comp.ts',
         ]);
 
         expect(result).toEqual({
@@ -53,18 +56,21 @@ describe('cli/options', () => {
           noMethods: true,
           noInherited: true,
           version: true,
-          help: true
+          help: true,
         });
       });
 
       it('should parse short flags', () => {
         const result = parseArgs([
-          '-p', 'tsconfig.json',
-          '-o', 'out.json',
-          '-f', 'markdown',
+          '-p',
+          'tsconfig.json',
+          '-o',
+          'out.json',
+          '-f',
+          'markdown',
           '-w',
           '-h',
-          'src/app.ts'
+          'src/app.ts',
         ]);
 
         expect(result.project).toBe('tsconfig.json');
@@ -87,15 +93,20 @@ describe('cli/options', () => {
       it('should parse diff options', () => {
         const result = parseArgs([
           'diff',
-          '--base', 'base.json',
-          '--head', 'head.json',
-          '-p', 'tsconfig.json',
-          '-o', 'out.json',
-          '-f', 'json',
+          '--base',
+          'base.json',
+          '--head',
+          'head.json',
+          '-p',
+          'tsconfig.json',
+          '-o',
+          'out.json',
+          '-f',
+          'json',
           '--no-methods',
           '--no-inherited',
           '-h',
-          '--version'
+          '--version',
         ]);
 
         expect(result).toEqual({
@@ -108,7 +119,7 @@ describe('cli/options', () => {
           noMethods: true,
           noInherited: true,
           help: true,
-          version: true
+          version: true,
         });
       });
     });
@@ -124,14 +135,17 @@ describe('cli/options', () => {
       it('should parse lint options', () => {
         const result = parseArgs([
           'lint',
-          '-p', 'tsconfig.json',
-          '-o', 'out.txt',
-          '-f', 'json',
+          '-p',
+          'tsconfig.json',
+          '-o',
+          'out.txt',
+          '-f',
+          'json',
           '--no-methods',
           '--no-inherited',
           '-h',
           '--version',
-          'src/**/*.ts'
+          'src/**/*.ts',
         ]);
 
         expect(result).toEqual({
@@ -143,7 +157,7 @@ describe('cli/options', () => {
           noMethods: true,
           noInherited: true,
           help: true,
-          version: true
+          version: true,
         });
       });
     });
@@ -159,14 +173,17 @@ describe('cli/options', () => {
       it('should parse stats options', () => {
         const result = parseArgs([
           'stats',
-          '-p', 'tsconfig.json',
-          '-o', 'out.md',
-          '-f', 'markdown',
+          '-p',
+          'tsconfig.json',
+          '-o',
+          'out.md',
+          '-f',
+          'markdown',
           '--no-methods',
           '--no-inherited',
           '-h',
           '--version',
-          'src/**/*.ts'
+          'src/**/*.ts',
         ]);
 
         expect(result).toEqual({
@@ -178,7 +195,7 @@ describe('cli/options', () => {
           noMethods: true,
           noInherited: true,
           help: true,
-          version: true
+          version: true,
         });
       });
     });
@@ -190,7 +207,9 @@ describe('cli/options', () => {
       printHelp();
       expect(consoleSpy).toHaveBeenCalled();
       const output = consoleSpy.mock.calls[0][0] as string;
-      expect(output).toContain('ngx-component-meta - Angular component API toolkit');
+      expect(output).toContain(
+        'ngx-component-meta - Angular component API toolkit',
+      );
       expect(output).toContain('Usage:');
       expect(output).toContain('Options:'); // Wait, does it contain Options? Let's check in code
       // Actually, just check a few keywords

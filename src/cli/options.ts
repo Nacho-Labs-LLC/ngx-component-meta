@@ -50,7 +50,8 @@ export interface StatsCliOptions {
   version: boolean;
 }
 
-export type CliOptions = ExtractCliOptions | DiffCliOptions | LintCliOptions | StatsCliOptions;
+export type CliOptions =
+  ExtractCliOptions | DiffCliOptions | LintCliOptions | StatsCliOptions;
 
 const HELP_TEXT = `
 ngx-component-meta - Angular component API toolkit

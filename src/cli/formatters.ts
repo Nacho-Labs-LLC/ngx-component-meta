@@ -25,10 +25,12 @@ export function formatCompodoc(
 }
 
 export function formatMarkdown(docs: (ComponentDoc | PipeDoc)[]): string {
-  return docs.map(doc => {
-    if ('pipeName' in doc) return formatPipeMarkdown(doc);
-    return formatComponentMarkdown(doc);
-  }).join('\n\n---\n\n');
+  return docs
+    .map((doc) => {
+      if ('pipeName' in doc) return formatPipeMarkdown(doc);
+      return formatComponentMarkdown(doc);
+    })
+    .join('\n\n---\n\n');
 }
 
 function escapeCell(value: string): string {
@@ -121,7 +123,7 @@ function formatPipeMarkdown(doc: PipeDoc): string {
 }
 
 function formatTransformSignature(doc: PipeDoc): string {
-  const params = doc.transform.params.map(p => formatParam(p)).join(', ');
+  const params = doc.transform.params.map((p) => formatParam(p)).join(', ');
   return `transform(${params}): ${doc.transform.returnType}`;
 }
 
@@ -133,8 +135,8 @@ function formatParam(p: MethodParamDoc): string {
 
 function formatInputsTable(inputs: InputDoc[]): string {
   const header = '| Name | Binding | Type | Required | Default | Description |';
-  const sep    = '|------|---------|------|----------|---------|-------------|';
-  const rows = inputs.map(i => {
+  const sep = '|------|---------|------|----------|---------|-------------|';
+  const rows = inputs.map((i) => {
     const def = i.defaultValue != null ? codeCell(i.defaultValue) : '—';
     return `| ${codeCell(i.name)} | ${codeCell(i.bindingName)} | ${codeCell(i.type)} | ${i.required ? 'yes' : 'no'} | ${def} | ${escapeCell(i.description)} |`;
   });
@@ -143,17 +145,18 @@ function formatInputsTable(inputs: InputDoc[]): string {
 
 function formatOutputsTable(outputs: OutputDoc[]): string {
   const header = '| Name | Binding | Type | Description |';
-  const sep    = '|------|---------|------|-------------|';
-  const rows = outputs.map(o =>
-    `| ${codeCell(o.name)} | ${codeCell(o.bindingName)} | ${codeCell(o.type)} | ${escapeCell(o.description)} |`,
+  const sep = '|------|---------|------|-------------|';
+  const rows = outputs.map(
+    (o) =>
+      `| ${codeCell(o.name)} | ${codeCell(o.bindingName)} | ${codeCell(o.type)} | ${escapeCell(o.description)} |`,
   );
   return [header, sep, ...rows].join('\n');
 }
 
 function formatModelsTable(models: ModelDoc[]): string {
   const header = '| Name | Binding | Type | Required | Default | Description |';
-  const sep    = '|------|---------|------|----------|---------|-------------|';
-  const rows = models.map(m => {
+  const sep = '|------|---------|------|----------|---------|-------------|';
+  const rows = models.map((m) => {
     const def = m.defaultValue != null ? codeCell(m.defaultValue) : '—';
     return `| ${codeCell(m.name)} | ${codeCell(m.bindingName)} | ${codeCell(m.type)} | ${m.required ? 'yes' : 'no'} | ${def} | ${escapeCell(m.description)} |`;
   });
@@ -162,9 +165,9 @@ function formatModelsTable(models: ModelDoc[]): string {
 
 function formatMethodsTable(methods: MethodDoc[]): string {
   const header = '| Name | Signature | Description |';
-  const sep    = '|------|-----------|-------------|';
-  const rows = methods.map(m => {
-    const params = m.params.map(p => formatParam(p)).join(', ');
+  const sep = '|------|-----------|-------------|';
+  const rows = methods.map((m) => {
+    const params = m.params.map((p) => formatParam(p)).join(', ');
     const sig = `(${params}) => ${m.returnType}`;
     return `| ${codeCell(m.name)} | ${codeCell(sig)} | ${escapeCell(m.description)} |`;
   });

@@ -98,6 +98,7 @@ There are 7 rules. Each has a default severity that you can override.
 Every `@Input()` or `input()` must have a JSDoc description.
 
 Triggers when:
+
 ```typescript
 @Component({ selector: 'app-button', template: '' })
 export class ButtonComponent {
@@ -107,6 +108,7 @@ export class ButtonComponent {
 ```
 
 Fix:
+
 ```typescript
 @Component({ selector: 'app-button', template: '' })
 export class ButtonComponent {
@@ -120,11 +122,13 @@ export class ButtonComponent {
 Every `@Output()` or `output()` must have a JSDoc description.
 
 Triggers when:
+
 ```typescript
 @Output() clicked = new EventEmitter<void>();
 ```
 
 Fix:
+
 ```typescript
 /** Emitted when the user clicks the button. */
 @Output() clicked = new EventEmitter<void>();
@@ -135,16 +139,18 @@ Fix:
 Every component, directive, and pipe class must have a JSDoc description.
 
 Triggers when:
+
 ```typescript
 @Component({ selector: 'app-card', template: '' })
-export class CardComponent { }
+export class CardComponent {}
 ```
 
 Fix:
+
 ```typescript
 /** A content container with optional header, body, and footer sections. */
 @Component({ selector: 'app-card', template: '' })
-export class CardComponent { }
+export class CardComponent {}
 ```
 
 ### `no-any-inputs` (default: warn)
@@ -152,6 +158,7 @@ export class CardComponent { }
 Inputs should not use type `any`. Untyped inputs make templates unsafe and documentation useless.
 
 Triggers when:
+
 ```typescript
 @Input() data: any;
 // or
@@ -159,6 +166,7 @@ data = input<any>();
 ```
 
 Fix:
+
 ```typescript
 @Input() data: Record<string, unknown>;
 // or define a proper interface
@@ -170,11 +178,13 @@ Fix:
 Outputs should not emit type `any`.
 
 Triggers when:
+
 ```typescript
 @Output() selected = new EventEmitter<any>();
 ```
 
 Fix:
+
 ```typescript
 @Output() selected = new EventEmitter<SelectionEvent>();
 ```
@@ -184,6 +194,7 @@ Fix:
 A required input should not have a default value. This is contradictory -- if it has a sensible default, it should not be required. If it must be provided by the consumer, it should not have a default.
 
 Triggers when:
+
 ```typescript
 name = input.required<string>({ initialValue: 'default' });
 // or any required input with a default value detected
@@ -196,15 +207,17 @@ Fix: either remove `required` or remove the default.
 Every component and directive must have a selector defined. Components without selectors can only be used via `ViewContainerRef` and are almost always a mistake.
 
 Triggers when:
+
 ```typescript
 @Component({ template: '<p>oops</p>' })
-export class OrphanComponent { }
+export class OrphanComponent {}
 ```
 
 Fix:
+
 ```typescript
 @Component({ selector: 'app-orphan', template: '<p>fixed</p>' })
-export class OrphanComponent { }
+export class OrphanComponent {}
 ```
 
 ## Configuring Severity Programmatically
@@ -221,9 +234,9 @@ const lintResult = lint(result, {
   rules: {
     'require-input-description': 'error',
     'require-output-description': 'error',
-    'require-component-description': 'error',  // promote to error
-    'no-any-inputs': 'error',                   // promote to error
-    'no-any-outputs': 'off',                    // disable entirely
+    'require-component-description': 'error', // promote to error
+    'no-any-inputs': 'error', // promote to error
+    'no-any-outputs': 'off', // disable entirely
     'no-required-with-default': 'warn',
     'require-selector': 'error',
   },
@@ -237,6 +250,7 @@ if (lintResult.summary.errors > 0) {
 ```
 
 Valid severity values:
+
 - `'error'` -- counted as an error, fails CI.
 - `'warn'` -- reported but does not fail CI.
 - `'off'` -- rule is skipped entirely.
@@ -268,10 +282,10 @@ The `lint` command exits with code 1 when any `error`-severity rule fires. Warni
 ### With Reporting
 
 ```yaml
-      - name: Lint components
-        run: |
-          npx ngx-component-meta lint -f json -o lint-report.json "src/**/*.ts" || true
-          npx ngx-component-meta lint -f stylish "src/**/*.ts"
+- name: Lint components
+  run: |
+    npx ngx-component-meta lint -f json -o lint-report.json "src/**/*.ts" || true
+    npx ngx-component-meta lint -f stylish "src/**/*.ts"
 ```
 
 The first invocation saves structured JSON for further processing. The second prints human-readable output to the CI log.
