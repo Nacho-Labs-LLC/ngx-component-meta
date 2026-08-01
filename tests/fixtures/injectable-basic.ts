@@ -4,13 +4,17 @@ import { Injectable } from '@angular/core';
 @Injectable({ providedIn: 'root' })
 export class UserService {
   /** Get user by ID. */
-  getUser(id: string): Promise<User> { return Promise.resolve({ name: '' }); }
+  getUser(id: string): Promise<User> {
+    return Promise.resolve({ name: '' });
+  }
 
   /** Current user count. */
   readonly count: number = 0;
 }
 
-interface User { name: string; }
+interface User {
+  name: string;
+}
 
 /** Basic logging service without providedIn. */
 @Injectable()

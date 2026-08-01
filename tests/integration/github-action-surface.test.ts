@@ -28,15 +28,24 @@ describe('GitHub Action launch surface', () => {
     expect(actionMainPath).toBe('dist/index.cjs');
     expect(existsSync(committedBundlePath)).toBe(true);
 
-    const tempOutdir = mkdtempSync(path.join(os.tmpdir(), 'ngx-component-meta-action-'));
+    const tempOutdir = mkdtempSync(
+      path.join(os.tmpdir(), 'ngx-component-meta-action-'),
+    );
 
     try {
-      execFileSync('node', ['scripts/build-action.mjs', '--outdir', tempOutdir], {
-        cwd: repoRoot,
-        stdio: 'pipe',
-      });
+      execFileSync(
+        'node',
+        ['scripts/build-action.mjs', '--outdir', tempOutdir],
+        {
+          cwd: repoRoot,
+          stdio: 'pipe',
+        },
+      );
 
-      const rebuiltBundlePath = path.join(tempOutdir, path.basename(committedBundlePath));
+      const rebuiltBundlePath = path.join(
+        tempOutdir,
+        path.basename(committedBundlePath),
+      );
       expect(existsSync(rebuiltBundlePath)).toBe(true);
       expect(readFileSync(rebuiltBundlePath, 'utf8')).toBe(
         readFileSync(committedBundlePath, 'utf8'),

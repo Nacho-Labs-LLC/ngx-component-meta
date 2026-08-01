@@ -16,7 +16,11 @@ export class TruncatePipe implements PipeTransform {
    * @param maxLength - Maximum allowed length
    * @param suffix - Suffix to append when truncated
    */
-  transform(value: string, maxLength: number = 100, suffix: string = '...'): string {
+  transform(
+    value: string,
+    maxLength: number = 100,
+    suffix: string = '...',
+  ): string {
     if (value.length <= maxLength) return value;
     return value.slice(0, maxLength) + suffix;
   }

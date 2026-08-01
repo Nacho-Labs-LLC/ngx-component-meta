@@ -9,7 +9,12 @@ describe('extractVariable', () => {
 
   function setup(sourceCode: string) {
     const filename = 'test.ts';
-    const sourceFileObj = ts.createSourceFile(filename, sourceCode, ts.ScriptTarget.Latest, true);
+    const sourceFileObj = ts.createSourceFile(
+      filename,
+      sourceCode,
+      ts.ScriptTarget.Latest,
+      true,
+    );
 
     const compilerHost: ts.CompilerHost = {
       getSourceFile: (fileName) => {
@@ -24,7 +29,7 @@ describe('extractVariable', () => {
       useCaseSensitiveFileNames: () => true,
       getNewLine: () => '\n',
       fileExists: (fileName) => fileName === filename,
-      readFile: (fileName) => fileName === filename ? sourceCode : '',
+      readFile: (fileName) => (fileName === filename ? sourceCode : ''),
     };
 
     program = ts.createProgram([filename], {}, compilerHost);
@@ -34,16 +39,19 @@ describe('extractVariable', () => {
     let varDeclNode: ts.VariableDeclaration | undefined;
 
     // Find a VariableDeclaration inside an exported VariableStatement
-    ts.forEachChild(sourceFile, node => {
+    ts.forEachChild(sourceFile, (node) => {
       if (ts.isVariableStatement(node)) {
-        const hasExport = node.modifiers?.some(m => m.kind === ts.SyntaxKind.ExportKeyword);
+        const hasExport = node.modifiers?.some(
+          (m) => m.kind === ts.SyntaxKind.ExportKeyword,
+        );
         if (hasExport) {
           varDeclNode = node.declarationList.declarations[0];
         }
       }
     });
 
-    if (!varDeclNode) throw new Error("No exported variable declaration found in source code");
+    if (!varDeclNode)
+      throw new Error('No exported variable declaration found in source code');
 
     return { checker, varDeclNode, sourceFile };
   }
@@ -144,7 +152,7 @@ describe('extractVariable', () => {
     // Create a fake node without a name
     const fakeNode = {
       ...varDeclNode,
-      name: undefined
+      name: undefined,
     } as unknown as ts.VariableDeclaration;
 
     const doc = extractVariable(checker, fakeNode, true, sourceFile);

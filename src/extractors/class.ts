@@ -1,7 +1,12 @@
 import ts from '@typescript/typescript6';
 import type { ClassDoc } from '../types.js';
 import { isPrivateMember } from '../utils/ast-helpers.js';
-import { getDescription, getRawDescription, getTags, isInternal } from '../utils/jsdoc.js';
+import {
+  getDescription,
+  getRawDescription,
+  getTags,
+  isInternal,
+} from '../utils/jsdoc.js';
 import { extractMethod } from './method.js';
 import { extractProperty } from './property.js';
 
@@ -13,7 +18,9 @@ export function extractClass(
   classDecl: ts.ClassDeclaration,
   sourceFile: ts.SourceFile,
 ): ClassDoc | null {
-  const classSymbol = classDecl.name ? checker.getSymbolAtLocation(classDecl.name) : undefined;
+  const classSymbol = classDecl.name
+    ? checker.getSymbolAtLocation(classDecl.name)
+    : undefined;
   if (!classSymbol) return null;
   if (isInternal(classSymbol)) return null;
 
@@ -32,13 +39,13 @@ export function extractClass(
     }
   }
 
-  const implementsList = classDecl.heritageClauses
-    ?.filter(h => h.token === ts.SyntaxKind.ImplementsKeyword)
-    .flatMap(h => h.types.map(t => t.getText(sourceFile)))
-    ?? [];
+  const implementsList =
+    classDecl.heritageClauses
+      ?.filter((h) => h.token === ts.SyntaxKind.ImplementsKeyword)
+      .flatMap((h) => h.types.map((t) => t.getText(sourceFile))) ?? [];
 
   const extendsClause = classDecl.heritageClauses?.find(
-    h => h.token === ts.SyntaxKind.ExtendsKeyword,
+    (h) => h.token === ts.SyntaxKind.ExtendsKeyword,
   );
   const extendsName = extendsClause?.types[0]?.getText(sourceFile) ?? null;
 

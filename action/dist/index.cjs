@@ -235744,7 +235744,10 @@ function diffInputs(component, baseInputs, headInputs, breaking, nonBreaking) {
           component,
           change: "default-changed",
           name,
-          details: { before: baseInput.defaultValue, after: headInput.defaultValue }
+          details: {
+            before: baseInput.defaultValue,
+            after: headInput.defaultValue
+          }
         });
       }
     }
@@ -235753,7 +235756,10 @@ function diffInputs(component, baseInputs, headInputs, breaking, nonBreaking) {
         component,
         change: "description-changed",
         name,
-        details: { before: baseInput.description, after: headInput.description }
+        details: {
+          before: baseInput.description,
+          after: headInput.description
+        }
       });
     }
   }
@@ -235876,7 +235882,10 @@ function diffModels(component, baseModels, headModels, breaking, nonBreaking) {
           component,
           change: "model-default-changed",
           name,
-          details: { before: baseModel.defaultValue, after: headModel.defaultValue }
+          details: {
+            before: baseModel.defaultValue,
+            after: headModel.defaultValue
+          }
         });
       }
     }
@@ -235911,7 +235920,10 @@ function diffMethods(component, baseMethods, headMethods, breaking, nonBreaking)
         component,
         change: "method-return-type-changed",
         name,
-        details: { before: baseMethod.returnType, after: headMethod.returnType }
+        details: {
+          before: baseMethod.returnType,
+          after: headMethod.returnType
+        }
       });
     }
     const baseParamMap = buildNameMap(baseMethod.params);
@@ -235923,7 +235935,11 @@ function diffMethods(component, baseMethods, headMethods, breaking, nonBreaking)
           component,
           change: "method-param-type-changed",
           name,
-          details: { param: paramName, before: baseParam.type, after: headParam.type }
+          details: {
+            param: paramName,
+            before: baseParam.type,
+            after: headParam.type
+          }
         });
       }
     }
@@ -236076,7 +236092,13 @@ function diffComponentDocs(baseDocs, headDocs, breaking, nonBreaking) {
     diffOutputs(name, baseDoc.outputs, headDoc.outputs, breaking, nonBreaking);
     diffModels(name, baseDoc.models, headDoc.models, breaking, nonBreaking);
     diffMethods(name, baseDoc.methods, headDoc.methods, breaking, nonBreaking);
-    diffProperties(name, baseDoc.properties, headDoc.properties, breaking, nonBreaking);
+    diffProperties(
+      name,
+      baseDoc.properties,
+      headDoc.properties,
+      breaking,
+      nonBreaking
+    );
   }
   for (const [name] of headMap) {
     if (!baseMap.has(name)) {
@@ -236177,7 +236199,9 @@ function isInternal(symbol) {
 }
 function getParamDescription(checker, methodSymbol, paramName) {
   const tags = methodSymbol.getJsDocTags();
-  const paramTag = tags.find((t) => t.name === "param" && t.text?.some((p) => p.text.startsWith(paramName)));
+  const paramTag = tags.find(
+    (t) => t.name === "param" && t.text?.some((p) => p.text.startsWith(paramName))
+  );
   if (!paramTag?.text) return "";
   const parts = paramTag.text;
   const textParts = parts.map((p) => p.text).join("");
@@ -236237,7 +236261,8 @@ function findDecorator(node, name) {
 function getStringProperty(obj, propertyName) {
   for (const prop of obj.properties) {
     if (!import_typescript63.default.isPropertyAssignment(prop)) continue;
-    if (!import_typescript63.default.isIdentifier(prop.name) || prop.name.text !== propertyName) continue;
+    if (!import_typescript63.default.isIdentifier(prop.name) || prop.name.text !== propertyName)
+      continue;
     if (import_typescript63.default.isStringLiteral(prop.initializer)) return prop.initializer.text;
   }
   return void 0;
@@ -236245,7 +236270,8 @@ function getStringProperty(obj, propertyName) {
 function getBooleanProperty(obj, propertyName) {
   for (const prop of obj.properties) {
     if (!import_typescript63.default.isPropertyAssignment(prop)) continue;
-    if (!import_typescript63.default.isIdentifier(prop.name) || prop.name.text !== propertyName) continue;
+    if (!import_typescript63.default.isIdentifier(prop.name) || prop.name.text !== propertyName)
+      continue;
     if (prop.initializer.kind === import_typescript63.default.SyntaxKind.TrueKeyword) return true;
     if (prop.initializer.kind === import_typescript63.default.SyntaxKind.FalseKeyword) return false;
   }
@@ -236299,7 +236325,8 @@ function getCallExpressionInitializer(prop) {
 function getExpressionProperty(obj, propertyName) {
   for (const prop of obj.properties) {
     if (!import_typescript63.default.isPropertyAssignment(prop)) continue;
-    if (!import_typescript63.default.isIdentifier(prop.name) || prop.name.text !== propertyName) continue;
+    if (!import_typescript63.default.isIdentifier(prop.name) || prop.name.text !== propertyName)
+      continue;
     return prop.initializer;
   }
   return void 0;
@@ -236310,7 +236337,11 @@ function extractParams(checker, parameters, sourceFile, parentSymbol) {
     const paramSymbol = checker.getSymbolAtLocation(param.name);
     const paramType = paramSymbol ? checker.getTypeOfSymbolAtLocation(paramSymbol, param) : checker.getTypeAtLocation(param);
     const optional = !!param.questionToken || !!param.initializer;
-    let type = checker.typeToString(paramType, param, import_typescript63.default.TypeFormatFlags.NoTruncation);
+    let type = checker.typeToString(
+      paramType,
+      param,
+      import_typescript63.default.TypeFormatFlags.NoTruncation
+    );
     if (param.questionToken && type.endsWith(" | undefined")) {
       type = type.slice(0, -" | undefined".length);
     }
@@ -236371,11 +236402,19 @@ function getEmitterEventType(checker, type, enclosingDecl) {
   if (name === "EventEmitter" || name === "OutputEmitterRef") {
     const typeArgs = getTypeArguments(checker, type);
     if (typeArgs.length > 0) {
-      return checker.typeToString(typeArgs[0], enclosingDecl, import_typescript64.default.TypeFormatFlags.NoTruncation);
+      return checker.typeToString(
+        typeArgs[0],
+        enclosingDecl,
+        import_typescript64.default.TypeFormatFlags.NoTruncation
+      );
     }
     return "void";
   }
-  return checker.typeToString(type, enclosingDecl, import_typescript64.default.TypeFormatFlags.NoTruncation);
+  return checker.typeToString(
+    type,
+    enclosingDecl,
+    import_typescript64.default.TypeFormatFlags.NoTruncation
+  );
 }
 function getPropertyType(checker, symbol, decl) {
   return checker.getTypeOfSymbolAtLocation(symbol, decl);
@@ -236470,7 +236509,12 @@ function extractPipe(checker, classDecl, decorator, sourceFile) {
   const standalone = obj ? getBooleanProperty(obj, "standalone") ?? true : true;
   const pure = obj ? getBooleanProperty(obj, "pure") ?? true : true;
   const transformMethod = findTransformMethod(classDecl);
-  const transformDoc = transformMethod ? extractTransformSignature(checker, transformMethod, classSymbol, sourceFile) : { params: [], returnType: "any" };
+  const transformDoc = transformMethod ? extractTransformSignature(
+    checker,
+    transformMethod,
+    classSymbol,
+    sourceFile
+  ) : { params: [], returnType: "any" };
   return {
     name: classSymbol.getName(),
     filePath: sourceFile.fileName,
@@ -236604,7 +236648,8 @@ function isCallFrom(checker, callExpr, moduleName) {
 }
 function getBaseIdentifier(node) {
   if (import_typescript66.default.isIdentifier(node)) return node;
-  if (import_typescript66.default.isPropertyAccessExpression(node)) return getBaseIdentifier(node.expression);
+  if (import_typescript66.default.isPropertyAccessExpression(node))
+    return getBaseIdentifier(node.expression);
   return void 0;
 }
 function getCallName(callExpr) {
@@ -236636,7 +236681,11 @@ function tryExtractSignalInput(checker, prop, callExpr, sourceFile) {
   const isRequired = callName === "required";
   const symbol = checker.getSymbolAtLocation(prop.name);
   const name = symbol.getName();
-  const { alias, transform } = extractInputOptions(callExpr, sourceFile, isRequired);
+  const { alias, transform } = extractInputOptions(
+    callExpr,
+    sourceFile,
+    isRequired
+  );
   return {
     name,
     bindingName: alias ?? name,
@@ -236681,7 +236730,8 @@ function extractInputOptions(callExpr, sourceFile, isRequired) {
 }
 function extractModelAlias(callExpr, isRequired) {
   const optionsArg = getOptionsArg(callExpr, isRequired);
-  if (!optionsArg || !import_typescript67.default.isObjectLiteralExpression(optionsArg)) return void 0;
+  if (!optionsArg || !import_typescript67.default.isObjectLiteralExpression(optionsArg))
+    return void 0;
   return getStringProperty(optionsArg, "alias");
 }
 function getOptionsArg(callExpr, isRequired) {
@@ -236831,7 +236881,9 @@ function extractInterfaceProperty(checker, member, sourceFile) {
   if (!symbol) return null;
   let type = checker.getTypeOfSymbolAtLocation(symbol, member);
   if (member.questionToken && type.isUnion()) {
-    const filtered = type.types.filter((t) => !(t.flags & import_typescript611.default.TypeFlags.Undefined));
+    const filtered = type.types.filter(
+      (t) => !(t.flags & import_typescript611.default.TypeFlags.Undefined)
+    );
     if (filtered.length === 1) {
       type = filtered[0];
     }
@@ -236856,9 +236908,15 @@ function extractInterfaceMethod(checker, member, sourceFile) {
       const paramSymbol = checker.getSymbolAtLocation(param.name);
       let paramType = paramSymbol ? checker.getTypeOfSymbolAtLocation(paramSymbol, param) : checker.getTypeAtLocation(param);
       if (paramType.isUnion()) {
-        const filtered = paramType.types.filter((t) => !(t.flags & import_typescript611.default.TypeFlags.Undefined));
+        const filtered = paramType.types.filter(
+          (t) => !(t.flags & import_typescript611.default.TypeFlags.Undefined)
+        );
         if (filtered.length === 1) {
-          params[i].type = checker.typeToString(filtered[0], param, import_typescript611.default.TypeFormatFlags.NoTruncation);
+          params[i].type = checker.typeToString(
+            filtered[0],
+            param,
+            import_typescript611.default.TypeFormatFlags.NoTruncation
+          );
         }
       }
     }
@@ -237009,7 +237067,9 @@ var QUERY_DECORATORS = {
 function createParser(tsconfigPath, options) {
   const configFile = import_typescript615.default.readConfigFile(tsconfigPath, import_typescript615.default.sys.readFile);
   if (configFile.error) {
-    throw new Error(`Failed to read tsconfig: ${import_typescript615.default.flattenDiagnosticMessageText(configFile.error.messageText, "\n")}`);
+    throw new Error(
+      `Failed to read tsconfig: ${import_typescript615.default.flattenDiagnosticMessageText(configFile.error.messageText, "\n")}`
+    );
   }
   const parsedConfig = import_typescript615.default.parseJsonConfigFileContent(
     configFile.config,
@@ -237020,7 +237080,11 @@ function createParser(tsconfigPath, options) {
     ...parsedConfig.options,
     ...options?.compilerOptions
   };
-  return createParserFromProgram(mergedOptions, parsedConfig.fileNames, options);
+  return createParserFromProgram(
+    mergedOptions,
+    parsedConfig.fileNames,
+    options
+  );
 }
 function createParserFromProgram(compilerOptions, rootFileNames, options) {
   let program;
@@ -237071,7 +237135,14 @@ function extractFromProgram(program, filePaths, options) {
       const directiveDecorator = decorators.find((d) => d.name === "Directive");
       const decorator = componentDecorator ?? directiveDecorator;
       if (!decorator) return;
-      const doc = extractComponentDoc(checker, node, decorator, sourceFile, program, options);
+      const doc = extractComponentDoc(
+        checker,
+        node,
+        decorator,
+        sourceFile,
+        program,
+        options
+      );
       if (doc) results.push(doc);
     });
   }
@@ -237104,17 +237175,35 @@ function extractAllFromProgram(program, filePaths, options) {
           if (pipeDoc) pipes.push(pipeDoc);
           return;
         }
-        const componentDecorator = decorators.find((d) => d.name === "Component");
-        const directiveDecorator = decorators.find((d) => d.name === "Directive");
+        const componentDecorator = decorators.find(
+          (d) => d.name === "Component"
+        );
+        const directiveDecorator = decorators.find(
+          (d) => d.name === "Directive"
+        );
         const decorator = componentDecorator ?? directiveDecorator;
         if (decorator) {
-          const doc = extractComponentDoc(checker, node, decorator, sourceFile, program, options);
+          const doc = extractComponentDoc(
+            checker,
+            node,
+            decorator,
+            sourceFile,
+            program,
+            options
+          );
           if (doc) components.push(doc);
           return;
         }
-        const injectableDecorator = decorators.find((d) => d.name === "Injectable");
+        const injectableDecorator = decorators.find(
+          (d) => d.name === "Injectable"
+        );
         if (injectableDecorator) {
-          const injectableDoc = extractInjectable(checker, node, injectableDecorator, sourceFile);
+          const injectableDoc = extractInjectable(
+            checker,
+            node,
+            injectableDecorator,
+            sourceFile
+          );
           if (injectableDoc) injectables.push(injectableDoc);
           return;
         }
@@ -237154,7 +237243,17 @@ function extractAllFromProgram(program, filePaths, options) {
       }
     });
   }
-  return { components, pipes, injectables, interfaces, typeAliases, enums, classes, functions, variables };
+  return {
+    components,
+    pipes,
+    injectables,
+    interfaces,
+    typeAliases,
+    enums,
+    classes,
+    functions,
+    variables
+  };
 }
 function extractComponentDoc(checker, classDecl, decorator, sourceFile, program, options) {
   const classSymbol = classDecl.name ? checker.getSymbolAtLocation(classDecl.name) : void 0;
@@ -237172,7 +237271,14 @@ function extractComponentDoc(checker, classDecl, decorator, sourceFile, program,
     hostListeners: []
   };
   const leafNames = /* @__PURE__ */ new Set();
-  extractMembersIntoCollections(checker, classDecl, sourceFile, options, collections, leafNames);
+  extractMembersIntoCollections(
+    checker,
+    classDecl,
+    sourceFile,
+    options,
+    collections,
+    leafNames
+  );
   if (options?.shouldIncludeInherited !== false) {
     resolveInheritance(
       checker,
@@ -237191,7 +237297,10 @@ function extractComponentDoc(checker, classDecl, decorator, sourceFile, program,
       leafNames
     );
   }
-  const { implements: implementsList, extends: extendsName } = getHeritageInfo(classDecl, sourceFile);
+  const { implements: implementsList, extends: extendsName } = getHeritageInfo(
+    classDecl,
+    sourceFile
+  );
   const name = resolveComponentName(classSymbol, sourceFile, options);
   const doc = {
     name,
@@ -237247,7 +237356,12 @@ function extractMembersIntoCollections(checker, classDecl, sourceFile, options, 
     if (import_typescript615.default.isMethodDeclaration(member)) {
       const hostListenerDecorator = findDecorator(member, "HostListener");
       if (hostListenerDecorator) {
-        const listenerDoc = extractHostListener(checker, member, hostListenerDecorator, sourceFile);
+        const listenerDoc = extractHostListener(
+          checker,
+          member,
+          hostListenerDecorator,
+          sourceFile
+        );
         if (listenerDoc) collections.hostListeners.push(listenerDoc);
         continue;
       }
@@ -237260,7 +237374,12 @@ function extractMembersIntoCollections(checker, classDecl, sourceFile, options, 
     if (import_typescript615.default.isGetAccessorDeclaration(member)) {
       const hostBindingDecorator = findDecorator(member, "HostBinding");
       if (hostBindingDecorator) {
-        const bindingDoc = extractHostBindingFromAccessor(checker, member, hostBindingDecorator, sourceFile);
+        const bindingDoc = extractHostBindingFromAccessor(
+          checker,
+          member,
+          hostBindingDecorator,
+          sourceFile
+        );
         if (bindingDoc) collections.hostBindings.push(bindingDoc);
       }
       continue;
@@ -237288,7 +237407,12 @@ function extractPropertyMember(checker, prop, sourceFile, options, inputs, outpu
   if (symbol && isInternal(symbol)) return;
   const callExpr = getCallExpressionInitializer(prop);
   if (callExpr && isAngularCoreCall(checker, callExpr)) {
-    const signalInput = tryExtractSignalInput(checker, prop, callExpr, sourceFile);
+    const signalInput = tryExtractSignalInput(
+      checker,
+      prop,
+      callExpr,
+      sourceFile
+    );
     if (signalInput) {
       inputs.push(signalInput);
       return;
@@ -237304,7 +237428,12 @@ function extractPropertyMember(checker, prop, sourceFile, options, inputs, outpu
       return;
     }
     if (options?.shouldIncludeQueries) {
-      const queryDoc = tryExtractSignalQuery(checker, prop, callExpr, sourceFile);
+      const queryDoc = tryExtractSignalQuery(
+        checker,
+        prop,
+        callExpr,
+        sourceFile
+      );
       if (queryDoc) {
         queries.push(queryDoc);
         return;
@@ -237313,16 +237442,25 @@ function extractPropertyMember(checker, prop, sourceFile, options, inputs, outpu
   }
   const decorators = getDecorators(prop);
   if (hostBindings) {
-    const hostBindingDecorator = decorators.find((d) => d.name === "HostBinding");
+    const hostBindingDecorator = decorators.find(
+      (d) => d.name === "HostBinding"
+    );
     if (hostBindingDecorator) {
-      const bindingDoc = extractHostBindingFromProperty(checker, prop, hostBindingDecorator, sourceFile);
+      const bindingDoc = extractHostBindingFromProperty(
+        checker,
+        prop,
+        hostBindingDecorator,
+        sourceFile
+      );
       if (bindingDoc) hostBindings.push(bindingDoc);
       return;
     }
   }
   const inputDecorator = decorators.find((d) => d.name === "Input");
   if (inputDecorator) {
-    inputs.push(extractDecoratorInput(checker, prop, inputDecorator, sourceFile));
+    inputs.push(
+      extractDecoratorInput(checker, prop, inputDecorator, sourceFile)
+    );
     return;
   }
   const outputDecorator = decorators.find((d) => d.name === "Output");
@@ -237334,7 +237472,13 @@ function extractPropertyMember(checker, prop, sourceFile, options, inputs, outpu
     const qDecorator = decorators.find((d) => d.name in QUERY_DECORATORS);
     if (qDecorator) {
       const queryKind = QUERY_DECORATORS[qDecorator.name];
-      const queryDoc = extractDecoratorQuery(checker, prop, qDecorator, queryKind, sourceFile);
+      const queryDoc = extractDecoratorQuery(
+        checker,
+        prop,
+        qDecorator,
+        queryKind,
+        sourceFile
+      );
       if (queryDoc) queries.push(queryDoc);
       return;
     }
@@ -237372,7 +237516,16 @@ function resolveInheritance(checker, classDecl, sourceFile, program, options, in
   const baseSourceFile = baseDecl.getSourceFile();
   if (!existingNames) {
     existingNames = /* @__PURE__ */ new Set();
-    for (const list of [inputs, outputs, models, properties, methods, queries, hostBindings ?? [], hostListeners ?? []]) {
+    for (const list of [
+      inputs,
+      outputs,
+      models,
+      properties,
+      methods,
+      queries,
+      hostBindings ?? [],
+      hostListeners ?? []
+    ]) {
       for (const item of list) {
         existingNames.add(item.name);
       }
@@ -237436,7 +237589,11 @@ function extractHostBindingFromAccessor(checker, accessor, decorator, sourceFile
   if (!memberName) return null;
   const hostPropertyName = getDecoratorStringArg(decorator) ?? memberName;
   const signature = checker.getSignatureFromDeclaration(accessor);
-  const returnType = signature ? checker.typeToString(checker.getReturnTypeOfSignature(signature), accessor, import_typescript615.default.TypeFormatFlags.NoTruncation) : "unknown";
+  const returnType = signature ? checker.typeToString(
+    checker.getReturnTypeOfSignature(signature),
+    accessor,
+    import_typescript615.default.TypeFormatFlags.NoTruncation
+  ) : "unknown";
   return {
     name: memberName,
     hostPropertyName,
@@ -237480,7 +237637,9 @@ function extractHostListener(checker, method, decorator, sourceFile) {
 
 // src/diff-formatters.ts
 function humanizeChange(change) {
-  return change.split("-").map((word, i) => i === 0 ? word.charAt(0).toUpperCase() + word.slice(1) : word).join(" ");
+  return change.split("-").map(
+    (word, i) => i === 0 ? word.charAt(0).toUpperCase() + word.slice(1) : word
+  ).join(" ");
 }
 function formatDetails(change) {
   const d = change.details;
@@ -237564,7 +237723,9 @@ function formatDiffText(result) {
     for (const [component, changes] of groups) {
       lines.push(`  ${component}`);
       for (const change of changes) {
-        lines.push(`    \u2717 ${humanizeChange(change.change)}: ${change.name} (${formatDetails(change)})`);
+        lines.push(
+          `    \u2717 ${humanizeChange(change.change)}: ${change.name} (${formatDetails(change)})`
+        );
       }
       lines.push("");
     }
@@ -237576,7 +237737,9 @@ function formatDiffText(result) {
     for (const [component, changes] of groups) {
       lines.push(`  ${component}`);
       for (const change of changes) {
-        lines.push(`    + ${humanizeChange(change.change)}: ${change.name} (${formatDetails(change)})`);
+        lines.push(
+          `    + ${humanizeChange(change.change)}: ${change.name} (${formatDetails(change)})`
+        );
       }
       lines.push("");
     }
@@ -237589,7 +237752,9 @@ function formatDiffJson(result) {
 function formatDiffMarkdown(result) {
   const lines = [];
   const { breaking, nonBreaking, summary: summary2 } = result;
-  lines.push(`## API Diff: ${summary2.breaking} breaking, ${summary2.nonBreaking} non-breaking changes`);
+  lines.push(
+    `## API Diff: ${summary2.breaking} breaking, ${summary2.nonBreaking} non-breaking changes`
+  );
   lines.push("");
   if (breaking.length > 0) {
     lines.push("### Breaking Changes");
@@ -237631,7 +237796,9 @@ async function run() {
     setFailed(`Base file not found: ${basePath}`);
     return;
   }
-  const baseDocs = JSON.parse(import_fs3.default.readFileSync(basePath, "utf-8"));
+  const baseDocs = JSON.parse(
+    import_fs3.default.readFileSync(basePath, "utf-8")
+  );
   let headDocs;
   if (headPath) {
     const resolved = import_path.default.resolve(headPath);
@@ -237652,7 +237819,9 @@ async function run() {
     }
     const parser = createParser(tsconfigPath);
     const program = parser.getProgram();
-    const sourceFiles = program.getSourceFiles().filter((sf) => !sf.isDeclarationFile && !sf.fileName.includes("node_modules")).map((sf) => sf.fileName);
+    const sourceFiles = program.getSourceFiles().filter(
+      (sf) => !sf.isDeclarationFile && !sf.fileName.includes("node_modules")
+    ).map((sf) => sf.fileName);
     headDocs = parser.parse(sourceFiles);
   }
   const result = diff(baseDocs, headDocs);
@@ -237671,10 +237840,17 @@ async function run() {
   }
   setOutput("breaking-count", String(result.summary.breaking));
   setOutput("non-breaking-count", String(result.summary.nonBreaking));
-  setOutput("has-breaking", result.summary.breaking > 0 ? "true" : "false");
+  setOutput(
+    "has-breaking",
+    result.summary.breaking > 0 ? "true" : "false"
+  );
   setOutput("diff-output", output);
   if (commentOnPr) {
-    await postPrComment(result.summary.breaking, result.summary.nonBreaking, output);
+    await postPrComment(
+      result.summary.breaking,
+      result.summary.nonBreaking,
+      output
+    );
   }
   if (failOnBreaking && result.summary.breaking > 0) {
     setFailed(
@@ -237727,9 +237903,7 @@ No API changes detected.`;
     repo,
     issue_number: issueNumber
   });
-  const existing = comments.find(
-    (c) => c.body?.includes(COMMENT_MARKER)
-  );
+  const existing = comments.find((c) => c.body?.includes(COMMENT_MARKER));
   if (existing) {
     await octokit.rest.issues.updateComment({
       owner,

@@ -22,7 +22,7 @@ describe('decorator-based components', () => {
 
   describe('inputs', () => {
     it('extracts simple @Input with default', () => {
-      const input = doc.inputs.find(i => i.name === 'label');
+      const input = doc.inputs.find((i) => i.name === 'label');
       expect(input).toBeDefined();
       expect(input!.type).toBe('string');
       expect(input!.required).toBe(false);
@@ -33,14 +33,14 @@ describe('decorator-based components', () => {
     });
 
     it('extracts required @Input', () => {
-      const input = doc.inputs.find(i => i.name === 'disabled');
+      const input = doc.inputs.find((i) => i.name === 'disabled');
       expect(input).toBeDefined();
       expect(input!.required).toBe(true);
       expect(input!.type).toBe('boolean');
     });
 
     it('extracts @Input with alias (string arg form)', () => {
-      const input = doc.inputs.find(i => i.name === 'variant');
+      const input = doc.inputs.find((i) => i.name === 'variant');
       expect(input).toBeDefined();
       expect(input!.bindingName).toBe('btnVariant');
       expect(input!.type).toBe('"primary" | "secondary" | "danger"');
@@ -50,7 +50,7 @@ describe('decorator-based components', () => {
 
   describe('outputs', () => {
     it('extracts simple @Output with EventEmitter', () => {
-      const output = doc.outputs.find(o => o.name === 'clicked');
+      const output = doc.outputs.find((o) => o.name === 'clicked');
       expect(output).toBeDefined();
       expect(output!.type).toBe('MouseEvent');
       expect(output!.bindingName).toBe('clicked');
@@ -58,7 +58,7 @@ describe('decorator-based components', () => {
     });
 
     it('extracts @Output with alias', () => {
-      const output = doc.outputs.find(o => o.name === 'focused');
+      const output = doc.outputs.find((o) => o.name === 'focused');
       expect(output).toBeDefined();
       expect(output!.bindingName).toBe('btnFocus');
       expect(output!.type).toBe('FocusEvent');
@@ -67,31 +67,35 @@ describe('decorator-based components', () => {
 
   describe('properties', () => {
     it('includes public properties', () => {
-      const prop = doc.properties.find(p => p.name === 'clickCount');
+      const prop = doc.properties.find((p) => p.name === 'clickCount');
       expect(prop).toBeDefined();
       expect(prop!.type).toBe('number');
       expect(prop!.defaultValue).toBe('0');
     });
 
     it('excludes private properties', () => {
-      expect(doc.properties.find(p => p.name === '_internalState')).toBeUndefined();
+      expect(
+        doc.properties.find((p) => p.name === '_internalState'),
+      ).toBeUndefined();
     });
   });
 
   describe('methods', () => {
     it('includes public methods', () => {
-      const method = doc.methods.find(m => m.name === 'reset');
+      const method = doc.methods.find((m) => m.name === 'reset');
       expect(method).toBeDefined();
       expect(method!.returnType).toBe('void');
       expect(method!.description).toContain('Reset');
     });
 
     it('excludes lifecycle hooks', () => {
-      expect(doc.methods.find(m => m.name === 'ngOnInit')).toBeUndefined();
+      expect(doc.methods.find((m) => m.name === 'ngOnInit')).toBeUndefined();
     });
 
     it('excludes @internal methods', () => {
-      expect(doc.methods.find(m => m.name === '_handleClick')).toBeUndefined();
+      expect(
+        doc.methods.find((m) => m.name === '_handleClick'),
+      ).toBeUndefined();
     });
   });
 });
@@ -106,7 +110,7 @@ describe('signal-based components', () => {
 
   describe('signal inputs', () => {
     it('extracts required signal input', () => {
-      const input = doc.inputs.find(i => i.name === 'title');
+      const input = doc.inputs.find((i) => i.name === 'title');
       expect(input).toBeDefined();
       expect(input!.type).toBe('string');
       expect(input!.required).toBe(true);
@@ -115,7 +119,7 @@ describe('signal-based components', () => {
     });
 
     it('extracts signal input with default and alias', () => {
-      const input = doc.inputs.find(i => i.name === 'size');
+      const input = doc.inputs.find((i) => i.name === 'size');
       expect(input).toBeDefined();
       expect(input!.bindingName).toBe('cardSize');
       expect(input!.required).toBe(false);
@@ -124,7 +128,7 @@ describe('signal-based components', () => {
     });
 
     it('extracts signal input with boolean default', () => {
-      const input = doc.inputs.find(i => i.name === 'elevated');
+      const input = doc.inputs.find((i) => i.name === 'elevated');
       expect(input).toBeDefined();
       expect(input!.defaultValue).toBe('false');
       expect(input!.required).toBe(false);
@@ -133,7 +137,7 @@ describe('signal-based components', () => {
 
   describe('signal outputs', () => {
     it('extracts typed signal output', () => {
-      const output = doc.outputs.find(o => o.name === 'selected');
+      const output = doc.outputs.find((o) => o.name === 'selected');
       expect(output).toBeDefined();
       expect(output!.type).toBe('string');
       expect(output!.source).toBe('signal');
@@ -141,7 +145,7 @@ describe('signal-based components', () => {
     });
 
     it('extracts signal output with alias', () => {
-      const output = doc.outputs.find(o => o.name === 'dismissed');
+      const output = doc.outputs.find((o) => o.name === 'dismissed');
       expect(output).toBeDefined();
       expect(output!.bindingName).toBe('cardDismissed');
       expect(output!.type).toBe('void');
@@ -150,7 +154,7 @@ describe('signal-based components', () => {
 
   describe('models', () => {
     it('extracts model with default', () => {
-      const m = doc.models.find(m => m.name === 'expanded');
+      const m = doc.models.find((m) => m.name === 'expanded');
       expect(m).toBeDefined();
       expect(m!.type).toBe('boolean');
       expect(m!.required).toBe(false);
@@ -158,7 +162,7 @@ describe('signal-based components', () => {
     });
 
     it('extracts required model', () => {
-      const m = doc.models.find(m => m.name === 'activeTab');
+      const m = doc.models.find((m) => m.name === 'activeTab');
       expect(m).toBeDefined();
       expect(m!.type).toBe('string');
       expect(m!.required).toBe(true);
@@ -214,21 +218,21 @@ describe('directives', () => {
   });
 
   it('extracts directive inputs with alias', () => {
-    const input = doc.inputs.find(i => i.name === 'text');
+    const input = doc.inputs.find((i) => i.name === 'text');
     expect(input).toBeDefined();
     expect(input!.bindingName).toBe('appTooltip');
     expect(input!.required).toBe(true);
   });
 
   it('extracts directive methods', () => {
-    expect(doc.methods.find(m => m.name === 'show')).toBeDefined();
-    expect(doc.methods.find(m => m.name === 'hide')).toBeDefined();
+    expect(doc.methods.find((m) => m.name === 'show')).toBeDefined();
+    expect(doc.methods.find((m) => m.name === 'hide')).toBeDefined();
   });
 });
 
 describe('inheritance', () => {
   const docs = parseComponents('inheritance.component.ts');
-  const child = docs.find(d => d.name === 'ChildComponent')!;
+  const child = docs.find((d) => d.name === 'ChildComponent')!;
 
   it('finds both components', () => {
     expect(docs).toHaveLength(2);
@@ -236,20 +240,20 @@ describe('inheritance', () => {
 
   it('inherits inputs from base', () => {
     // 'visible' comes from BaseComponent via signal input
-    const visible = child.inputs.find(i => i.name === 'visible');
+    const visible = child.inputs.find((i) => i.name === 'visible');
     expect(visible).toBeDefined();
     expect(visible!.source).toBe('signal');
   });
 
   it('child overrides are preserved', () => {
     // 'id' is overridden in child
-    const id = child.inputs.find(i => i.name === 'id');
+    const id = child.inputs.find((i) => i.name === 'id');
     expect(id).toBeDefined();
     expect(id!.defaultValue).toBe("'child-default'");
   });
 
   it('inherits methods from base', () => {
-    const reset = child.methods.find(m => m.name === 'reset');
+    const reset = child.methods.find((m) => m.name === 'reset');
     expect(reset).toBeDefined();
   });
 
@@ -263,16 +267,16 @@ describe('mixed decorator + signal', () => {
 
   it('collects both decorator and signal inputs', () => {
     expect(doc.inputs).toHaveLength(2);
-    const decoratorInput = doc.inputs.find(i => i.source === 'decorator');
-    const signalInput = doc.inputs.find(i => i.source === 'signal');
+    const decoratorInput = doc.inputs.find((i) => i.source === 'decorator');
+    const signalInput = doc.inputs.find((i) => i.source === 'signal');
     expect(decoratorInput!.name).toBe('name');
     expect(signalInput!.name).toBe('age');
   });
 
   it('collects both decorator and signal outputs', () => {
     expect(doc.outputs).toHaveLength(2);
-    const decoratorOutput = doc.outputs.find(o => o.source === 'decorator');
-    const signalOutput = doc.outputs.find(o => o.source === 'signal');
+    const decoratorOutput = doc.outputs.find((o) => o.source === 'decorator');
+    const signalOutput = doc.outputs.find((o) => o.source === 'signal');
     expect(decoratorOutput!.name).toBe('saved');
     expect(signalOutput!.name).toBe('deleted');
   });
@@ -283,18 +287,18 @@ describe('mixed decorator + signal', () => {
   });
 
   it('collects plain properties', () => {
-    const loading = doc.properties.find(p => p.name === 'loading');
+    const loading = doc.properties.find((p) => p.name === 'loading');
     expect(loading).toBeDefined();
     expect(loading!.type).toBe('boolean');
   });
 
   it('collects methods with modifiers', () => {
-    const submit = doc.methods.find(m => m.name === 'submit');
+    const submit = doc.methods.find((m) => m.name === 'submit');
     expect(submit).toBeDefined();
     expect(submit!.returnType).toBe('boolean');
     expect(submit!.modifier).toBe('public');
 
-    const internal = doc.methods.find(m => m.name === 'internalMethod');
+    const internal = doc.methods.find((m) => m.name === 'internalMethod');
     expect(internal).toBeDefined();
     expect(internal!.modifier).toBe('protected');
   });
@@ -310,9 +314,9 @@ describe('parser options', () => {
 
   it('respects propFilter', () => {
     const doc = parseFirstComponent('decorator-basic.component.ts', {
-      propFilter: (prop) => 'required' in prop ? prop.required : true,
+      propFilter: (prop) => ('required' in prop ? prop.required : true),
     });
     // Only required inputs should remain
-    expect(doc.inputs.every(i => i.required)).toBe(true);
+    expect(doc.inputs.every((i) => i.required)).toBe(true);
   });
 });

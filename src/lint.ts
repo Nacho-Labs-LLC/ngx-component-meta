@@ -20,7 +20,12 @@ export interface LintViolation {
 
 export interface LintResult {
   violations: LintViolation[];
-  summary: { errors: number; warnings: number; components: number; passed: number };
+  summary: {
+    errors: number;
+    warnings: number;
+    components: number;
+    passed: number;
+  };
 }
 
 export interface LintOptions {
@@ -56,7 +61,9 @@ const DEFAULT_RULES: Required<LintRuleConfig> = {
   'require-selector': 'error',
 };
 
-function resolveRules(userRules?: Partial<LintRuleConfig>): Required<LintRuleConfig> {
+function resolveRules(
+  userRules?: Partial<LintRuleConfig>,
+): Required<LintRuleConfig> {
   return { ...DEFAULT_RULES, ...userRules };
 }
 
@@ -81,10 +88,16 @@ function lintComponent(
   const before = violations.length;
 
   // require-component-description
-  if (rules['require-component-description'] !== 'off' && !doc.description.trim()) {
+  if (
+    rules['require-component-description'] !== 'off' &&
+    !doc.description.trim()
+  ) {
     pushViolation(
-      violations, rules['require-component-description'],
-      'require-component-description', doc.name, doc.filePath,
+      violations,
+      rules['require-component-description'],
+      'require-component-description',
+      doc.name,
+      doc.filePath,
       `Component is missing a description`,
     );
   }
@@ -92,18 +105,27 @@ function lintComponent(
   // require-selector
   if (rules['require-selector'] !== 'off' && !doc.selector) {
     pushViolation(
-      violations, rules['require-selector'],
-      'require-selector', doc.name, doc.filePath,
+      violations,
+      rules['require-selector'],
+      'require-selector',
+      doc.name,
+      doc.filePath,
       `Component must have a selector defined`,
     );
   }
 
   // Input rules
   for (const input of doc.inputs) {
-    if (rules['require-input-description'] !== 'off' && !input.description.trim()) {
+    if (
+      rules['require-input-description'] !== 'off' &&
+      !input.description.trim()
+    ) {
       pushViolation(
-        violations, rules['require-input-description'],
-        'require-input-description', doc.name, doc.filePath,
+        violations,
+        rules['require-input-description'],
+        'require-input-description',
+        doc.name,
+        doc.filePath,
         `Input is missing a description`,
         input.name,
       );
@@ -111,17 +133,27 @@ function lintComponent(
 
     if (rules['no-any-inputs'] !== 'off' && input.type === 'any') {
       pushViolation(
-        violations, rules['no-any-inputs'],
-        'no-any-inputs', doc.name, doc.filePath,
+        violations,
+        rules['no-any-inputs'],
+        'no-any-inputs',
+        doc.name,
+        doc.filePath,
         `Input should not use type 'any'`,
         input.name,
       );
     }
 
-    if (rules['no-required-with-default'] !== 'off' && input.required && input.defaultValue !== undefined) {
+    if (
+      rules['no-required-with-default'] !== 'off' &&
+      input.required &&
+      input.defaultValue !== undefined
+    ) {
       pushViolation(
-        violations, rules['no-required-with-default'],
-        'no-required-with-default', doc.name, doc.filePath,
+        violations,
+        rules['no-required-with-default'],
+        'no-required-with-default',
+        doc.name,
+        doc.filePath,
         `Required input should not have a default value`,
         input.name,
       );
@@ -130,10 +162,16 @@ function lintComponent(
 
   // Output rules
   for (const output of doc.outputs) {
-    if (rules['require-output-description'] !== 'off' && !output.description.trim()) {
+    if (
+      rules['require-output-description'] !== 'off' &&
+      !output.description.trim()
+    ) {
       pushViolation(
-        violations, rules['require-output-description'],
-        'require-output-description', doc.name, doc.filePath,
+        violations,
+        rules['require-output-description'],
+        'require-output-description',
+        doc.name,
+        doc.filePath,
         `Output is missing a description`,
         output.name,
       );
@@ -141,8 +179,11 @@ function lintComponent(
 
     if (rules['no-any-outputs'] !== 'off' && output.type === 'any') {
       pushViolation(
-        violations, rules['no-any-outputs'],
-        'no-any-outputs', doc.name, doc.filePath,
+        violations,
+        rules['no-any-outputs'],
+        'no-any-outputs',
+        doc.name,
+        doc.filePath,
         `Output should not use type 'any'`,
         output.name,
       );
@@ -159,10 +200,16 @@ function lintPipe(
 ): boolean {
   const before = violations.length;
 
-  if (rules['require-component-description'] !== 'off' && !doc.description.trim()) {
+  if (
+    rules['require-component-description'] !== 'off' &&
+    !doc.description.trim()
+  ) {
     pushViolation(
-      violations, rules['require-component-description'],
-      'require-component-description', doc.name, doc.filePath,
+      violations,
+      rules['require-component-description'],
+      'require-component-description',
+      doc.name,
+      doc.filePath,
       `Pipe is missing a description`,
     );
   }
@@ -170,7 +217,10 @@ function lintPipe(
   return violations.length === before;
 }
 
-export function lint(docs: ParseResult, options?: Partial<LintOptions>): LintResult {
+export function lint(
+  docs: ParseResult,
+  options?: Partial<LintOptions>,
+): LintResult {
   const rules = resolveRules(options?.rules);
   const violations: LintViolation[] = [];
   let passed = 0;

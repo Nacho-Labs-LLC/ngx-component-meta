@@ -5,6 +5,7 @@ These specs describe features that need to be built to maximize Compodoc replace
 ## Current state (v0.1.0)
 
 The core library is complete and tested:
+
 - Parses components, directives, and pipes
 - Handles both decorator (`@Input`, `@Output`) and signal (`input()`, `output()`, `model()`) APIs
 - Extracts JSDoc, types, defaults, aliases, transforms
@@ -14,15 +15,15 @@ The core library is complete and tested:
 
 ## Specs (ordered by priority)
 
-| # | Spec | Priority | Estimated scope | Status |
-|---|------|----------|-----------------|--------|
-| 01 | [Storybook Builder Plugin](./01-storybook-builder-plugin.md) | P0 | ~300 LOC, new package | Not started |
-| 02 | [Migration Guide & README](./02-migration-guide.md) | P0 | Docs only | Not started |
-| 03 | [Watch Mode](./03-watch-mode.md) | P1 | ~200 LOC in core | Not started |
-| 04 | [Markdown Output](./04-markdown-output.md) | P1 | ~150 LOC in cli/formatters | Not started |
-| 05 | [Vite/esbuild Plugin](./05-vite-plugin.md) | P2 | ~200 LOC, new package | Not started |
-| 06 | [API Diff Tool](./06-api-diff.md) | P2 | ~300 LOC, new CLI command | Not started |
-| 07 | [Injectables & Interfaces](./07-injectables-interfaces.md) | P3 | ~200 LOC in extractors | Not started |
+| #   | Spec                                                         | Priority | Estimated scope            | Status      |
+| --- | ------------------------------------------------------------ | -------- | -------------------------- | ----------- |
+| 01  | [Storybook Builder Plugin](./01-storybook-builder-plugin.md) | P0       | ~300 LOC, new package      | Not started |
+| 02  | [Migration Guide & README](./02-migration-guide.md)          | P0       | Docs only                  | Not started |
+| 03  | [Watch Mode](./03-watch-mode.md)                             | P1       | ~200 LOC in core           | Not started |
+| 04  | [Markdown Output](./04-markdown-output.md)                   | P1       | ~150 LOC in cli/formatters | Not started |
+| 05  | [Vite/esbuild Plugin](./05-vite-plugin.md)                   | P2       | ~200 LOC, new package      | Not started |
+| 06  | [API Diff Tool](./06-api-diff.md)                            | P2       | ~300 LOC, new CLI command  | Not started |
+| 07  | [Injectables & Interfaces](./07-injectables-interfaces.md)   | P3       | ~200 LOC in extractors     | Not started |
 
 ## Repo structure
 

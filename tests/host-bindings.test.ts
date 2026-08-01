@@ -12,7 +12,7 @@ describe('host bindings and listeners', () => {
   });
 
   it('keeps @Input in inputs (not misclassified)', () => {
-    const colorInput = doc.inputs.find(i => i.name === 'color');
+    const colorInput = doc.inputs.find((i) => i.name === 'color');
     expect(colorInput).toBeDefined();
     expect(colorInput!.type).toBe('string');
     expect(colorInput!.defaultValue).toBe("'yellow'");
@@ -25,7 +25,7 @@ describe('host bindings and listeners', () => {
     });
 
     it('extracts class.highlighted binding from property', () => {
-      const binding = doc.hostBindings.find(b => b.name === 'isHighlighted');
+      const binding = doc.hostBindings.find((b) => b.name === 'isHighlighted');
       expect(binding).toBeDefined();
       expect(binding!.hostPropertyName).toBe('class.highlighted');
       expect(binding!.type).toBe('boolean');
@@ -34,7 +34,9 @@ describe('host bindings and listeners', () => {
     });
 
     it('extracts style.backgroundColor binding from getter', () => {
-      const binding = doc.hostBindings.find(b => b.name === 'backgroundColor');
+      const binding = doc.hostBindings.find(
+        (b) => b.name === 'backgroundColor',
+      );
       expect(binding).toBeDefined();
       expect(binding!.hostPropertyName).toBe('style.backgroundColor');
       expect(binding!.type).toBe('string');
@@ -43,7 +45,7 @@ describe('host bindings and listeners', () => {
     });
 
     it('extracts attr.role binding from property', () => {
-      const binding = doc.hostBindings.find(b => b.name === 'role');
+      const binding = doc.hostBindings.find((b) => b.name === 'role');
       expect(binding).toBeDefined();
       expect(binding!.hostPropertyName).toBe('attr.role');
       expect(binding!.type).toBe('string');
@@ -58,7 +60,7 @@ describe('host bindings and listeners', () => {
     });
 
     it('extracts mouseenter listener', () => {
-      const listener = doc.hostListeners.find(l => l.name === 'onMouseEnter');
+      const listener = doc.hostListeners.find((l) => l.name === 'onMouseEnter');
       expect(listener).toBeDefined();
       expect(listener!.eventName).toBe('mouseenter');
       expect(listener!.args).toEqual([]);
@@ -68,7 +70,7 @@ describe('host bindings and listeners', () => {
     });
 
     it('extracts mouseleave listener', () => {
-      const listener = doc.hostListeners.find(l => l.name === 'onMouseLeave');
+      const listener = doc.hostListeners.find((l) => l.name === 'onMouseLeave');
       expect(listener).toBeDefined();
       expect(listener!.eventName).toBe('mouseleave');
       expect(listener!.args).toEqual([]);
@@ -76,7 +78,7 @@ describe('host bindings and listeners', () => {
     });
 
     it('extracts click listener with $event arg and MouseEvent param', () => {
-      const listener = doc.hostListeners.find(l => l.name === 'onClick');
+      const listener = doc.hostListeners.find((l) => l.name === 'onClick');
       expect(listener).toBeDefined();
       expect(listener!.eventName).toBe('click');
       expect(listener!.args).toEqual(['$event']);
@@ -88,14 +90,18 @@ describe('host bindings and listeners', () => {
   });
 
   it('does not include host bindings in properties', () => {
-    expect(doc.properties.find(p => p.name === 'isHighlighted')).toBeUndefined();
-    expect(doc.properties.find(p => p.name === 'role')).toBeUndefined();
-    expect(doc.properties.find(p => p.name === 'backgroundColor')).toBeUndefined();
+    expect(
+      doc.properties.find((p) => p.name === 'isHighlighted'),
+    ).toBeUndefined();
+    expect(doc.properties.find((p) => p.name === 'role')).toBeUndefined();
+    expect(
+      doc.properties.find((p) => p.name === 'backgroundColor'),
+    ).toBeUndefined();
   });
 
   it('does not include host listeners in methods', () => {
-    expect(doc.methods.find(m => m.name === 'onMouseEnter')).toBeUndefined();
-    expect(doc.methods.find(m => m.name === 'onMouseLeave')).toBeUndefined();
-    expect(doc.methods.find(m => m.name === 'onClick')).toBeUndefined();
+    expect(doc.methods.find((m) => m.name === 'onMouseEnter')).toBeUndefined();
+    expect(doc.methods.find((m) => m.name === 'onMouseLeave')).toBeUndefined();
+    expect(doc.methods.find((m) => m.name === 'onClick')).toBeUndefined();
   });
 });

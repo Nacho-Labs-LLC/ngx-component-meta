@@ -1,6 +1,13 @@
 # Changelog
 
-## 0.1.0 (unreleased)
+## 0.1.1
+
+- Add enforced formatting and lint checks.
+- Run browser E2E and package-content verification in CI and publish workflows.
+- Update development dependencies and resolve the PostCSS advisory.
+- Make the committed GitHub Action bundle reproducible across line-ending conventions.
+
+## 0.1.0
 
 Initial release.
 

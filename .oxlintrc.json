@@ -1,0 +1,17 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "categories": {
+    "correctness": "error"
+  },
+  "ignorePatterns": [
+    "dist/**",
+    "action/dist/**",
+    "demo/**",
+    "test-results/**",
+    "tests/**"
+  ],
+  "rules": {
+    "eslint/no-unused-vars": "off",
+    "oxc/only-used-in-recursion": "off"
+  }
+}

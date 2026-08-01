@@ -40,14 +40,14 @@ describe('injectables', () => {
   });
 
   it('extracts @Injectable without providedIn as providedIn: null', () => {
-    const logSvc = result.injectables.find(i => i.name === 'LogService');
+    const logSvc = result.injectables.find((i) => i.name === 'LogService');
     expect(logSvc).toBeDefined();
     expect(logSvc!.providedIn).toBeNull();
     expect(logSvc!.description).toContain('Basic logging service');
   });
 
   it('extracts methods on injectable without providedIn', () => {
-    const logSvc = result.injectables.find(i => i.name === 'LogService')!;
+    const logSvc = result.injectables.find((i) => i.name === 'LogService')!;
     expect(logSvc.methods).toHaveLength(1);
     expect(logSvc.methods[0].name).toBe('log');
     expect(logSvc.methods[0].params).toHaveLength(1);
@@ -61,7 +61,7 @@ describe('interfaces', () => {
 
   it('extracts exported interfaces (excluding @internal and non-exported)', () => {
     expect(result.interfaces).toHaveLength(3);
-    const names = result.interfaces.map(i => i.name);
+    const names = result.interfaces.map((i) => i.name);
     expect(names).toContain('UserConfig');
     expect(names).toContain('Shape');
     expect(names).toContain('NamedShape');
@@ -70,26 +70,26 @@ describe('interfaces', () => {
   });
 
   it('extracts interface properties', () => {
-    const iface = result.interfaces.find(i => i.name === 'UserConfig')!;
+    const iface = result.interfaces.find((i) => i.name === 'UserConfig')!;
     expect(iface.properties).toHaveLength(3);
 
-    const name = iface.properties.find(p => p.name === 'name');
+    const name = iface.properties.find((p) => p.name === 'name');
     expect(name).toBeDefined();
     expect(name!.type).toBe('string');
     expect(name!.optional).toBe(false);
 
-    const age = iface.properties.find(p => p.name === 'age');
+    const age = iface.properties.find((p) => p.name === 'age');
     expect(age).toBeDefined();
     expect(age!.type).toBe('number');
     expect(age!.optional).toBe(true);
 
-    const role = iface.properties.find(p => p.name === 'role');
+    const role = iface.properties.find((p) => p.name === 'role');
     expect(role).toBeDefined();
     expect(role!.description).toContain('User role');
   });
 
   it('extracts interface methods', () => {
-    const shape = result.interfaces.find(i => i.name === 'Shape')!;
+    const shape = result.interfaces.find((i) => i.name === 'Shape')!;
     expect(shape.methods).toHaveLength(1);
 
     const area = shape.methods[0];
@@ -103,29 +103,29 @@ describe('interfaces', () => {
   });
 
   it('extracts interface extends clause', () => {
-    const namedShape = result.interfaces.find(i => i.name === 'NamedShape')!;
+    const namedShape = result.interfaces.find((i) => i.name === 'NamedShape')!;
     expect(namedShape.extends).toHaveLength(1);
     expect(namedShape.extends[0]).toBe('Shape');
   });
 
   it('extracts properties on interface with extends', () => {
-    const namedShape = result.interfaces.find(i => i.name === 'NamedShape')!;
+    const namedShape = result.interfaces.find((i) => i.name === 'NamedShape')!;
     expect(namedShape.properties).toHaveLength(1);
     expect(namedShape.properties[0].name).toBe('label');
   });
 
   it('interface without extends has empty extends array', () => {
-    const userConfig = result.interfaces.find(i => i.name === 'UserConfig')!;
+    const userConfig = result.interfaces.find((i) => i.name === 'UserConfig')!;
     expect(userConfig.extends).toEqual([]);
   });
 
   it('excludes @internal interfaces', () => {
-    const internal = result.interfaces.find(i => i.name === 'InternalConfig');
+    const internal = result.interfaces.find((i) => i.name === 'InternalConfig');
     expect(internal).toBeUndefined();
   });
 
   it('excludes non-exported interfaces from parseAll results', () => {
-    const helper = result.interfaces.find(i => i.name === 'PrivateHelper');
+    const helper = result.interfaces.find((i) => i.name === 'PrivateHelper');
     expect(helper).toBeUndefined();
   });
 });
@@ -158,15 +158,15 @@ describe('enums', () => {
     const enumDoc = result.enums[0];
     expect(enumDoc.members).toHaveLength(3);
 
-    const active = enumDoc.members.find(m => m.name === 'Active');
+    const active = enumDoc.members.find((m) => m.name === 'Active');
     expect(active).toBeDefined();
     expect(active!.value).toBe('ACTIVE');
 
-    const inactive = enumDoc.members.find(m => m.name === 'Inactive');
+    const inactive = enumDoc.members.find((m) => m.name === 'Inactive');
     expect(inactive).toBeDefined();
     expect(inactive!.value).toBe('INACTIVE');
 
-    const pending = enumDoc.members.find(m => m.name === 'Pending');
+    const pending = enumDoc.members.find((m) => m.name === 'Pending');
     expect(pending).toBeDefined();
     expect(pending!.value).toBe('PENDING');
   });

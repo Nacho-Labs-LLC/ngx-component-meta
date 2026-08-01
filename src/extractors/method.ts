@@ -1,7 +1,18 @@
 import ts from '@typescript/typescript6';
 import type { MethodDoc } from '../types.js';
-import { isPrivateMember, isProtectedMember, getMemberName, extractParams, getReturnTypeString } from '../utils/ast-helpers.js';
-import { getDescription, getRawDescription, getTags, isInternal } from '../utils/jsdoc.js';
+import {
+  isPrivateMember,
+  isProtectedMember,
+  getMemberName,
+  extractParams,
+  getReturnTypeString,
+} from '../utils/ast-helpers.js';
+import {
+  getDescription,
+  getRawDescription,
+  getTags,
+  isInternal,
+} from '../utils/jsdoc.js';
 
 /** Angular lifecycle hook method names. Excluded from output by default. */
 const LIFECYCLE_HOOKS = new Set([
@@ -29,7 +40,9 @@ export function extractMethod(
   const name = getMemberName(method);
   if (!name || LIFECYCLE_HOOKS.has(name)) return null;
 
-  const symbol = method.name ? checker.getSymbolAtLocation(method.name) : undefined;
+  const symbol = method.name
+    ? checker.getSymbolAtLocation(method.name)
+    : undefined;
   if (!symbol) return null;
 
   if (isInternal(symbol)) return null;

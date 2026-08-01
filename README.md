@@ -64,14 +64,14 @@ TypeScript (`>=5.0.0`) is the only peer dependency.
 
 ## Features
 
-| Feature | What it does |
-|---------|-------------|
-| **Extract** | Components, directives, pipes, injectables, interfaces, type aliases, enums, classes, functions, variables. Supports `@Input()`, `input()`, `input.required()`, `@Output()`, `output()`, `model()`, `model.required()`, `@HostBinding`, `@HostListener`, signal queries (`viewChild()`, `contentChildren()`, etc.). Full type unwrapping -- you get `string`, not `InputSignal<string>`. |
-| **Diff** | Compare API snapshots across versions. Detects breaking vs non-breaking changes (removed inputs, type changes, new required params). CI-ready with exit code 1 on breaking changes. GitHub Action included. |
-| **Lint** | Enforce documentation and quality rules. 7 built-in rules with configurable severity. ESLint-style output with `--format stylish`. |
-| **Stats** | Track signal migration progress. Per-component breakdown of decorator vs signal bindings. "63% migrated" in one command. |
-| **Storybook** | Drop-in Compodoc replacement via `toCompodocJson()`. Or bypass Compodoc entirely with `createArgTypesExtractor()` for richer categories (inputs, outputs, two-way bindings, methods). Vite plugin included. |
-| **Props JSON** | Framework-agnostic prop tables for Docusaurus, Astro, VitePress, or any static site generator. |
+| Feature        | What it does                                                                                                                                                                                                                                                                                                                                                                             |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Extract**    | Components, directives, pipes, injectables, interfaces, type aliases, enums, classes, functions, variables. Supports `@Input()`, `input()`, `input.required()`, `@Output()`, `output()`, `model()`, `model.required()`, `@HostBinding`, `@HostListener`, signal queries (`viewChild()`, `contentChildren()`, etc.). Full type unwrapping -- you get `string`, not `InputSignal<string>`. |
+| **Diff**       | Compare API snapshots across versions. Detects breaking vs non-breaking changes (removed inputs, type changes, new required params). CI-ready with exit code 1 on breaking changes. GitHub Action included.                                                                                                                                                                              |
+| **Lint**       | Enforce documentation and quality rules. 7 built-in rules with configurable severity. ESLint-style output with `--format stylish`.                                                                                                                                                                                                                                                       |
+| **Stats**      | Track signal migration progress. Per-component breakdown of decorator vs signal bindings. "63% migrated" in one command.                                                                                                                                                                                                                                                                 |
+| **Storybook**  | Drop-in Compodoc replacement via `toCompodocJson()`. Or bypass Compodoc entirely with `createArgTypesExtractor()` for richer categories (inputs, outputs, two-way bindings, methods). Vite plugin included.                                                                                                                                                                              |
+| **Props JSON** | Framework-agnostic prop tables for Docusaurus, Astro, VitePress, or any static site generator.                                                                                                                                                                                                                                                                                           |
 
 ## CLI Reference
 
@@ -120,15 +120,15 @@ ngx-component-meta lint -f stylish "src/**/*.ts"
 
 **Built-in rules:**
 
-| Rule | Default | Description |
-|------|---------|-------------|
-| `require-input-description` | error | Every input must have a JSDoc description |
-| `require-output-description` | error | Every output must have a JSDoc description |
-| `require-component-description` | warn | Every component/directive must have a JSDoc description |
-| `require-selector` | error | Components must have a selector defined |
-| `no-any-inputs` | warn | Inputs should not use type `any` |
-| `no-any-outputs` | warn | Outputs should not use type `any` |
-| `no-required-with-default` | warn | Required inputs should not have default values |
+| Rule                            | Default | Description                                             |
+| ------------------------------- | ------- | ------------------------------------------------------- |
+| `require-input-description`     | error   | Every input must have a JSDoc description               |
+| `require-output-description`    | error   | Every output must have a JSDoc description              |
+| `require-component-description` | warn    | Every component/directive must have a JSDoc description |
+| `require-selector`              | error   | Components must have a selector defined                 |
+| `no-any-inputs`                 | warn    | Inputs should not use type `any`                        |
+| `no-any-outputs`                | warn    | Outputs should not use type `any`                       |
+| `no-required-with-default`      | warn    | Required inputs should not have default values          |
 
 ### Stats
 
@@ -159,13 +159,13 @@ Components: 12 total
 
 All commands support:
 
-| Flag | Description |
-|------|-------------|
+| Flag                   | Description                                  |
+| ---------------------- | -------------------------------------------- |
 | `-p, --project <path>` | Path to tsconfig.json (default: auto-detect) |
-| `-o, --output <file>` | Write output to file instead of stdout |
-| `-f, --format <fmt>` | Output format (varies by command) |
-| `--no-methods` | Exclude methods from output |
-| `--no-inherited` | Exclude inherited members |
+| `-o, --output <file>`  | Write output to file instead of stdout       |
+| `-f, --format <fmt>`   | Output format (varies by command)            |
+| `--no-methods`         | Exclude methods from output                  |
+| `--no-inherited`       | Exclude inherited members                    |
 
 ## Programmatic API
 
@@ -192,9 +192,9 @@ const allDocs = parser.parse('src/**/*.component.ts');
 
 // Parse everything: components, pipes, injectables, interfaces, enums...
 const fullResult = parser.parseAll('src/**/*.ts');
-console.log(fullResult.components);  // ComponentDoc[]
+console.log(fullResult.components); // ComponentDoc[]
 console.log(fullResult.injectables); // InjectableDoc[]
-console.log(fullResult.interfaces);  // InterfaceDoc[]
+console.log(fullResult.interfaces); // InterfaceDoc[]
 ```
 
 The parser reuses its `ts.Program` across calls, so subsequent parses are fast.
@@ -212,7 +212,11 @@ const result = parseAll(['src/**/*.ts']);
 ### API diff
 
 ```typescript
-import { parse, diff, formatDiffMarkdown } from '@nacho-labs/ngx-component-meta';
+import {
+  parse,
+  diff,
+  formatDiffMarkdown,
+} from '@nacho-labs/ngx-component-meta';
 
 const base = parse(['src/**/*.component.ts']); // e.g., from main branch
 const head = parse(['src/**/*.component.ts']); // e.g., from PR branch
@@ -228,7 +232,11 @@ if (result.summary.breaking > 0) {
 ### Lint
 
 ```typescript
-import { parseAll, lint, formatLintStylish } from '@nacho-labs/ngx-component-meta';
+import {
+  parseAll,
+  lint,
+  formatLintStylish,
+} from '@nacho-labs/ngx-component-meta';
 
 const result = parseAll(['src/**/*.ts']);
 const report = lint(result, {
@@ -244,7 +252,11 @@ console.log(formatLintStylish(report));
 ### Migration stats
 
 ```typescript
-import { parseAll, computeStats, formatStatsText } from '@nacho-labs/ngx-component-meta';
+import {
+  parseAll,
+  computeStats,
+  formatStatsText,
+} from '@nacho-labs/ngx-component-meta';
 
 const result = parseAll(['src/**/*.ts']);
 const stats = computeStats(result);
@@ -325,53 +337,53 @@ Detect breaking API changes on every pull request:
 
 Full options:
 
-| Input | Required | Default | Description |
-|-------|----------|---------|-------------|
-| `base` | Yes | -- | Path to baseline JSON file |
-| `head` | No | -- | Path to head JSON file (omit to parse current source) |
-| `project` | No | -- | Path to tsconfig.json (used when `head` is omitted) |
-| `format` | No | `markdown` | Output format: text, json, markdown |
-| `fail-on-breaking` | No | `true` | Fail the action on breaking changes |
-| `comment-on-pr` | No | `true` | Post/update a PR comment with the diff |
+| Input              | Required | Default    | Description                                           |
+| ------------------ | -------- | ---------- | ----------------------------------------------------- |
+| `base`             | Yes      | --         | Path to baseline JSON file                            |
+| `head`             | No       | --         | Path to head JSON file (omit to parse current source) |
+| `project`          | No       | --         | Path to tsconfig.json (used when `head` is omitted)   |
+| `format`           | No       | `markdown` | Output format: text, json, markdown                   |
+| `fail-on-breaking` | No       | `true`     | Fail the action on breaking changes                   |
+| `comment-on-pr`    | No       | `true`     | Post/update a PR comment with the diff                |
 
 Outputs: `breaking-count`, `non-breaking-count`, `has-breaking`, `diff-output`.
 
 ## Comparison
 
-| Feature | ngx-component-meta | Compodoc | typedoc |
-|---------|-------------------|----------|---------|
-| Signal inputs (`input()`, `input.required()`) | Yes | Broken (10+ open bugs) | No (shows `InputSignal<T>`) |
-| `model()` / `model.required()` | Yes | No | No |
-| Type unwrapping | Yes (`string` not `InputSignal<string>`) | Partial | No |
-| Breaking change detection | Yes | No | No |
-| Lint rules | 7 built-in | No | No |
-| Signal migration tracking | Yes | No | No |
-| Structured JSON output | Yes | Yes (with HTML site) | Yes |
-| Storybook integration | Drop-in + direct mode | Native | No |
-| Props JSON for static sites | Yes | No | No |
-| Dependencies | 0 (TypeScript peer) | 43 | 27 |
-| Install size | ~50KB | ~15MB | ~8MB |
+| Feature                                       | ngx-component-meta                       | Compodoc               | typedoc                     |
+| --------------------------------------------- | ---------------------------------------- | ---------------------- | --------------------------- |
+| Signal inputs (`input()`, `input.required()`) | Yes                                      | Broken (10+ open bugs) | No (shows `InputSignal<T>`) |
+| `model()` / `model.required()`                | Yes                                      | No                     | No                          |
+| Type unwrapping                               | Yes (`string` not `InputSignal<string>`) | Partial                | No                          |
+| Breaking change detection                     | Yes                                      | No                     | No                          |
+| Lint rules                                    | 7 built-in                               | No                     | No                          |
+| Signal migration tracking                     | Yes                                      | No                     | No                          |
+| Structured JSON output                        | Yes                                      | Yes (with HTML site)   | Yes                         |
+| Storybook integration                         | Drop-in + direct mode                    | Native                 | No                          |
+| Props JSON for static sites                   | Yes                                      | No                     | No                          |
+| Dependencies                                  | 0 (TypeScript peer)                      | 43                     | 27                          |
+| Install size                                  | ~50KB                                    | ~15MB                  | ~8MB                        |
 
 ## What It Extracts
 
-| Feature | Decorator API | Signal API | Output field |
-|---------|--------------|------------|--------------|
-| Inputs | `@Input()` | `input()`, `input.required()` | `inputs: InputDoc[]` |
-| Outputs | `@Output()` | `output()` | `outputs: OutputDoc[]` |
-| Two-way bindings | -- | `model()`, `model.required()` | `models: ModelDoc[]` |
-| Properties | class fields | class fields | `properties: PropertyDoc[]` |
-| Methods | class methods | class methods | `methods: MethodDoc[]` |
-| Queries | `@ViewChild()` etc. | `viewChild()` etc. | `queries: QueryDoc[]` |
-| Host bindings | `@HostBinding()` | -- | `hostBindings: HostBindingDoc[]` |
-| Host listeners | `@HostListener()` | -- | `hostListeners: HostListenerDoc[]` |
-| Pipes | `@Pipe()` | -- | `PipeDoc` |
-| Injectables | `@Injectable()` | -- | `InjectableDoc` |
-| Interfaces | exported interfaces | -- | `InterfaceDoc` |
-| Type Aliases | exported type aliases | -- | `TypeAliasDoc` |
-| Enums | exported enums | -- | `EnumDoc` |
-| Classes | exported classes | -- | `ClassDoc` |
-| Functions | exported functions | -- | `FunctionDoc` |
-| Variables | exported variables | -- | `VariableDoc` |
+| Feature          | Decorator API         | Signal API                    | Output field                       |
+| ---------------- | --------------------- | ----------------------------- | ---------------------------------- |
+| Inputs           | `@Input()`            | `input()`, `input.required()` | `inputs: InputDoc[]`               |
+| Outputs          | `@Output()`           | `output()`                    | `outputs: OutputDoc[]`             |
+| Two-way bindings | --                    | `model()`, `model.required()` | `models: ModelDoc[]`               |
+| Properties       | class fields          | class fields                  | `properties: PropertyDoc[]`        |
+| Methods          | class methods         | class methods                 | `methods: MethodDoc[]`             |
+| Queries          | `@ViewChild()` etc.   | `viewChild()` etc.            | `queries: QueryDoc[]`              |
+| Host bindings    | `@HostBinding()`      | --                            | `hostBindings: HostBindingDoc[]`   |
+| Host listeners   | `@HostListener()`     | --                            | `hostListeners: HostListenerDoc[]` |
+| Pipes            | `@Pipe()`             | --                            | `PipeDoc`                          |
+| Injectables      | `@Injectable()`       | --                            | `InjectableDoc`                    |
+| Interfaces       | exported interfaces   | --                            | `InterfaceDoc`                     |
+| Type Aliases     | exported type aliases | --                            | `TypeAliasDoc`                     |
+| Enums            | exported enums        | --                            | `EnumDoc`                          |
+| Classes          | exported classes      | --                            | `ClassDoc`                         |
+| Functions        | exported functions    | --                            | `FunctionDoc`                      |
+| Variables        | exported variables    | --                            | `VariableDoc`                      |
 
 Use `parseAll()` for the full result. The basic `parse()` returns only components, directives, and pipes.
 

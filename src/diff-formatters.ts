@@ -3,7 +3,9 @@ import type { ApiDiff, ApiChange } from './diff.js';
 function humanizeChange(change: string): string {
   return change
     .split('-')
-    .map((word, i) => (i === 0 ? word.charAt(0).toUpperCase() + word.slice(1) : word))
+    .map((word, i) =>
+      i === 0 ? word.charAt(0).toUpperCase() + word.slice(1) : word,
+    )
     .join(' ');
 }
 
@@ -94,7 +96,9 @@ export function formatDiffText(result: ApiDiff): string {
     for (const [component, changes] of groups) {
       lines.push(`  ${component}`);
       for (const change of changes) {
-        lines.push(`    \u2717 ${humanizeChange(change.change)}: ${change.name} (${formatDetails(change)})`);
+        lines.push(
+          `    \u2717 ${humanizeChange(change.change)}: ${change.name} (${formatDetails(change)})`,
+        );
       }
       lines.push('');
     }
@@ -107,7 +111,9 @@ export function formatDiffText(result: ApiDiff): string {
     for (const [component, changes] of groups) {
       lines.push(`  ${component}`);
       for (const change of changes) {
-        lines.push(`    + ${humanizeChange(change.change)}: ${change.name} (${formatDetails(change)})`);
+        lines.push(
+          `    + ${humanizeChange(change.change)}: ${change.name} (${formatDetails(change)})`,
+        );
       }
       lines.push('');
     }
@@ -124,7 +130,9 @@ export function formatDiffMarkdown(result: ApiDiff): string {
   const lines: string[] = [];
   const { breaking, nonBreaking, summary } = result;
 
-  lines.push(`## API Diff: ${summary.breaking} breaking, ${summary.nonBreaking} non-breaking changes`);
+  lines.push(
+    `## API Diff: ${summary.breaking} breaking, ${summary.nonBreaking} non-breaking changes`,
+  );
   lines.push('');
 
   if (breaking.length > 0) {

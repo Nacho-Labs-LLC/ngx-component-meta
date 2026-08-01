@@ -105,8 +105,10 @@ The `-f compodoc` flag outputs the same JSON structure Compodoc produces. Downst
 
 ```ts
 import docs from './documentation.json';
-const comp = docs.components.find(c => c.name === 'MyComponent');
-comp.inputsClass.forEach(input => { /* render */ });
+const comp = docs.components.find((c) => c.name === 'MyComponent');
+comp.inputsClass.forEach((input) => {
+  /* render */
+});
 ```
 
 ### After (compat mode -- zero code changes)
@@ -127,13 +129,13 @@ For new code, use the native format directly for richer metadata (signal source,
 import { parse } from 'ngx-component-meta';
 
 const docs = parse(['src/my.component.ts']);
-docs.forEach(doc => {
+docs.forEach((doc) => {
   if ('kind' in doc) {
     // ComponentDoc -- has inputs, outputs, models, methods, properties, queries
-    doc.inputs.forEach(input => {
+    doc.inputs.forEach((input) => {
       console.log(input.name, input.type, input.source); // 'decorator' | 'signal'
     });
-    doc.models.forEach(model => {
+    doc.models.forEach((model) => {
       console.log(model.name, model.type, model.required);
     });
   } else {
@@ -160,20 +162,20 @@ const docs2 = parser.parseWithProgram(['src/card/card.component.ts'], program);
 
 ## Compodoc CLI Flag Mapping
 
-| Compodoc flag | ngx-component-meta equivalent |
-|---|---|
-| `-p tsconfig.json` | `-p tsconfig.json` |
-| `-e json` | `-f json` (default) |
-| `-d outputDir` | `-o outputDir/documentation.json` |
-| `--disablePrivate` | Default behavior (private members always excluded) |
-| `--disableInternal` | Default behavior (`@internal` always excluded) |
-| `--disableLifeCycleHooks` | Default behavior (lifecycle hooks always excluded) |
-| `--disableProtected` | Use `propFilter` to exclude protected members |
-| `--disableRoutesGraph` | N/A (no route analysis -- focused metadata tool) |
-| `-s` / `--serve` | N/A (no built-in server -- use any static server) |
-| `-w` / `--watch` | `-w` / `--watch` (watches for file changes and rebuilds automatically) |
-| (no equivalent) | `--split` (write one file per component, with `markdown` format + `--output`) |
-| (no equivalent) | `-f markdown` (output as markdown tables instead of JSON) |
+| Compodoc flag             | ngx-component-meta equivalent                                                 |
+| ------------------------- | ----------------------------------------------------------------------------- |
+| `-p tsconfig.json`        | `-p tsconfig.json`                                                            |
+| `-e json`                 | `-f json` (default)                                                           |
+| `-d outputDir`            | `-o outputDir/documentation.json`                                             |
+| `--disablePrivate`        | Default behavior (private members always excluded)                            |
+| `--disableInternal`       | Default behavior (`@internal` always excluded)                                |
+| `--disableLifeCycleHooks` | Default behavior (lifecycle hooks always excluded)                            |
+| `--disableProtected`      | Use `propFilter` to exclude protected members                                 |
+| `--disableRoutesGraph`    | N/A (no route analysis -- focused metadata tool)                              |
+| `-s` / `--serve`          | N/A (no built-in server -- use any static server)                             |
+| `-w` / `--watch`          | `-w` / `--watch` (watches for file changes and rebuilds automatically)        |
+| (no equivalent)           | `--split` (write one file per component, with `markdown` format + `--output`) |
+| (no equivalent)           | `-f markdown` (output as markdown tables instead of JSON)                     |
 
 ### Excluding protected members (replaces `--disableProtected`)
 
@@ -192,18 +194,19 @@ const docs = parse(['src/**/*.component.ts'], {
 
 If you switch from Compodoc's native JSON to `ngx-component-meta`'s native format (`-f json`), the structure is different:
 
-| Compodoc field | ngx-component-meta field |
-|---|---|
-| `components[].inputsClass` | `ComponentDoc.inputs` |
-| `components[].outputsClass` | `ComponentDoc.outputs` |
-| (no equivalent) | `ComponentDoc.models` |
+| Compodoc field                 | ngx-component-meta field  |
+| ------------------------------ | ------------------------- |
+| `components[].inputsClass`     | `ComponentDoc.inputs`     |
+| `components[].outputsClass`    | `ComponentDoc.outputs`    |
+| (no equivalent)                | `ComponentDoc.models`     |
 | `components[].propertiesClass` | `ComponentDoc.properties` |
-| `components[].methodsClass` | `ComponentDoc.methods` |
-| (no equivalent) | `ComponentDoc.queries` |
-| `components[].selector` | `ComponentDoc.selector` |
-| `pipes[].name` (pipe name) | `PipeDoc.pipeName` |
+| `components[].methodsClass`    | `ComponentDoc.methods`    |
+| (no equivalent)                | `ComponentDoc.queries`    |
+| `components[].selector`        | `ComponentDoc.selector`   |
+| `pipes[].name` (pipe name)     | `PipeDoc.pipeName`        |
 
 The native format also adds:
+
 - `source: 'decorator' | 'signal'` on inputs, outputs, and queries
 - `models` array for `model()` two-way bindings (separate from inputs/outputs)
 - `queries` array for `viewChild()`, `contentChild()`, etc.

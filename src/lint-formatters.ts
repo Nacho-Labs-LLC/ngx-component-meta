@@ -22,7 +22,9 @@ export function formatLintText(result: LintResult): string {
   }
 
   if (result.violations.length === 0) {
-    lines.push(`All ${result.summary.components} components passed lint checks.`);
+    lines.push(
+      `All ${result.summary.components} components passed lint checks.`,
+    );
   } else {
     lines.push('');
     lines.push(
@@ -55,7 +57,9 @@ export function formatLintStylish(result: LintResult): string {
     lines.push(filePath);
     for (const v of violations) {
       const sev = v.severity === 'error' ? '\u2717' : '\u26A0';
-      lines.push(`  ${sev} ${v.component}${memberSuffix(v.member)}  ${v.message}  ${v.rule}`);
+      lines.push(
+        `  ${sev} ${v.component}${memberSuffix(v.member)}  ${v.message}  ${v.rule}`,
+      );
     }
     lines.push('');
   }
@@ -67,7 +71,9 @@ export function formatLintStylish(result: LintResult): string {
   return lines.join('\n');
 }
 
-function groupByFile(violations: LintViolation[]): Map<string, LintViolation[]> {
+function groupByFile(
+  violations: LintViolation[],
+): Map<string, LintViolation[]> {
   const groups = new Map<string, LintViolation[]>();
   for (const v of violations) {
     const list = groups.get(v.filePath) ?? [];

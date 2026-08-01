@@ -1,9 +1,15 @@
 import { describe, it, expect } from 'vitest';
 import { parseAllFixture } from '../helpers.js';
 import { toPropsJson, toPropsJsonString } from '../../src/props-json.js';
-import type { PropsJsonComponent, PropsJsonOutput } from '../../src/props-json.js';
+import type {
+  PropsJsonComponent,
+  PropsJsonOutput,
+} from '../../src/props-json.js';
 
-function findComponent(output: PropsJsonOutput, name: string): PropsJsonComponent {
+function findComponent(
+  output: PropsJsonOutput,
+  name: string,
+): PropsJsonComponent {
   const comp = output.components.find((c) => c.name === name);
   if (!comp) throw new Error(`Component "${name}" not found in output`);
   return comp;
@@ -196,7 +202,11 @@ describe('toPropsJson', () => {
       // Create a parse result with no outputs to test omission
       const stripped = {
         ...result,
-        components: result.components.map((c) => ({ ...c, outputs: [], models: [] })),
+        components: result.components.map((c) => ({
+          ...c,
+          outputs: [],
+          models: [],
+        })),
       };
       const strippedOutput = toPropsJson(stripped);
       const strippedMixed = findComponent(strippedOutput, 'MixedComponent');

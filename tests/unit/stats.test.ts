@@ -3,7 +3,11 @@ import path from 'path';
 import ts from '@typescript/typescript6';
 import { createParserFromOptions } from '../../src/parser.js';
 import { computeStats } from '../../src/stats.js';
-import { formatStatsText, formatStatsJson, formatStatsMarkdown } from '../../src/stats-formatters.js';
+import {
+  formatStatsText,
+  formatStatsJson,
+  formatStatsMarkdown,
+} from '../../src/stats-formatters.js';
 import { parseAllFixture } from '../helpers.js';
 import type { ParseResult, ComponentDoc } from '../../src/types.js';
 
@@ -24,7 +28,7 @@ const BASE_COMPILER_OPTIONS: ts.CompilerOptions = {
 };
 
 function parseMultipleFixtures(...fixtureNames: string[]): ParseResult {
-  const filePaths = fixtureNames.map(name => path.join(FIXTURES_DIR, name));
+  const filePaths = fixtureNames.map((name) => path.join(FIXTURES_DIR, name));
   const parser = createParserFromOptions(BASE_COMPILER_OPTIONS);
   return parser.parseAll(filePaths);
 }
@@ -134,13 +138,13 @@ describe('computeStats', () => {
       // signal-basic: 3 signal inputs, 2 signal outputs, 2 models
       // decorator-basic: 3 decorator inputs, 2 decorator outputs
       // mixed: 1 decorator input + 1 signal input, 1 decorator output + 1 signal output, 1 model
-      expect(stats.inputs.decorator).toBe(4);   // 3 + 1
-      expect(stats.inputs.signal).toBe(4);       // 3 + 1
+      expect(stats.inputs.decorator).toBe(4); // 3 + 1
+      expect(stats.inputs.signal).toBe(4); // 3 + 1
       expect(stats.inputs.total).toBe(8);
-      expect(stats.outputs.decorator).toBe(3);   // 2 + 1
-      expect(stats.outputs.signal).toBe(3);       // 2 + 1
+      expect(stats.outputs.decorator).toBe(3); // 2 + 1
+      expect(stats.outputs.signal).toBe(3); // 2 + 1
       expect(stats.outputs.total).toBe(6);
-      expect(stats.models.total).toBe(3);         // 2 + 1
+      expect(stats.models.total).toBe(3); // 2 + 1
 
       // signalAdoption = (4 + 3 + 3) / (8 + 6 + 3) * 100 = 10/17 * 100 = 58.8%
       expect(stats.signalAdoption).toBe(58.8);
@@ -169,27 +173,29 @@ describe('computeStats', () => {
     it('classifies component with no inputs/outputs/models as no-bindings', () => {
       const result: ParseResult = {
         ...emptyResult(),
-        components: [{
-          name: 'EmptyComponent',
-          filePath: '/empty.ts',
-          description: '',
-          rawDescription: '',
-          kind: 'component',
-          selector: 'app-empty',
-          standalone: true,
-          exportAs: null,
-          tags: {},
-          inputs: [],
-          outputs: [],
-          models: [],
-          properties: [],
-          methods: [],
-          queries: [],
-          hostBindings: [],
-          hostListeners: [],
-          implements: [],
-          extends: null,
-        }],
+        components: [
+          {
+            name: 'EmptyComponent',
+            filePath: '/empty.ts',
+            description: '',
+            rawDescription: '',
+            kind: 'component',
+            selector: 'app-empty',
+            standalone: true,
+            exportAs: null,
+            tags: {},
+            inputs: [],
+            outputs: [],
+            models: [],
+            properties: [],
+            methods: [],
+            queries: [],
+            hostBindings: [],
+            hostListeners: [],
+            implements: [],
+            extends: null,
+          },
+        ],
       };
       const stats = computeStats(result);
 
@@ -258,7 +264,10 @@ describe('computeStats', () => {
 
   describe('component sort order', () => {
     it('sorts legacy, partially-migrated, fully-migrated, no-bindings', () => {
-      const makeComp = (name: string, overrides: Partial<ComponentDoc> = {}): ComponentDoc => ({
+      const makeComp = (
+        name: string,
+        overrides: Partial<ComponentDoc> = {},
+      ): ComponentDoc => ({
         name,
         filePath: `/${name}.ts`,
         description: '',
@@ -288,17 +297,65 @@ describe('computeStats', () => {
           makeComp('Empty'),
           // fully-migrated
           makeComp('Signal', {
-            inputs: [{ name: 'a', bindingName: 'a', type: 'string', required: false, defaultValue: undefined, description: '', rawDescription: '', tags: {}, source: 'signal', transform: null }],
+            inputs: [
+              {
+                name: 'a',
+                bindingName: 'a',
+                type: 'string',
+                required: false,
+                defaultValue: undefined,
+                description: '',
+                rawDescription: '',
+                tags: {},
+                source: 'signal',
+                transform: null,
+              },
+            ],
           }),
           // legacy
           makeComp('Legacy', {
-            inputs: [{ name: 'b', bindingName: 'b', type: 'string', required: false, defaultValue: undefined, description: '', rawDescription: '', tags: {}, source: 'decorator', transform: null }],
+            inputs: [
+              {
+                name: 'b',
+                bindingName: 'b',
+                type: 'string',
+                required: false,
+                defaultValue: undefined,
+                description: '',
+                rawDescription: '',
+                tags: {},
+                source: 'decorator',
+                transform: null,
+              },
+            ],
           }),
           // partially-migrated
           makeComp('Partial', {
             inputs: [
-              { name: 'c', bindingName: 'c', type: 'string', required: false, defaultValue: undefined, description: '', rawDescription: '', tags: {}, source: 'decorator', transform: null },
-              { name: 'd', bindingName: 'd', type: 'string', required: false, defaultValue: undefined, description: '', rawDescription: '', tags: {}, source: 'signal', transform: null },
+              {
+                name: 'c',
+                bindingName: 'c',
+                type: 'string',
+                required: false,
+                defaultValue: undefined,
+                description: '',
+                rawDescription: '',
+                tags: {},
+                source: 'decorator',
+                transform: null,
+              },
+              {
+                name: 'd',
+                bindingName: 'd',
+                type: 'string',
+                required: false,
+                defaultValue: undefined,
+                description: '',
+                rawDescription: '',
+                tags: {},
+                source: 'signal',
+                transform: null,
+              },
             ],
           }),
         ],
@@ -306,13 +363,13 @@ describe('computeStats', () => {
 
       const stats = computeStats(result);
 
-      expect(stats.components.map(c => c.status)).toEqual([
+      expect(stats.components.map((c) => c.status)).toEqual([
         'legacy',
         'partially-migrated',
         'fully-migrated',
         'no-bindings',
       ]);
-      expect(stats.components.map(c => c.name)).toEqual([
+      expect(stats.components.map((c) => c.name)).toEqual([
         'Legacy',
         'Partial',
         'Signal',
@@ -325,27 +382,40 @@ describe('computeStats', () => {
     it('classifies a component with only models as fully-migrated', () => {
       const result: ParseResult = {
         ...emptyResult(),
-        components: [{
-          name: 'ModelOnly',
-          filePath: '/model-only.ts',
-          description: '',
-          rawDescription: '',
-          kind: 'component',
-          selector: 'app-model-only',
-          standalone: true,
-          exportAs: null,
-          tags: {},
-          inputs: [],
-          outputs: [],
-          models: [{ name: 'm', bindingName: 'm', type: 'string', required: false, defaultValue: undefined, description: '', rawDescription: '', tags: {} }],
-          properties: [],
-          methods: [],
-          queries: [],
-          hostBindings: [],
-          hostListeners: [],
-          implements: [],
-          extends: null,
-        }],
+        components: [
+          {
+            name: 'ModelOnly',
+            filePath: '/model-only.ts',
+            description: '',
+            rawDescription: '',
+            kind: 'component',
+            selector: 'app-model-only',
+            standalone: true,
+            exportAs: null,
+            tags: {},
+            inputs: [],
+            outputs: [],
+            models: [
+              {
+                name: 'm',
+                bindingName: 'm',
+                type: 'string',
+                required: false,
+                defaultValue: undefined,
+                description: '',
+                rawDescription: '',
+                tags: {},
+              },
+            ],
+            properties: [],
+            methods: [],
+            queries: [],
+            hostBindings: [],
+            hostListeners: [],
+            implements: [],
+            extends: null,
+          },
+        ],
       };
 
       const stats = computeStats(result);

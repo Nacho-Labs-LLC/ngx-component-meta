@@ -30,7 +30,12 @@ export interface PropsJsonComponent {
   /** Pipe-specific: transform signature. Only present for pipes. */
   transform?: {
     signature: string;
-    params: { name: string; type: string; optional: boolean; description: string }[];
+    params: {
+      name: string;
+      type: string;
+      optional: boolean;
+      description: string;
+    }[];
     returnType: string;
   };
 }
@@ -92,7 +97,10 @@ function formatMethodSignature(method: MethodDoc): string {
   return `(${params}) => ${method.returnType}`;
 }
 
-function formatPipeSignature(params: MethodParamDoc[], returnType: string): string {
+function formatPipeSignature(
+  params: MethodParamDoc[],
+  returnType: string,
+): string {
   const paramStr = params
     .map((p) => {
       const opt = p.optional ? '?' : '';
@@ -102,7 +110,10 @@ function formatPipeSignature(params: MethodParamDoc[], returnType: string): stri
   return `(${paramStr}) => ${returnType}`;
 }
 
-function optionalBindingName(name: string, bindingName: string): string | undefined {
+function optionalBindingName(
+  name: string,
+  bindingName: string,
+): string | undefined {
   return bindingName !== name ? bindingName : undefined;
 }
 
@@ -177,7 +188,10 @@ function mapPipe(pipe: PipeDoc): PropsJsonComponent {
     description: pipe.description,
     selector: null,
     transform: {
-      signature: formatPipeSignature(pipe.transform.params, pipe.transform.returnType),
+      signature: formatPipeSignature(
+        pipe.transform.params,
+        pipe.transform.returnType,
+      ),
       params: pipe.transform.params.map((p) => ({
         name: p.name,
         type: p.type,

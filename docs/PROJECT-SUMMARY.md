@@ -12,7 +12,9 @@ A zero-dependency Angular component API toolkit that extracts structured metadat
 ## What it does today
 
 ### Core extraction
+
 Parses Angular source files and produces structured JSON for:
+
 - Components and directives (selector, standalone, exportAs)
 - All input forms: `@Input()`, `input()`, `input.required()`, aliases, transforms
 - All output forms: `@Output()`, `output()`, aliases
@@ -27,6 +29,7 @@ Parses Angular source files and produces structured JSON for:
 - Type unwrapping: `InputSignal<T>` → `T`, `EventEmitter<T>` → `T`, `ModelSignal<T>` → `T`
 
 ### CLI (4 subcommands)
+
 ```
 ngx-component-meta "src/**/*.ts"                              # extract
 ngx-component-meta diff --base v1.json --head v2.json         # breaking change detection
@@ -35,8 +38,14 @@ ngx-component-meta stats "src/**/*.ts"                         # signal migratio
 ```
 
 ### Programmatic API
+
 ```typescript
-import { parse, parseAll, createParser, createWatchParser } from 'ngx-component-meta';
+import {
+  parse,
+  parseAll,
+  createParser,
+  createWatchParser,
+} from 'ngx-component-meta';
 import { diff } from 'ngx-component-meta';
 import { lint } from 'ngx-component-meta';
 import { computeStats } from 'ngx-component-meta';
@@ -44,12 +53,14 @@ import { toPropsJson } from 'ngx-component-meta';
 ```
 
 ### Storybook integration
+
 - `toCompodocJson()` — drop-in Compodoc replacement, zero Storybook config changes
 - `createArgTypesExtractor()` — direct bypass for richer categories (models get their own section)
 - Vite plugin with HMR (`packages/vite/`)
 - Storybook preset (`packages/storybook/`)
 
 ### GitHub Action
+
 - `action/` directory with PR comment support, fail-on-breaking, upsert comments
 - Needs `@vercel/ncc` bundle step before first use
 
@@ -57,18 +68,18 @@ import { toPropsJson } from 'ngx-component-meta';
 
 ## Benchmarks (Deposco design system — 54 source files)
 
-| Metric | ngx-component-meta | Compodoc |
-|--------|-------------------|----------|
-| Parse time | 1.2s | 1.1s |
-| Output type quality | Unwrapped (`Event`) | Wrapper (`EventEmitter`) |
-| JSON output size | 165KB | 5.1MB |
-| Install size | 812KB | 13MB |
-| Runtime dependencies | 0 | 43 |
-| Signal input support | Full | Buggy |
-| `model()` support | Full | None |
-| Breaking change detection | Built-in | None |
-| Lint rules | 7 built-in | None |
-| Migration tracking | Built-in | None |
+| Metric                    | ngx-component-meta  | Compodoc                 |
+| ------------------------- | ------------------- | ------------------------ |
+| Parse time                | 1.2s                | 1.1s                     |
+| Output type quality       | Unwrapped (`Event`) | Wrapper (`EventEmitter`) |
+| JSON output size          | 165KB               | 5.1MB                    |
+| Install size              | 812KB               | 13MB                     |
+| Runtime dependencies      | 0                   | 43                       |
+| Signal input support      | Full                | Buggy                    |
+| `model()` support         | Full                | None                     |
+| Breaking change detection | Built-in            | None                     |
+| Lint rules                | 7 built-in          | None                     |
+| Migration tracking        | Built-in            | None                     |
 
 Parse speed is comparable. The differentiator is output quality, footprint, and the features Compodoc doesn't have.
 
@@ -87,6 +98,7 @@ Parse speed is comparable. The differentiator is output quality, footprint, and 
 **Pitch:** "Your component API is a contract. Start enforcing it."
 
 **Adoption path:**
+
 1. Generate a baseline JSON on main
 2. Add the GitHub Action to the PR workflow
 3. PRs with breaking changes get flagged before merge
@@ -100,12 +112,14 @@ Parse speed is comparable. The differentiator is output quality, footprint, and 
 **Problem:** Compodoc has 10+ open signal-related bugs, no `model()` support, freezes on some projects, 43 deps, slow builds. Every Angular 17+ team hits these issues.
 
 **Solution:** Replace `@compodoc/compodoc` with `ngx-component-meta`. Two options:
+
 - `toCompodocJson()` — zero Storybook config changes, just swap the JSON source
 - `createArgTypesExtractor()` — richer categories, models get their own section
 
 **Pitch:** "Drop-in Compodoc replacement. Zero deps. Signals just work."
 
 **Adoption path:**
+
 1. `npm install -D ngx-component-meta`
 2. Remove `@compodoc/compodoc`
 3. Update `.storybook/preview.ts` (5 lines of code)
@@ -121,6 +135,7 @@ Parse speed is comparable. The differentiator is output quality, footprint, and 
 **Pitch:** "Track your Angular signal migration. One command."
 
 **Adoption path:**
+
 1. `npx ngx-component-meta stats "src/**/*.ts"` — zero install needed to try
 2. Add to CI for ongoing tracking
 3. Once installed, team discovers diff and lint
@@ -134,6 +149,7 @@ Parse speed is comparable. The differentiator is output quality, footprint, and 
 **Solution:** `ngx-component-meta lint` with 7 built-in rules, configurable severity, ESLint-style output, CI integration with exit code 1 on errors.
 
 **Rules:**
+
 - `require-input-description` (error)
 - `require-output-description` (error)
 - `require-component-description` (warn)
@@ -207,17 +223,17 @@ Parse speed is comparable. The differentiator is output quality, footprint, and 
 
 ## Documentation inventory
 
-| Document | Location | Purpose |
-|----------|----------|---------|
-| README | `README.md` | Project homepage, quick start, feature overview |
-| API Reference | `docs/api-reference.md` | Every public function and type |
-| CI Breaking Changes | `docs/guides/ci-breaking-changes.md` | GitHub Action setup, workflow examples |
-| Storybook Setup | `docs/guides/storybook-setup.md` | Both integration modes, Vite plugin |
-| Signal Migration | `docs/guides/signal-migration.md` | Stats CLI and programmatic usage |
-| Quality Gates | `docs/guides/quality-gates.md` | Lint rules, CI integration |
-| Static Site Docs | `docs/guides/static-site-docs.md` | Props JSON for Docusaurus/Astro/VitePress |
-| Migration from Compodoc | `docs/migration-from-compodoc.md` | Step-by-step replacement guide |
-| Signal Support | `docs/signal-support.md` | What signal APIs are supported |
+| Document                | Location                             | Purpose                                         |
+| ----------------------- | ------------------------------------ | ----------------------------------------------- |
+| README                  | `README.md`                          | Project homepage, quick start, feature overview |
+| API Reference           | `docs/api-reference.md`              | Every public function and type                  |
+| CI Breaking Changes     | `docs/guides/ci-breaking-changes.md` | GitHub Action setup, workflow examples          |
+| Storybook Setup         | `docs/guides/storybook-setup.md`     | Both integration modes, Vite plugin             |
+| Signal Migration        | `docs/guides/signal-migration.md`    | Stats CLI and programmatic usage                |
+| Quality Gates           | `docs/guides/quality-gates.md`       | Lint rules, CI integration                      |
+| Static Site Docs        | `docs/guides/static-site-docs.md`    | Props JSON for Docusaurus/Astro/VitePress       |
+| Migration from Compodoc | `docs/migration-from-compodoc.md`    | Step-by-step replacement guide                  |
+| Signal Support          | `docs/signal-support.md`             | What signal APIs are supported                  |
 
 ---
 

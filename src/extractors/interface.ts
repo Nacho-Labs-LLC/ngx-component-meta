@@ -1,7 +1,16 @@
 import ts from '@typescript/typescript6';
-import type { InterfaceDoc, InterfacePropertyDoc, InterfaceMethodDoc } from '../types.js';
+import type {
+  InterfaceDoc,
+  InterfacePropertyDoc,
+  InterfaceMethodDoc,
+} from '../types.js';
 import { extractParams, getReturnTypeString } from '../utils/ast-helpers.js';
-import { getDescription, getRawDescription, getTags, isInternal } from '../utils/jsdoc.js';
+import {
+  getDescription,
+  getRawDescription,
+  getTags,
+  isInternal,
+} from '../utils/jsdoc.js';
 
 /**
  * Extract an exported interface declaration into an InterfaceDoc.
@@ -56,7 +65,9 @@ function extractInterfaceProperty(
   member: ts.PropertySignature,
   sourceFile: ts.SourceFile,
 ): InterfacePropertyDoc | null {
-  const symbol = member.name ? checker.getSymbolAtLocation(member.name) : undefined;
+  const symbol = member.name
+    ? checker.getSymbolAtLocation(member.name)
+    : undefined;
   if (!symbol) return null;
 
   let type = checker.getTypeOfSymbolAtLocation(symbol, member);
@@ -65,7 +76,9 @@ function extractInterfaceProperty(
   // Strip the undefined union branch so the type reads `number` — the `optional` flag
   // already conveys optionality.
   if (member.questionToken && type.isUnion()) {
-    const filtered = type.types.filter(t => !(t.flags & ts.TypeFlags.Undefined));
+    const filtered = type.types.filter(
+      (t) => !(t.flags & ts.TypeFlags.Undefined),
+    );
     if (filtered.length === 1) {
       type = filtered[0];
     }
@@ -86,7 +99,9 @@ function extractInterfaceMethod(
   member: ts.MethodSignature,
   sourceFile: ts.SourceFile,
 ): InterfaceMethodDoc | null {
-  const symbol = member.name ? checker.getSymbolAtLocation(member.name) : undefined;
+  const symbol = member.name
+    ? checker.getSymbolAtLocation(member.name)
+    : undefined;
   if (!symbol) return null;
 
   const signature = checker.getSignatureFromDeclaration(member);
@@ -101,9 +116,15 @@ function extractInterfaceMethod(
         ? checker.getTypeOfSymbolAtLocation(paramSymbol, param)
         : checker.getTypeAtLocation(param);
       if (paramType.isUnion()) {
-        const filtered = paramType.types.filter(t => !(t.flags & ts.TypeFlags.Undefined));
+        const filtered = paramType.types.filter(
+          (t) => !(t.flags & ts.TypeFlags.Undefined),
+        );
         if (filtered.length === 1) {
-          params[i].type = checker.typeToString(filtered[0], param, ts.TypeFormatFlags.NoTruncation);
+          params[i].type = checker.typeToString(
+            filtered[0],
+            param,
+            ts.TypeFormatFlags.NoTruncation,
+          );
         }
       }
     }

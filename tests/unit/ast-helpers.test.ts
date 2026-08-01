@@ -14,7 +14,7 @@ import {
   getCallExpressionInitializer,
   getExpressionProperty,
   extractParams,
-  getReturnTypeString
+  getReturnTypeString,
 } from '../../src/utils/ast-helpers.js';
 
 // Helper to create TS nodes from a string
@@ -23,7 +23,7 @@ function createNode(sourceText: string) {
     'test.ts',
     sourceText,
     ts.ScriptTarget.Latest,
-    true
+    true,
   );
 
   // Return the first statement's expression or declaration to make targeting easier
@@ -33,15 +33,17 @@ function createNode(sourceText: string) {
       return { sourceFile, node: firstStatement };
     }
     if (ts.isExpressionStatement(firstStatement)) {
-       return { sourceFile, node: firstStatement.expression };
+      return { sourceFile, node: firstStatement.expression };
     }
     if (ts.isVariableStatement(firstStatement)) {
-       return { sourceFile, node: firstStatement.declarationList.declarations[0] };
+      return {
+        sourceFile,
+        node: firstStatement.declarationList.declarations[0],
+      };
     }
   }
   return { sourceFile, node: sourceFile };
 }
-
 
 describe('Decorator Helpers', () => {
   it('getDecorators should extract decorators correctly', () => {
@@ -98,7 +100,9 @@ describe('Decorator Helpers', () => {
     const code = `@Input('aliasName') myInput: string;`;
     const { node } = createNode(code) as { node: ts.VariableDeclaration };
     const classCode = `class MyClass { ${code} }`;
-    const { node: classNode } = createNode(classCode) as { node: ts.ClassDeclaration };
+    const { node: classNode } = createNode(classCode) as {
+      node: ts.ClassDeclaration;
+    };
     const prop = classNode.members[0];
 
     const inputDecorator = findDecorator(prop, 'Input');
@@ -110,7 +114,9 @@ describe('Decorator Helpers', () => {
   it('getDecoratorStringArg should return undefined if not a string literal', () => {
     const code = `@Input({ alias: 'aliasName' }) myInput: string;`;
     const classCode = `class MyClass { ${code} }`;
-    const { node: classNode } = createNode(classCode) as { node: ts.ClassDeclaration };
+    const { node: classNode } = createNode(classCode) as {
+      node: ts.ClassDeclaration;
+    };
     const prop = classNode.members[0];
 
     const inputDecorator = findDecorator(prop, 'Input');
@@ -123,7 +129,9 @@ describe('Decorator Helpers', () => {
 describe('Class Member Modifiers', () => {
   it('isPrivateMember should return true for private modifier', () => {
     const code = `class MyClass { private myProp = 1; }`;
-    const { node: classNode } = createNode(code) as { node: ts.ClassDeclaration };
+    const { node: classNode } = createNode(code) as {
+      node: ts.ClassDeclaration;
+    };
     const prop = classNode.members[0];
 
     expect(isPrivateMember(prop)).toBe(true);
@@ -131,7 +139,9 @@ describe('Class Member Modifiers', () => {
 
   it('isPrivateMember should return true for # private identifier', () => {
     const code = `class MyClass { #myProp = 1; }`;
-    const { node: classNode } = createNode(code) as { node: ts.ClassDeclaration };
+    const { node: classNode } = createNode(code) as {
+      node: ts.ClassDeclaration;
+    };
     const prop = classNode.members[0];
 
     expect(isPrivateMember(prop)).toBe(true);
@@ -139,7 +149,9 @@ describe('Class Member Modifiers', () => {
 
   it('isPrivateMember should return false for public members', () => {
     const code = `class MyClass { public myProp = 1; myOtherProp = 2; }`;
-    const { node: classNode } = createNode(code) as { node: ts.ClassDeclaration };
+    const { node: classNode } = createNode(code) as {
+      node: ts.ClassDeclaration;
+    };
 
     expect(isPrivateMember(classNode.members[0])).toBe(false);
     expect(isPrivateMember(classNode.members[1])).toBe(false);
@@ -147,7 +159,9 @@ describe('Class Member Modifiers', () => {
 
   it('isProtectedMember should return true for protected modifier', () => {
     const code = `class MyClass { protected myProp = 1; }`;
-    const { node: classNode } = createNode(code) as { node: ts.ClassDeclaration };
+    const { node: classNode } = createNode(code) as {
+      node: ts.ClassDeclaration;
+    };
     const prop = classNode.members[0];
 
     expect(isProtectedMember(prop)).toBe(true);
@@ -155,7 +169,9 @@ describe('Class Member Modifiers', () => {
 
   it('isProtectedMember should return false for public/private members', () => {
     const code = `class MyClass { public myProp = 1; private myPrivate = 2; }`;
-    const { node: classNode } = createNode(code) as { node: ts.ClassDeclaration };
+    const { node: classNode } = createNode(code) as {
+      node: ts.ClassDeclaration;
+    };
 
     expect(isProtectedMember(classNode.members[0])).toBe(false);
     expect(isProtectedMember(classNode.members[1])).toBe(false);
@@ -163,7 +179,9 @@ describe('Class Member Modifiers', () => {
 
   it('isReadonlyMember should return true for readonly modifier', () => {
     const code = `class MyClass { readonly myProp = 1; }`;
-    const { node: classNode } = createNode(code) as { node: ts.ClassDeclaration };
+    const { node: classNode } = createNode(code) as {
+      node: ts.ClassDeclaration;
+    };
     const prop = classNode.members[0];
 
     expect(isReadonlyMember(prop)).toBe(true);
@@ -171,28 +189,39 @@ describe('Class Member Modifiers', () => {
 
   it('isReadonlyMember should return false for non-readonly members', () => {
     const code = `class MyClass { myProp = 1; }`;
-    const { node: classNode } = createNode(code) as { node: ts.ClassDeclaration };
+    const { node: classNode } = createNode(code) as {
+      node: ts.ClassDeclaration;
+    };
 
     expect(isReadonlyMember(classNode.members[0])).toBe(false);
   });
 
   it('getMemberName should return name for identifier', () => {
     const code = `class MyClass { myProp = 1; }`;
-    const { node: classNode } = createNode(code) as { node: ts.ClassDeclaration };
+    const { node: classNode } = createNode(code) as {
+      node: ts.ClassDeclaration;
+    };
 
     expect(getMemberName(classNode.members[0])).toBe('myProp');
   });
 
   it('getMemberName should return name for string literal', () => {
     const code = `class MyClass { 'my-prop' = 1; }`;
-    const { node: classNode } = createNode(code) as { node: ts.ClassDeclaration };
+    const { node: classNode } = createNode(code) as {
+      node: ts.ClassDeclaration;
+    };
 
     expect(getMemberName(classNode.members[0])).toBe('my-prop');
   });
 
   it('getMemberName should return undefined for computed names without a simple literal', () => {
     const code = `const a = 'prop'; class MyClass { [a] = 1; }`;
-    const sourceFile = ts.createSourceFile('test.ts', code, ts.ScriptTarget.Latest, true);
+    const sourceFile = ts.createSourceFile(
+      'test.ts',
+      code,
+      ts.ScriptTarget.Latest,
+      true,
+    );
     const classNode = sourceFile.statements.find(ts.isClassDeclaration);
 
     expect(getMemberName(classNode!.members[0])).toBeUndefined();
@@ -233,7 +262,9 @@ describe('Object and Expression Properties', () => {
 
   it('getCallExpressionInitializer should return a call expression if present', () => {
     const code = `class MyClass { myProp = signal(1); }`;
-    const { node: classNode } = createNode(code) as { node: ts.ClassDeclaration };
+    const { node: classNode } = createNode(code) as {
+      node: ts.ClassDeclaration;
+    };
     const prop = classNode.members[0] as ts.PropertyDeclaration;
 
     const callExpr = getCallExpressionInitializer(prop);
@@ -243,7 +274,9 @@ describe('Object and Expression Properties', () => {
 
   it('getCallExpressionInitializer should return undefined if not a call expression', () => {
     const code = `class MyClass { myProp = 1; }`;
-    const { node: classNode } = createNode(code) as { node: ts.ClassDeclaration };
+    const { node: classNode } = createNode(code) as {
+      node: ts.ClassDeclaration;
+    };
     const prop = classNode.members[0] as ts.PropertyDeclaration;
 
     const callExpr = getCallExpressionInitializer(prop);
@@ -259,7 +292,7 @@ describe('Complex Helpers (TypeChecker required)', () => {
       filename,
       sourceText,
       ts.ScriptTarget.Latest,
-      true
+      true,
     );
 
     // Create a fast compiler host that doesn't read real library files
@@ -277,7 +310,7 @@ describe('Complex Helpers (TypeChecker required)', () => {
       useCaseSensitiveFileNames: () => true,
       getNewLine: () => '\n',
       fileExists: (fileName) => fileName === filename,
-      readFile: (fileName) => fileName === filename ? sourceText : '',
+      readFile: (fileName) => (fileName === filename ? sourceText : ''),
     };
 
     const program = ts.createProgram([filename], {}, compilerHost);
@@ -302,7 +335,12 @@ describe('Complex Helpers (TypeChecker required)', () => {
     // Get symbol for the method (required for jsdoc descriptions)
     const methodSymbol = checker.getSymbolAtLocation(methodNode.name)!;
 
-    const params = extractParams(checker, methodNode.parameters, sourceFile, methodSymbol);
+    const params = extractParams(
+      checker,
+      methodNode.parameters,
+      sourceFile,
+      methodSymbol,
+    );
 
     expect(params).toHaveLength(3);
 
@@ -343,7 +381,12 @@ describe('Complex Helpers (TypeChecker required)', () => {
     const { checker, sourceFile } = setupChecker(code);
     const classNode = sourceFile.statements.find(ts.isClassDeclaration)!;
 
-    const returnTypeStr = getReturnTypeString(checker, undefined, classNode, 'any');
+    const returnTypeStr = getReturnTypeString(
+      checker,
+      undefined,
+      classNode,
+      'any',
+    );
     expect(returnTypeStr).toBe('any');
   });
 });

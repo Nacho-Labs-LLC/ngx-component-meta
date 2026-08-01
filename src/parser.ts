@@ -25,8 +25,22 @@ import type {
   WatchParser,
   MemberDoc,
 } from './types.js';
-import { findDecorator, getDecorators, getDecoratorStringArg, isPrivateMember, getMemberName, getCallExpressionInitializer, extractParams, getReturnTypeString } from './utils/ast-helpers.js';
-import { getDescription, getRawDescription, getTags, isInternal } from './utils/jsdoc.js';
+import {
+  findDecorator,
+  getDecorators,
+  getDecoratorStringArg,
+  isPrivateMember,
+  getMemberName,
+  getCallExpressionInitializer,
+  extractParams,
+  getReturnTypeString,
+} from './utils/ast-helpers.js';
+import {
+  getDescription,
+  getRawDescription,
+  getTags,
+  isInternal,
+} from './utils/jsdoc.js';
 import { typeToString } from './utils/type-resolver.js';
 import { getDefaultValue } from './utils/default-value.js';
 import { extractComponentMetadata } from './extractors/component.js';
@@ -35,7 +49,10 @@ import { extractDecoratorOutput } from './extractors/output.js';
 import { extractPipe } from './extractors/pipe.js';
 import { extractMethod } from './extractors/method.js';
 import { extractProperty } from './extractors/property.js';
-import { tryExtractSignalInput, tryExtractModel } from './extractors/signal-input.js';
+import {
+  tryExtractSignalInput,
+  tryExtractModel,
+} from './extractors/signal-input.js';
 import { tryExtractSignalOutput } from './extractors/signal-output.js';
 import { tryExtractSignalQuery } from './extractors/signal-query.js';
 import { isAngularCoreCall } from './utils/import-tracker.js';
@@ -58,10 +75,15 @@ const QUERY_DECORATORS: Record<string, QueryDoc['kind']> = {
 /**
  * Create a parser from a tsconfig.json path.
  */
-export function createParser(tsconfigPath: string, options?: ParserOptions): Parser {
+export function createParser(
+  tsconfigPath: string,
+  options?: ParserOptions,
+): Parser {
   const configFile = ts.readConfigFile(tsconfigPath, ts.sys.readFile);
   if (configFile.error) {
-    throw new Error(`Failed to read tsconfig: ${ts.flattenDiagnosticMessageText(configFile.error.messageText, '\n')}`);
+    throw new Error(
+      `Failed to read tsconfig: ${ts.flattenDiagnosticMessageText(configFile.error.messageText, '\n')}`,
+    );
   }
 
   const parsedConfig = ts.parseJsonConfigFileContent(
@@ -75,7 +97,11 @@ export function createParser(tsconfigPath: string, options?: ParserOptions): Par
     ...options?.compilerOptions,
   };
 
-  return createParserFromProgram(mergedOptions, parsedConfig.fileNames, options);
+  return createParserFromProgram(
+    mergedOptions,
+    parsedConfig.fileNames,
+    options,
+  );
 }
 
 /**
@@ -95,11 +121,17 @@ export function parse(
   filePathOrPaths: string | string[],
   options?: ParserOptions,
 ): (ComponentDoc | PipeDoc)[] {
-  const files = Array.isArray(filePathOrPaths) ? filePathOrPaths : [filePathOrPaths];
+  const files = Array.isArray(filePathOrPaths)
+    ? filePathOrPaths
+    : [filePathOrPaths];
   if (files.length === 0) return [];
 
   // Try to find tsconfig.json by walking up from the first file
-  const tsconfigPath = ts.findConfigFile(files[0], ts.sys.fileExists, 'tsconfig.json');
+  const tsconfigPath = ts.findConfigFile(
+    files[0],
+    ts.sys.fileExists,
+    'tsconfig.json',
+  );
   if (tsconfigPath) {
     const parser = createParser(tsconfigPath, options);
     return parser.parse(files);
@@ -127,12 +159,28 @@ export function parseAll(
   filePathOrPaths: string | string[],
   options?: ParserOptions,
 ): ParseResult {
-  const files = Array.isArray(filePathOrPaths) ? filePathOrPaths : [filePathOrPaths];
+  const files = Array.isArray(filePathOrPaths)
+    ? filePathOrPaths
+    : [filePathOrPaths];
   if (files.length === 0) {
-    return { components: [], pipes: [], injectables: [], interfaces: [], typeAliases: [], enums: [], classes: [], functions: [], variables: [] };
+    return {
+      components: [],
+      pipes: [],
+      injectables: [],
+      interfaces: [],
+      typeAliases: [],
+      enums: [],
+      classes: [],
+      functions: [],
+      variables: [],
+    };
   }
 
-  const tsconfigPath = ts.findConfigFile(files[0], ts.sys.fileExists, 'tsconfig.json');
+  const tsconfigPath = ts.findConfigFile(
+    files[0],
+    ts.sys.fileExists,
+    'tsconfig.json',
+  );
   if (tsconfigPath) {
     const parser = createParser(tsconfigPath, options);
     return parser.parseAll(files);
@@ -166,13 +214,17 @@ function createParserFromProgram(
 
   return {
     parse(filePathOrPaths: string | string[]): (ComponentDoc | PipeDoc)[] {
-      const files = Array.isArray(filePathOrPaths) ? filePathOrPaths : [filePathOrPaths];
+      const files = Array.isArray(filePathOrPaths)
+        ? filePathOrPaths
+        : [filePathOrPaths];
       const prog = getOrCreateProgram(files);
       return extractFromProgram(prog, files, options);
     },
 
     parseAll(filePathOrPaths: string | string[]): ParseResult {
-      const files = Array.isArray(filePathOrPaths) ? filePathOrPaths : [filePathOrPaths];
+      const files = Array.isArray(filePathOrPaths)
+        ? filePathOrPaths
+        : [filePathOrPaths];
       const prog = getOrCreateProgram(files);
       return extractAllFromProgram(prog, files, options);
     },
@@ -181,7 +233,9 @@ function createParserFromProgram(
       filePathOrPaths: string | string[],
       externalProgram: ts.Program,
     ): (ComponentDoc | PipeDoc)[] {
-      const files = Array.isArray(filePathOrPaths) ? filePathOrPaths : [filePathOrPaths];
+      const files = Array.isArray(filePathOrPaths)
+        ? filePathOrPaths
+        : [filePathOrPaths];
       return extractFromProgram(externalProgram, files, options);
     },
 
@@ -209,13 +263,13 @@ function extractFromProgram(
     const sourceFile = program.getSourceFile(filePath);
     if (!sourceFile) continue;
 
-    ts.forEachChild(sourceFile, node => {
+    ts.forEachChild(sourceFile, (node) => {
       if (!ts.isClassDeclaration(node) || !node.name) return;
 
       const decorators = getDecorators(node);
 
       // Check for @Pipe
-      const pipeDecorator = decorators.find(d => d.name === 'Pipe');
+      const pipeDecorator = decorators.find((d) => d.name === 'Pipe');
       if (pipeDecorator) {
         const pipeDoc = extractPipe(checker, node, pipeDecorator, sourceFile);
         if (pipeDoc) results.push(pipeDoc);
@@ -223,12 +277,19 @@ function extractFromProgram(
       }
 
       // Check for @Component or @Directive
-      const componentDecorator = decorators.find(d => d.name === 'Component');
-      const directiveDecorator = decorators.find(d => d.name === 'Directive');
+      const componentDecorator = decorators.find((d) => d.name === 'Component');
+      const directiveDecorator = decorators.find((d) => d.name === 'Directive');
       const decorator = componentDecorator ?? directiveDecorator;
       if (!decorator) return;
 
-      const doc = extractComponentDoc(checker, node, decorator, sourceFile, program, options);
+      const doc = extractComponentDoc(
+        checker,
+        node,
+        decorator,
+        sourceFile,
+        program,
+        options,
+      );
       if (doc) results.push(doc);
     });
   }
@@ -241,7 +302,9 @@ function extractFromProgram(
  */
 function isExported(node: ts.Declaration | ts.VariableStatement): boolean {
   const modifiers = ts.getModifiers(node as ts.HasModifiers);
-  return modifiers?.some(m => m.kind === ts.SyntaxKind.ExportKeyword) ?? false;
+  return (
+    modifiers?.some((m) => m.kind === ts.SyntaxKind.ExportKeyword) ?? false
+  );
 }
 
 /**
@@ -267,12 +330,12 @@ function extractAllFromProgram(
     const sourceFile = program.getSourceFile(filePath);
     if (!sourceFile) continue;
 
-    ts.forEachChild(sourceFile, node => {
+    ts.forEachChild(sourceFile, (node) => {
       // Class declarations: components, directives, pipes, injectables, or plain classes
       if (ts.isClassDeclaration(node) && node.name) {
         const decorators = getDecorators(node);
 
-        const pipeDecorator = decorators.find(d => d.name === 'Pipe');
+        const pipeDecorator = decorators.find((d) => d.name === 'Pipe');
         if (pipeDecorator) {
           const pipeDoc = extractPipe(checker, node, pipeDecorator, sourceFile);
           if (pipeDoc) pipes.push(pipeDoc);
@@ -281,18 +344,36 @@ function extractAllFromProgram(
 
         // Check Component/Directive before Injectable — a class with both
         // decorators should be treated as a component, not an injectable.
-        const componentDecorator = decorators.find(d => d.name === 'Component');
-        const directiveDecorator = decorators.find(d => d.name === 'Directive');
+        const componentDecorator = decorators.find(
+          (d) => d.name === 'Component',
+        );
+        const directiveDecorator = decorators.find(
+          (d) => d.name === 'Directive',
+        );
         const decorator = componentDecorator ?? directiveDecorator;
         if (decorator) {
-          const doc = extractComponentDoc(checker, node, decorator, sourceFile, program, options);
+          const doc = extractComponentDoc(
+            checker,
+            node,
+            decorator,
+            sourceFile,
+            program,
+            options,
+          );
           if (doc) components.push(doc);
           return;
         }
 
-        const injectableDecorator = decorators.find(d => d.name === 'Injectable');
+        const injectableDecorator = decorators.find(
+          (d) => d.name === 'Injectable',
+        );
         if (injectableDecorator) {
-          const injectableDoc = extractInjectable(checker, node, injectableDecorator, sourceFile);
+          const injectableDoc = extractInjectable(
+            checker,
+            node,
+            injectableDecorator,
+            sourceFile,
+          );
           if (injectableDoc) injectables.push(injectableDoc);
           return;
         }
@@ -345,7 +426,17 @@ function extractAllFromProgram(
     });
   }
 
-  return { components, pipes, injectables, interfaces, typeAliases, enums, classes, functions, variables };
+  return {
+    components,
+    pipes,
+    injectables,
+    interfaces,
+    typeAliases,
+    enums,
+    classes,
+    functions,
+    variables,
+  };
 }
 
 interface ComponentCollections {
@@ -362,12 +453,18 @@ interface ComponentCollections {
 function extractComponentDoc(
   checker: ts.TypeChecker,
   classDecl: ts.ClassDeclaration,
-  decorator: { name: string; args: ts.NodeArray<ts.Expression> | undefined; node: ts.Decorator },
+  decorator: {
+    name: string;
+    args: ts.NodeArray<ts.Expression> | undefined;
+    node: ts.Decorator;
+  },
   sourceFile: ts.SourceFile,
   program: ts.Program,
   options?: ParserOptions,
 ): ComponentDoc | null {
-  const classSymbol = classDecl.name ? checker.getSymbolAtLocation(classDecl.name) : undefined;
+  const classSymbol = classDecl.name
+    ? checker.getSymbolAtLocation(classDecl.name)
+    : undefined;
   if (!classSymbol) return null;
 
   // Check for @internal
@@ -388,7 +485,14 @@ function extractComponentDoc(
 
   // Process class members
   const leafNames = new Set<string>();
-  extractMembersIntoCollections(checker, classDecl, sourceFile, options, collections, leafNames);
+  extractMembersIntoCollections(
+    checker,
+    classDecl,
+    sourceFile,
+    options,
+    collections,
+    leafNames,
+  );
 
   // Resolve inheritance
   if (options?.shouldIncludeInherited !== false) {
@@ -411,7 +515,10 @@ function extractComponentDoc(
   }
 
   // Resolve heritage info (implements, extends)
-  const { implements: implementsList, extends: extendsName } = getHeritageInfo(classDecl, sourceFile);
+  const { implements: implementsList, extends: extendsName } = getHeritageInfo(
+    classDecl,
+    sourceFile,
+  );
 
   // Apply name resolver
   const name = resolveComponentName(classSymbol, sourceFile, options);
@@ -442,14 +549,17 @@ function extractComponentDoc(
 /**
  * Resolves the heritage information (implements and extends) for a class.
  */
-function getHeritageInfo(classDecl: ts.ClassDeclaration, sourceFile: ts.SourceFile): { implements: string[]; extends: string | null } {
-  const implementsList = classDecl.heritageClauses
-    ?.filter(h => h.token === ts.SyntaxKind.ImplementsKeyword)
-    .flatMap(h => h.types.map(t => t.getText(sourceFile)))
-    ?? [];
+function getHeritageInfo(
+  classDecl: ts.ClassDeclaration,
+  sourceFile: ts.SourceFile,
+): { implements: string[]; extends: string | null } {
+  const implementsList =
+    classDecl.heritageClauses
+      ?.filter((h) => h.token === ts.SyntaxKind.ImplementsKeyword)
+      .flatMap((h) => h.types.map((t) => t.getText(sourceFile))) ?? [];
 
   const extendsClause = classDecl.heritageClauses?.find(
-    h => h.token === ts.SyntaxKind.ExtendsKeyword,
+    (h) => h.token === ts.SyntaxKind.ExtendsKeyword,
   );
   const extendsName = extendsClause?.types[0]?.getText(sourceFile) ?? null;
 
@@ -459,7 +569,11 @@ function getHeritageInfo(classDecl: ts.ClassDeclaration, sourceFile: ts.SourceFi
 /**
  * Resolves the component name, potentially using a custom resolver.
  */
-function resolveComponentName(classSymbol: ts.Symbol, sourceFile: ts.SourceFile, options: ParserOptions | undefined): string {
+function resolveComponentName(
+  classSymbol: ts.Symbol,
+  sourceFile: ts.SourceFile,
+  options: ParserOptions | undefined,
+): string {
   let name = classSymbol.getName();
   if (options?.componentNameResolver) {
     const resolved = options.componentNameResolver(classSymbol, sourceFile);
@@ -471,15 +585,18 @@ function resolveComponentName(classSymbol: ts.Symbol, sourceFile: ts.SourceFile,
 /**
  * Applies property filters to all member collections in a ComponentDoc.
  */
-function applyPropFilters(doc: ComponentDoc, filter: (prop: MemberDoc, doc: ComponentDoc) => boolean): void {
-  doc.inputs = doc.inputs.filter(p => filter(p, doc));
-  doc.outputs = doc.outputs.filter(p => filter(p, doc));
-  doc.models = doc.models.filter(p => filter(p, doc));
-  doc.properties = doc.properties.filter(p => filter(p, doc));
-  doc.methods = doc.methods.filter(p => filter(p, doc));
-  doc.queries = doc.queries.filter(p => filter(p, doc));
-  doc.hostBindings = doc.hostBindings.filter(p => filter(p, doc));
-  doc.hostListeners = doc.hostListeners.filter(p => filter(p, doc));
+function applyPropFilters(
+  doc: ComponentDoc,
+  filter: (prop: MemberDoc, doc: ComponentDoc) => boolean,
+): void {
+  doc.inputs = doc.inputs.filter((p) => filter(p, doc));
+  doc.outputs = doc.outputs.filter((p) => filter(p, doc));
+  doc.models = doc.models.filter((p) => filter(p, doc));
+  doc.properties = doc.properties.filter((p) => filter(p, doc));
+  doc.methods = doc.methods.filter((p) => filter(p, doc));
+  doc.queries = doc.queries.filter((p) => filter(p, doc));
+  doc.hostBindings = doc.hostBindings.filter((p) => filter(p, doc));
+  doc.hostListeners = doc.hostListeners.filter((p) => filter(p, doc));
 }
 
 /**
@@ -505,7 +622,12 @@ function extractMembersIntoCollections(
       // Check for @HostListener before falling through to regular method extraction
       const hostListenerDecorator = findDecorator(member, 'HostListener');
       if (hostListenerDecorator) {
-        const listenerDoc = extractHostListener(checker, member, hostListenerDecorator, sourceFile);
+        const listenerDoc = extractHostListener(
+          checker,
+          member,
+          hostListenerDecorator,
+          sourceFile,
+        );
         if (listenerDoc) collections.hostListeners.push(listenerDoc);
         continue;
       }
@@ -521,7 +643,12 @@ function extractMembersIntoCollections(
     if (ts.isGetAccessorDeclaration(member)) {
       const hostBindingDecorator = findDecorator(member, 'HostBinding');
       if (hostBindingDecorator) {
-        const bindingDoc = extractHostBindingFromAccessor(checker, member, hostBindingDecorator, sourceFile);
+        const bindingDoc = extractHostBindingFromAccessor(
+          checker,
+          member,
+          hostBindingDecorator,
+          sourceFile,
+        );
         if (bindingDoc) collections.hostBindings.push(bindingDoc);
       }
       continue;
@@ -567,21 +694,43 @@ function extractPropertyMember(
   const callExpr = getCallExpressionInitializer(prop);
   if (callExpr && isAngularCoreCall(checker, callExpr)) {
     // Try signal input
-    const signalInput = tryExtractSignalInput(checker, prop, callExpr, sourceFile);
-    if (signalInput) { inputs.push(signalInput); return; }
+    const signalInput = tryExtractSignalInput(
+      checker,
+      prop,
+      callExpr,
+      sourceFile,
+    );
+    if (signalInput) {
+      inputs.push(signalInput);
+      return;
+    }
 
     // Try model
     const modelDoc = tryExtractModel(checker, prop, callExpr, sourceFile);
-    if (modelDoc) { models.push(modelDoc); return; }
+    if (modelDoc) {
+      models.push(modelDoc);
+      return;
+    }
 
     // Try signal output
     const signalOutput = tryExtractSignalOutput(checker, prop, callExpr);
-    if (signalOutput) { outputs.push(signalOutput); return; }
+    if (signalOutput) {
+      outputs.push(signalOutput);
+      return;
+    }
 
     // Try signal query
     if (options?.shouldIncludeQueries) {
-      const queryDoc = tryExtractSignalQuery(checker, prop, callExpr, sourceFile);
-      if (queryDoc) { queries.push(queryDoc); return; }
+      const queryDoc = tryExtractSignalQuery(
+        checker,
+        prop,
+        callExpr,
+        sourceFile,
+      );
+      if (queryDoc) {
+        queries.push(queryDoc);
+        return;
+      }
     }
   }
 
@@ -589,23 +738,32 @@ function extractPropertyMember(
 
   // 2. Check for @HostBinding before falling through to plain property
   if (hostBindings) {
-    const hostBindingDecorator = decorators.find(d => d.name === 'HostBinding');
+    const hostBindingDecorator = decorators.find(
+      (d) => d.name === 'HostBinding',
+    );
     if (hostBindingDecorator) {
-      const bindingDoc = extractHostBindingFromProperty(checker, prop, hostBindingDecorator, sourceFile);
+      const bindingDoc = extractHostBindingFromProperty(
+        checker,
+        prop,
+        hostBindingDecorator,
+        sourceFile,
+      );
       if (bindingDoc) hostBindings.push(bindingDoc);
       return;
     }
   }
 
   // 3. Check for decorator-based @Input
-  const inputDecorator = decorators.find(d => d.name === 'Input');
+  const inputDecorator = decorators.find((d) => d.name === 'Input');
   if (inputDecorator) {
-    inputs.push(extractDecoratorInput(checker, prop, inputDecorator, sourceFile));
+    inputs.push(
+      extractDecoratorInput(checker, prop, inputDecorator, sourceFile),
+    );
     return;
   }
 
   // 4. Check for decorator-based @Output
-  const outputDecorator = decorators.find(d => d.name === 'Output');
+  const outputDecorator = decorators.find((d) => d.name === 'Output');
   if (outputDecorator) {
     outputs.push(extractDecoratorOutput(checker, prop, outputDecorator));
     return;
@@ -613,10 +771,16 @@ function extractPropertyMember(
 
   // 5. Check for decorator-based queries
   if (options?.shouldIncludeQueries) {
-    const qDecorator = decorators.find(d => d.name in QUERY_DECORATORS);
+    const qDecorator = decorators.find((d) => d.name in QUERY_DECORATORS);
     if (qDecorator) {
       const queryKind = QUERY_DECORATORS[qDecorator.name];
-      const queryDoc = extractDecoratorQuery(checker, prop, qDecorator, queryKind, sourceFile);
+      const queryDoc = extractDecoratorQuery(
+        checker,
+        prop,
+        qDecorator,
+        queryKind,
+        sourceFile,
+      );
       if (queryDoc) queries.push(queryDoc);
       return;
     }
@@ -630,7 +794,11 @@ function extractPropertyMember(
 function extractDecoratorQuery(
   checker: ts.TypeChecker,
   prop: ts.PropertyDeclaration,
-  decorator: { name: string; args: ts.NodeArray<ts.Expression> | undefined; node: ts.Decorator },
+  decorator: {
+    name: string;
+    args: ts.NodeArray<ts.Expression> | undefined;
+    node: ts.Decorator;
+  },
   kind: QueryDoc['kind'],
   sourceFile: ts.SourceFile,
 ): QueryDoc | null {
@@ -638,9 +806,9 @@ function extractDecoratorQuery(
   if (!symbol) return null;
 
   const selector = decorator.args?.[0]
-    ? (ts.isStringLiteral(decorator.args[0])
-        ? decorator.args[0].text
-        : decorator.args[0].getText(sourceFile))
+    ? ts.isStringLiteral(decorator.args[0])
+      ? decorator.args[0].text
+      : decorator.args[0].getText(sourceFile)
     : '';
 
   const type = checker.getTypeOfSymbolAtLocation(symbol, prop);
@@ -678,7 +846,7 @@ function resolveInheritance(
   existingNames?: Set<string>,
 ): void {
   const extendsClause = classDecl.heritageClauses?.find(
-    h => h.token === ts.SyntaxKind.ExtendsKeyword,
+    (h) => h.token === ts.SyntaxKind.ExtendsKeyword,
   );
   if (!extendsClause?.types.length) return;
 
@@ -694,7 +862,16 @@ function resolveInheritance(
   // Collect existing member names to avoid duplicates (child overrides parent)
   if (!existingNames) {
     existingNames = new Set<string>();
-    for (const list of [inputs, outputs, models, properties, methods, queries, hostBindings ?? [], hostListeners ?? []]) {
+    for (const list of [
+      inputs,
+      outputs,
+      models,
+      properties,
+      methods,
+      queries,
+      hostBindings ?? [],
+      hostListeners ?? [],
+    ]) {
       for (const item of list) {
         existingNames.add(item.name);
       }
@@ -745,7 +922,11 @@ function resolveInheritance(
 function extractHostBindingFromProperty(
   checker: ts.TypeChecker,
   prop: ts.PropertyDeclaration,
-  decorator: { name: string; args: ts.NodeArray<ts.Expression> | undefined; node: ts.Decorator },
+  decorator: {
+    name: string;
+    args: ts.NodeArray<ts.Expression> | undefined;
+    node: ts.Decorator;
+  },
   sourceFile: ts.SourceFile,
 ): HostBindingDoc | null {
   const symbol = checker.getSymbolAtLocation(prop.name);
@@ -774,20 +955,32 @@ function extractHostBindingFromProperty(
 function extractHostBindingFromAccessor(
   checker: ts.TypeChecker,
   accessor: ts.GetAccessorDeclaration,
-  decorator: { name: string; args: ts.NodeArray<ts.Expression> | undefined; node: ts.Decorator },
+  decorator: {
+    name: string;
+    args: ts.NodeArray<ts.Expression> | undefined;
+    node: ts.Decorator;
+  },
   sourceFile: ts.SourceFile,
 ): HostBindingDoc | null {
-  const symbol = accessor.name ? checker.getSymbolAtLocation(accessor.name) : undefined;
+  const symbol = accessor.name
+    ? checker.getSymbolAtLocation(accessor.name)
+    : undefined;
   if (!symbol) return null;
 
-  const memberName = ts.isIdentifier(accessor.name) ? accessor.name.text : undefined;
+  const memberName = ts.isIdentifier(accessor.name)
+    ? accessor.name.text
+    : undefined;
   if (!memberName) return null;
 
   const hostPropertyName = getDecoratorStringArg(decorator) ?? memberName;
 
   const signature = checker.getSignatureFromDeclaration(accessor);
   const returnType = signature
-    ? checker.typeToString(checker.getReturnTypeOfSignature(signature), accessor, ts.TypeFormatFlags.NoTruncation)
+    ? checker.typeToString(
+        checker.getReturnTypeOfSignature(signature),
+        accessor,
+        ts.TypeFormatFlags.NoTruncation,
+      )
     : 'unknown';
 
   return {
@@ -807,19 +1000,26 @@ function extractHostBindingFromAccessor(
 function extractHostListener(
   checker: ts.TypeChecker,
   method: ts.MethodDeclaration,
-  decorator: { name: string; args: ts.NodeArray<ts.Expression> | undefined; node: ts.Decorator },
+  decorator: {
+    name: string;
+    args: ts.NodeArray<ts.Expression> | undefined;
+    node: ts.Decorator;
+  },
   sourceFile: ts.SourceFile,
 ): HostListenerDoc | null {
-  const symbol = method.name ? checker.getSymbolAtLocation(method.name) : undefined;
+  const symbol = method.name
+    ? checker.getSymbolAtLocation(method.name)
+    : undefined;
   if (!symbol) return null;
 
   const memberName = getMemberName(method);
   if (!memberName) return null;
 
   // First arg is the event name (required string)
-  const eventName = decorator.args?.[0] && ts.isStringLiteral(decorator.args[0])
-    ? decorator.args[0].text
-    : memberName;
+  const eventName =
+    decorator.args?.[0] && ts.isStringLiteral(decorator.args[0])
+      ? decorator.args[0].text
+      : memberName;
 
   // Second arg is an optional array of arg expressions
   const args: string[] = [];
@@ -863,7 +1063,9 @@ export function createWatchParser(
 ): WatchParser {
   const configFile = ts.readConfigFile(tsconfigPath, ts.sys.readFile);
   if (configFile.error) {
-    throw new Error(`Failed to read tsconfig: ${ts.flattenDiagnosticMessageText(configFile.error.messageText, '\n')}`);
+    throw new Error(
+      `Failed to read tsconfig: ${ts.flattenDiagnosticMessageText(configFile.error.messageText, '\n')}`,
+    );
   }
 
   const configDir = path.dirname(path.resolve(tsconfigPath));
@@ -879,7 +1081,9 @@ export function createWatchParser(
   };
 
   const rootFileNames = parsedConfig.fileNames;
-  const tsFiles = rootFileNames.filter(f => f.endsWith('.ts') && !f.endsWith('.d.ts'));
+  const tsFiles = rootFileNames.filter(
+    (f) => f.endsWith('.ts') && !f.endsWith('.d.ts'),
+  );
   const watchDir = options?.watchDir ?? configDir;
   const onUpdate = options?.onUpdate;
 
@@ -908,13 +1112,17 @@ export function createWatchParser(
 
   const watchParser: WatchParser = {
     parse(filePathOrPaths: string | string[]): (ComponentDoc | PipeDoc)[] {
-      const files = Array.isArray(filePathOrPaths) ? filePathOrPaths : [filePathOrPaths];
+      const files = Array.isArray(filePathOrPaths)
+        ? filePathOrPaths
+        : [filePathOrPaths];
       const prog = buildProgram();
       return extractFromProgram(prog, files, options);
     },
 
     parseAll(filePathOrPaths: string | string[]): ParseResult {
-      const files = Array.isArray(filePathOrPaths) ? filePathOrPaths : [filePathOrPaths];
+      const files = Array.isArray(filePathOrPaths)
+        ? filePathOrPaths
+        : [filePathOrPaths];
       const prog = buildProgram();
       return extractAllFromProgram(prog, files, options);
     },
@@ -923,7 +1131,9 @@ export function createWatchParser(
       filePathOrPaths: string | string[],
       externalProgram: ts.Program,
     ): (ComponentDoc | PipeDoc)[] {
-      const files = Array.isArray(filePathOrPaths) ? filePathOrPaths : [filePathOrPaths];
+      const files = Array.isArray(filePathOrPaths)
+        ? filePathOrPaths
+        : [filePathOrPaths];
       return extractFromProgram(externalProgram, files, options);
     },
 
@@ -941,24 +1151,34 @@ export function createWatchParser(
     start(): void {
       if (watcher) return;
 
-      watcher = fs.watch(watchDir, { recursive: true }, (_eventType: string, filename: string | null) => {
-        if (!filename || !filename.endsWith('.ts')) return;
+      watcher = fs.watch(
+        watchDir,
+        { recursive: true },
+        (_eventType: string, filename: string | null) => {
+          if (!filename || !filename.endsWith('.ts')) return;
 
-        if (debounceTimer) clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => {
-          try {
-            fullParse();
-            onUpdate?.(latestDocs);
-          } catch (err) {
-            // Syntax errors or broken files should not crash the watcher.
-            // Keep the previous docs intact.
-            console.warn('[ngx-component-meta] Rebuild failed, keeping previous docs:', err instanceof Error ? err.message : err);
-          }
-        }, DEBOUNCE_MS);
-      });
+          if (debounceTimer) clearTimeout(debounceTimer);
+          debounceTimer = setTimeout(() => {
+            try {
+              fullParse();
+              onUpdate?.(latestDocs);
+            } catch (err) {
+              // Syntax errors or broken files should not crash the watcher.
+              // Keep the previous docs intact.
+              console.warn(
+                '[ngx-component-meta] Rebuild failed, keeping previous docs:',
+                err instanceof Error ? err.message : err,
+              );
+            }
+          }, DEBOUNCE_MS);
+        },
+      );
 
       watcher.on('error', (err: Error) => {
-        console.warn('[ngx-component-meta] File watcher error:', err instanceof Error ? err.message : err);
+        console.warn(
+          '[ngx-component-meta] File watcher error:',
+          err instanceof Error ? err.message : err,
+        );
       });
     },
 

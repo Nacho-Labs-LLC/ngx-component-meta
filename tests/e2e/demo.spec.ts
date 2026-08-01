@@ -39,21 +39,28 @@ export class ButtonComponent {
 test.describe('Demo page loads', () => {
   test('renders the page with header and panels', async ({ page }) => {
     await page.goto('/');
-    await expect(page.locator('header h1')).toHaveText('@nacho-labs/ngx-component-meta');
+    await expect(page.locator('header h1')).toHaveText(
+      '@nacho-labs/ngx-component-meta',
+    );
     await expect(page.locator('#editor')).toBeVisible();
     await expect(page.locator('.tab.active')).toHaveText('Visual');
   });
 
   test('auto-parses the default source on load', async ({ page }) => {
     await page.goto('/');
-    await expect(page.locator('#tab-visual .section-title')).toContainText('ButtonComponent', { timeout: 10_000 });
+    await expect(page.locator('#tab-visual .section-title')).toContainText(
+      'ButtonComponent',
+      { timeout: 10_000 },
+    );
   });
 });
 
 test.describe('Visual tab', () => {
   test('displays inputs table with correct data', async ({ page }) => {
     await page.goto('/');
-    await expect(page.locator('#tab-visual')).toContainText('Inputs', { timeout: 10_000 });
+    await expect(page.locator('#tab-visual')).toContainText('Inputs', {
+      timeout: 10_000,
+    });
 
     const inputsTable = page.locator('#tab-visual table').first();
     await expect(inputsTable).toContainText('label');
@@ -62,20 +69,26 @@ test.describe('Visual tab', () => {
 
   test('displays outputs table', async ({ page }) => {
     await page.goto('/');
-    await expect(page.locator('#tab-visual')).toContainText('Outputs', { timeout: 10_000 });
+    await expect(page.locator('#tab-visual')).toContainText('Outputs', {
+      timeout: 10_000,
+    });
     await expect(page.locator('#tab-visual')).toContainText('clicked');
     await expect(page.locator('#tab-visual')).toContainText('hovered');
   });
 
   test('displays models table', async ({ page }) => {
     await page.goto('/');
-    await expect(page.locator('#tab-visual')).toContainText('Models', { timeout: 10_000 });
+    await expect(page.locator('#tab-visual')).toContainText('Models', {
+      timeout: 10_000,
+    });
     await expect(page.locator('#tab-visual')).toContainText('size');
   });
 
   test('displays methods table', async ({ page }) => {
     await page.goto('/');
-    await expect(page.locator('#tab-visual')).toContainText('Methods', { timeout: 10_000 });
+    await expect(page.locator('#tab-visual')).toContainText('Methods', {
+      timeout: 10_000,
+    });
     await expect(page.locator('#tab-visual')).toContainText('reset');
     await expect(page.locator('#tab-visual')).toContainText('void');
   });
@@ -84,7 +97,10 @@ test.describe('Visual tab', () => {
 test.describe('JSON tab', () => {
   test('shows valid JSON output', async ({ page }) => {
     await page.goto('/');
-    await expect(page.locator('#tab-visual .section-title')).toContainText('ButtonComponent', { timeout: 10_000 });
+    await expect(page.locator('#tab-visual .section-title')).toContainText(
+      'ButtonComponent',
+      { timeout: 10_000 },
+    );
 
     await page.click('[data-tab="json"]');
     await expect(page.locator('#tab-json')).toBeVisible();
@@ -101,7 +117,10 @@ test.describe('JSON tab', () => {
 test.describe('Lint tab', () => {
   test('shows lint results', async ({ page }) => {
     await page.goto('/');
-    await expect(page.locator('#tab-visual .section-title')).toContainText('ButtonComponent', { timeout: 10_000 });
+    await expect(page.locator('#tab-visual .section-title')).toContainText(
+      'ButtonComponent',
+      { timeout: 10_000 },
+    );
 
     await page.click('[data-tab="lint"]');
     await expect(page.locator('#tab-lint')).toBeVisible();
@@ -114,7 +133,10 @@ test.describe('Lint tab', () => {
 test.describe('Stats tab', () => {
   test('shows signal adoption stats', async ({ page }) => {
     await page.goto('/');
-    await expect(page.locator('#tab-visual .section-title')).toContainText('ButtonComponent', { timeout: 10_000 });
+    await expect(page.locator('#tab-visual .section-title')).toContainText(
+      'ButtonComponent',
+      { timeout: 10_000 },
+    );
 
     await page.click('[data-tab="stats"]');
     await expect(page.locator('#tab-stats')).toBeVisible();
@@ -126,9 +148,13 @@ test.describe('Stats tab', () => {
 test.describe('Live editing', () => {
   test('updates output when editor content changes', async ({ page }) => {
     await page.goto('/');
-    await expect(page.locator('#tab-visual .section-title')).toContainText('ButtonComponent', { timeout: 10_000 });
+    await expect(page.locator('#tab-visual .section-title')).toContainText(
+      'ButtonComponent',
+      { timeout: 10_000 },
+    );
 
-    await page.locator('#editor').fill(`import { Component, Input } from '@angular/core';
+    await page.locator('#editor')
+      .fill(`import { Component, Input } from '@angular/core';
 
 @Component({ selector: 'app-hello', template: '' })
 export class HelloComponent {
@@ -136,25 +162,42 @@ export class HelloComponent {
   @Input() message: string = 'Hello';
 }`);
 
-    await expect(page.locator('#tab-visual .section-title')).toContainText('HelloComponent', { timeout: 10_000 });
+    await expect(page.locator('#tab-visual .section-title')).toContainText(
+      'HelloComponent',
+      { timeout: 10_000 },
+    );
     await expect(page.locator('#tab-visual')).toContainText('message');
-    await expect(page.locator('#tab-visual')).not.toContainText('ButtonComponent');
+    await expect(page.locator('#tab-visual')).not.toContainText(
+      'ButtonComponent',
+    );
   });
 
   test('handles empty input gracefully', async ({ page }) => {
     await page.goto('/');
-    await expect(page.locator('#tab-visual .section-title')).toContainText('ButtonComponent', { timeout: 10_000 });
+    await expect(page.locator('#tab-visual .section-title')).toContainText(
+      'ButtonComponent',
+      { timeout: 10_000 },
+    );
 
     await page.locator('#editor').fill('');
-    await expect(page.locator('#tab-visual')).toContainText('No components or pipes found', { timeout: 10_000 });
+    await expect(page.locator('#tab-visual')).toContainText(
+      'No components or pipes found',
+      { timeout: 10_000 },
+    );
   });
 
   test('handles invalid TypeScript gracefully', async ({ page }) => {
     await page.goto('/');
-    await expect(page.locator('#tab-visual .section-title')).toContainText('ButtonComponent', { timeout: 10_000 });
+    await expect(page.locator('#tab-visual .section-title')).toContainText(
+      'ButtonComponent',
+      { timeout: 10_000 },
+    );
 
     await page.locator('#editor').fill('this is not valid typescript @@@');
-    await expect(page.locator('#tab-visual')).toContainText('No components or pipes found', { timeout: 10_000 });
+    await expect(page.locator('#tab-visual')).toContainText(
+      'No components or pipes found',
+      { timeout: 10_000 },
+    );
   });
 });
 
@@ -182,7 +225,9 @@ export class TestComponent {
     expect(data.stats).toBeDefined();
   });
 
-  test('POST /api/parse returns error for missing source', async ({ request }) => {
+  test('POST /api/parse returns error for missing source', async ({
+    request,
+  }) => {
     const response = await request.post('/api/parse', {
       data: {},
     });

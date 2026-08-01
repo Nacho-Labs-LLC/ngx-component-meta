@@ -43,7 +43,7 @@ tests/
 
 - TypeScript strict mode — no `any` unless unavoidable
 - Prefer early returns over deep nesting
-- No comments explaining *what* — only *why* when non-obvious
+- No comments explaining _what_ — only _why_ when non-obvious
 - Keep functions small and focused
 - Zero runtime dependencies — only `typescript` as a peer dep
 

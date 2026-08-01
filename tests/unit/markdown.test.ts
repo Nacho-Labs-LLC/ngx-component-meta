@@ -1,6 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { formatMarkdown } from '../../src/cli/formatters.js';
-import { parseFirstComponent, parseComponents, parsePipes } from '../helpers.js';
+import {
+  parseFirstComponent,
+  parseComponents,
+  parsePipes,
+} from '../helpers.js';
 
 describe('formatMarkdown', () => {
   describe('component formatting', () => {
@@ -12,7 +16,9 @@ describe('formatMarkdown', () => {
     });
 
     it('renders the description', () => {
-      expect(md).toContain('A basic button component using decorator-based inputs.');
+      expect(md).toContain(
+        'A basic button component using decorator-based inputs.',
+      );
     });
 
     it('renders selector and standalone metadata', () => {
@@ -22,7 +28,9 @@ describe('formatMarkdown', () => {
 
     it('renders Inputs section with table', () => {
       expect(md).toContain('### Inputs');
-      expect(md).toContain('| Name | Binding | Type | Required | Default | Description |');
+      expect(md).toContain(
+        '| Name | Binding | Type | Required | Default | Description |',
+      );
     });
 
     it('renders input names in backticks', () => {
@@ -61,7 +69,9 @@ describe('formatMarkdown', () => {
       // Should NOT contain an unescaped pipe within the type backticks
       // Find the variant row and check it has escaped pipes in the type
       const lines = md.split('\n');
-      const variantRow = lines.find(l => l.includes('`variant`') || l.includes('btnVariant'));
+      const variantRow = lines.find(
+        (l) => l.includes('`variant`') || l.includes('btnVariant'),
+      );
       expect(variantRow).toBeDefined();
       expect(variantRow).toContain('"primary" \\| "secondary" \\| "danger"');
     });
@@ -109,7 +119,9 @@ describe('formatMarkdown', () => {
 
     it('renders the transform signature in a code block', () => {
       expect(md).toContain('### Transform');
-      expect(md).toContain('transform(value: string, maxLength?: number = 100, suffix?: string = \'...\')');
+      expect(md).toContain(
+        "transform(value: string, maxLength?: number = 100, suffix?: string = '...')",
+      );
       expect(md).toContain(': string');
     });
   });

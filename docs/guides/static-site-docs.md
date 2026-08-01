@@ -78,9 +78,24 @@ The output is a single JSON file with this shape:
       "transform": {
         "signature": "(value: string, maxLength: number, ellipsis?: string) => string",
         "params": [
-          { "name": "value", "type": "string", "optional": false, "description": "The string to truncate." },
-          { "name": "maxLength", "type": "number", "optional": false, "description": "Maximum character length." },
-          { "name": "ellipsis", "type": "string", "optional": true, "description": "String to append when truncated." }
+          {
+            "name": "value",
+            "type": "string",
+            "optional": false,
+            "description": "The string to truncate."
+          },
+          {
+            "name": "maxLength",
+            "type": "number",
+            "optional": false,
+            "description": "Maximum character length."
+          },
+          {
+            "name": "ellipsis",
+            "type": "string",
+            "optional": true,
+            "description": "String to append when truncated."
+          }
         ],
         "returnType": "string"
       }
@@ -92,6 +107,7 @@ The output is a single JSON file with this shape:
 ```
 
 Key design decisions:
+
 - **Types are unwrapped.** Signal inputs show `string`, not `InputSignal<string>`.
 - **`signal: boolean`** tells you how the input/output was declared, so your docs can show a badge or note.
 - **`bindingName`** is only present when the template binding name differs from the property name (i.e., when an alias is used).
@@ -149,7 +165,9 @@ export function PropsTable({ name }: PropsTableProps) {
                   <td>
                     <code>{prop.type}</code>
                   </td>
-                  <td>{prop.defaultValue ? <code>{prop.defaultValue}</code> : '—'}</td>
+                  <td>
+                    {prop.defaultValue ? <code>{prop.defaultValue}</code> : '—'}
+                  </td>
                   <td>{prop.required ? 'Yes' : 'No'}</td>
                   <td>{prop.description}</td>
                 </tr>
@@ -223,7 +241,7 @@ export function PropsTable({ name }: PropsTableProps) {
 
 In Docusaurus, Astro, or any MDX-based site:
 
-```mdx
+````mdx
 ---
 title: Button
 ---
@@ -237,10 +255,9 @@ A clickable button with multiple visual variants.
 ## Usage
 
 ```html
-<app-button variant="primary" (clicked)="handleClick()">
-  Click me
-</app-button>
+<app-button variant="primary" (clicked)="handleClick()"> Click me </app-button>
 ```
+````
 
 ## API
 
@@ -254,7 +271,11 @@ Each component page imports the same `PropsTable` and passes its class name. The
 If you need to customize the output or integrate with a build pipeline:
 
 ```typescript
-import { createParser, toPropsJson, toPropsJsonString } from 'ngx-component-meta';
+import {
+  createParser,
+  toPropsJson,
+  toPropsJsonString,
+} from 'ngx-component-meta';
 import { writeFileSync } from 'fs';
 
 const parser = createParser('./tsconfig.lib.json');

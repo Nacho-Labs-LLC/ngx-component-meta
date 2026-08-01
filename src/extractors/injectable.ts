@@ -5,7 +5,12 @@ import {
   getStringProperty,
   isPrivateMember,
 } from '../utils/ast-helpers.js';
-import { getDescription, getRawDescription, getTags, isInternal } from '../utils/jsdoc.js';
+import {
+  getDescription,
+  getRawDescription,
+  getTags,
+  isInternal,
+} from '../utils/jsdoc.js';
 import { extractMethod } from './method.js';
 import { extractProperty } from './property.js';
 
@@ -18,16 +23,21 @@ export function extractInjectable(
   decorator: DecoratorInfo,
   sourceFile: ts.SourceFile,
 ): InjectableDoc | null {
-  const classSymbol = classDecl.name ? checker.getSymbolAtLocation(classDecl.name) : undefined;
+  const classSymbol = classDecl.name
+    ? checker.getSymbolAtLocation(classDecl.name)
+    : undefined;
   if (!classSymbol) return null;
 
   if (isInternal(classSymbol)) return null;
 
   const obj = getDecoratorObjectArg(decorator);
   const providedInRaw = obj ? getStringProperty(obj, 'providedIn') : undefined;
-  const providedIn = (providedInRaw === 'root' || providedInRaw === 'platform' || providedInRaw === 'any')
-    ? providedInRaw
-    : null;
+  const providedIn =
+    providedInRaw === 'root' ||
+    providedInRaw === 'platform' ||
+    providedInRaw === 'any'
+      ? providedInRaw
+      : null;
 
   const methods: InjectableDoc['methods'] = [];
   const properties: InjectableDoc['properties'] = [];

@@ -4,7 +4,10 @@ import { getCallName, getSignalBaseName } from '../utils/import-tracker.js';
 import { getUnwrappedReturnType } from '../utils/type-resolver.js';
 import { getSignalDefaultValue } from '../utils/default-value.js';
 import { getDescription, getRawDescription, getTags } from '../utils/jsdoc.js';
-import { getStringProperty, getExpressionProperty } from '../utils/ast-helpers.js';
+import {
+  getStringProperty,
+  getExpressionProperty,
+} from '../utils/ast-helpers.js';
 
 /**
  * Try to extract a signal input() or model() from a property declaration.
@@ -26,7 +29,11 @@ export function tryExtractSignalInput(
   const name = symbol.getName();
 
   // Resolve alias and transform from options
-  const { alias, transform } = extractInputOptions(callExpr, sourceFile, isRequired);
+  const { alias, transform } = extractInputOptions(
+    callExpr,
+    sourceFile,
+    isRequired,
+  );
 
   return {
     name,
@@ -106,7 +113,8 @@ function extractModelAlias(
   isRequired: boolean,
 ): string | undefined {
   const optionsArg = getOptionsArg(callExpr, isRequired);
-  if (!optionsArg || !ts.isObjectLiteralExpression(optionsArg)) return undefined;
+  if (!optionsArg || !ts.isObjectLiteralExpression(optionsArg))
+    return undefined;
   return getStringProperty(optionsArg, 'alias');
 }
 

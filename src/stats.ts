@@ -50,17 +50,21 @@ export interface ComponentMigrationStats {
 }
 
 const STATUS_ORDER: Record<ComponentMigrationStats['status'], number> = {
-  'legacy': 0,
+  legacy: 0,
   'partially-migrated': 1,
   'fully-migrated': 2,
   'no-bindings': 3,
 };
 
 function classifyComponent(comp: ComponentDoc): ComponentMigrationStats {
-  const inputDecorator = comp.inputs.filter(i => i.source === 'decorator').length;
-  const inputSignal = comp.inputs.filter(i => i.source === 'signal').length;
-  const outputDecorator = comp.outputs.filter(o => o.source === 'decorator').length;
-  const outputSignal = comp.outputs.filter(o => o.source === 'signal').length;
+  const inputDecorator = comp.inputs.filter(
+    (i) => i.source === 'decorator',
+  ).length;
+  const inputSignal = comp.inputs.filter((i) => i.source === 'signal').length;
+  const outputDecorator = comp.outputs.filter(
+    (o) => o.source === 'decorator',
+  ).length;
+  const outputSignal = comp.outputs.filter((o) => o.source === 'signal').length;
   const models = comp.models.length;
 
   const totalDecorator = inputDecorator + outputDecorator;
@@ -118,7 +122,9 @@ export function computeStats(result: ParseResult): MigrationStats {
   const totalBindings = totalInputs + totalOutputs + totalModels;
   const totalSignalBindings = inputSignal + outputSignal + totalModels;
 
-  componentStats.sort((a, b) => STATUS_ORDER[a.status] - STATUS_ORDER[b.status]);
+  componentStats.sort(
+    (a, b) => STATUS_ORDER[a.status] - STATUS_ORDER[b.status],
+  );
 
   let fullyMigrated = 0;
   let partiallyMigrated = 0;
@@ -127,10 +133,18 @@ export function computeStats(result: ParseResult): MigrationStats {
 
   for (const cs of componentStats) {
     switch (cs.status) {
-      case 'fully-migrated': fullyMigrated++; break;
-      case 'partially-migrated': partiallyMigrated++; break;
-      case 'legacy': legacy++; break;
-      case 'no-bindings': noBindings++; break;
+      case 'fully-migrated':
+        fullyMigrated++;
+        break;
+      case 'partially-migrated':
+        partiallyMigrated++;
+        break;
+      case 'legacy':
+        legacy++;
+        break;
+      case 'no-bindings':
+        noBindings++;
+        break;
     }
   }
 

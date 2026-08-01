@@ -5,7 +5,10 @@ import {
   getDecoratorStringArg,
   getStringProperty,
 } from '../utils/ast-helpers.js';
-import { getEmitterEventType, getPropertyType } from '../utils/type-resolver.js';
+import {
+  getEmitterEventType,
+  getPropertyType,
+} from '../utils/type-resolver.js';
 import { getDescription, getRawDescription, getTags } from '../utils/jsdoc.js';
 
 /**

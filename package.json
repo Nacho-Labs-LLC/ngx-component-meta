@@ -1,6 +1,6 @@
 {
   "name": "@nacho-labs/ngx-component-meta",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Lightweight Angular component metadata extractor — inputs, outputs, models, methods, types from source",
   "license": "MIT",
   "author": "Nate Richardson",
@@ -43,6 +43,9 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "typecheck": "tsc --noEmit",
+    "lint": "oxlint",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "build:action": "node scripts/build-action.mjs"
   },
   "peerDependencies": {
@@ -54,9 +57,11 @@
   "devDependencies": {
     "@actions/core": "^3.0.1",
     "@actions/github": "^9.1.1",
-    "@playwright/test": "^1.59.1",
-    "@types/node": "^26.1.0",
+    "@playwright/test": "^1.62.1",
+    "@types/node": "^26.1.2",
     "esbuild": "^0.28.1",
+    "oxlint": "^1.76.0",
+    "prettier": "^3.9.6",
     "typescript": "^7.0.2",
     "vitest": "^4.1.10"
   },

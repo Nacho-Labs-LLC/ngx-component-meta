@@ -3,6 +3,7 @@
 ## Problem
 
 Some projects want metadata extraction integrated into their build pipeline rather than as a separate CLI step. This is common in:
+
 - Custom documentation sites built with Vite (VitePress, Astro, etc.)
 - Component catalogs that import metadata at build time
 - Dev servers that need live metadata updates
@@ -12,6 +13,7 @@ Some projects want metadata extraction integrated into their build pipeline rath
 Create a Vite plugin package: `ngx-component-meta-vite`
 
 The plugin:
+
 1. Provides a virtual module `virtual:ngx-component-meta` that exports parsed metadata
 2. Watches source files in dev mode and triggers HMR when metadata changes
 3. Runs extraction once during production build
@@ -27,9 +29,9 @@ import { ngxComponentMeta } from 'ngx-component-meta-vite';
 export default defineConfig({
   plugins: [
     ngxComponentMeta({
-      tsconfig: './tsconfig.json',          // default: auto-detect
-      include: ['src/**/*.component.ts'],   // default: auto from tsconfig
-      format: 'native',                     // 'native' | 'compodoc'
+      tsconfig: './tsconfig.json', // default: auto-detect
+      include: ['src/**/*.component.ts'], // default: auto from tsconfig
+      format: 'native', // 'native' | 'compodoc'
     }),
   ],
 });
@@ -82,7 +84,11 @@ packages/vite/
 
 ```typescript
 import type { Plugin } from 'vite';
-import { createParser, type ComponentDoc, type PipeDoc } from 'ngx-component-meta';
+import {
+  createParser,
+  type ComponentDoc,
+  type PipeDoc,
+} from 'ngx-component-meta';
 import { toCompodocJson } from 'ngx-component-meta/storybook';
 
 const VIRTUAL_ID = 'virtual:ngx-component-meta';
@@ -96,28 +102,30 @@ interface NgxComponentMetaOptions {
   format?: 'native' | 'compodoc';
 }
 
-export function ngxComponentMeta(options: NgxComponentMetaOptions = {}): Plugin {
+export function ngxComponentMeta(
+  options: NgxComponentMetaOptions = {},
+): Plugin {
   let docs: (ComponentDoc | PipeDoc)[] = [];
-  
+
   return {
     name: 'ngx-component-meta',
-    
+
     buildStart() {
       const tsconfigPath = options.tsconfig ?? './tsconfig.json';
       const parser = createParser(tsconfigPath);
       const files = options.include ?? ['src/**/*.component.ts'];
       docs = parser.parse(files);
     },
-    
+
     resolveId(id) {
       if (id === VIRTUAL_ID) return RESOLVED_VIRTUAL_ID;
       if (id === VIRTUAL_COMPODOC_ID) return RESOLVED_COMPODOC_ID;
     },
-    
+
     load(id) {
       if (id === RESOLVED_VIRTUAL_ID) {
-        const components = docs.filter(d => 'kind' in d);
-        const pipes = docs.filter(d => 'pipeName' in d);
+        const components = docs.filter((d) => 'kind' in d);
+        const pipes = docs.filter((d) => 'pipeName' in d);
         return `export const components = ${JSON.stringify(components)};
 export const pipes = ${JSON.stringify(pipes)};`;
       }
@@ -126,25 +134,30 @@ export const pipes = ${JSON.stringify(pipes)};`;
         return `export default ${JSON.stringify(json)};`;
       }
     },
-    
+
     // Dev mode: watch source files for changes
     configureServer(server) {
       // Watch component files and invalidate virtual module on change
       const files = options.include ?? ['src/**/*.component.ts'];
       // Use server.watcher to detect changes and trigger HMR
       server.watcher.on('change', (file) => {
-        if (file.endsWith('.component.ts') || file.endsWith('.directive.ts') || file.endsWith('.pipe.ts')) {
+        if (
+          file.endsWith('.component.ts') ||
+          file.endsWith('.directive.ts') ||
+          file.endsWith('.pipe.ts')
+        ) {
           // Re-extract
           const tsconfigPath = options.tsconfig ?? './tsconfig.json';
           const parser = createParser(tsconfigPath);
           docs = parser.parse(files);
-          
+
           // Invalidate virtual modules
           const mod = server.moduleGraph.getModuleById(RESOLVED_VIRTUAL_ID);
           if (mod) server.moduleGraph.invalidateModule(mod);
-          const compodocMod = server.moduleGraph.getModuleById(RESOLVED_COMPODOC_ID);
+          const compodocMod =
+            server.moduleGraph.getModuleById(RESOLVED_COMPODOC_ID);
           if (compodocMod) server.moduleGraph.invalidateModule(compodocMod);
-          
+
           server.ws.send({ type: 'full-reload' });
         }
       });

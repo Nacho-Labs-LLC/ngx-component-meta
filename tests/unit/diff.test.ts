@@ -1,7 +1,20 @@
 import { describe, it, expect } from 'vitest';
 import { diff } from '../../src/diff.js';
-import { formatDiffText, formatDiffJson, formatDiffMarkdown } from '../../src/diff-formatters.js';
-import type { ComponentDoc, PipeDoc, InputDoc, OutputDoc, ModelDoc, MethodDoc, MethodParamDoc, PropertyDoc } from '../../src/types.js';
+import {
+  formatDiffText,
+  formatDiffJson,
+  formatDiffMarkdown,
+} from '../../src/diff-formatters.js';
+import type {
+  ComponentDoc,
+  PipeDoc,
+  InputDoc,
+  OutputDoc,
+  ModelDoc,
+  MethodDoc,
+  MethodParamDoc,
+  PropertyDoc,
+} from '../../src/types.js';
 
 function makeInput(overrides: Partial<InputDoc> = {}): InputDoc {
   return {
@@ -82,7 +95,9 @@ function makeMethod(overrides: Partial<MethodDoc> = {}): MethodDoc {
   };
 }
 
-function makeMethodParam(overrides: Partial<MethodParamDoc> = {}): MethodParamDoc {
+function makeMethodParam(
+  overrides: Partial<MethodParamDoc> = {},
+): MethodParamDoc {
   return {
     name: 'param',
     type: 'string',
@@ -118,7 +133,15 @@ function makePipe(overrides: Partial<PipeDoc> = {}): PipeDoc {
     rawDescription: '',
     tags: {},
     transform: {
-      params: [{ name: 'value', type: 'string', optional: false, defaultValue: undefined, description: '' }],
+      params: [
+        {
+          name: 'value',
+          type: 'string',
+          optional: false,
+          defaultValue: undefined,
+          description: '',
+        },
+      ],
       returnType: 'string',
     },
     ...overrides,
@@ -145,7 +168,9 @@ describe('diff', () => {
 
   describe('inputs', () => {
     it('classifies input removed as breaking', () => {
-      const base = makeComponent({ inputs: [makeInput({ name: 'color', type: 'string' })] });
+      const base = makeComponent({
+        inputs: [makeInput({ name: 'color', type: 'string' })],
+      });
       const head = makeComponent({ inputs: [] });
       const result = diff([base], [head]);
 
@@ -161,7 +186,14 @@ describe('diff', () => {
     it('classifies input added (optional) as non-breaking', () => {
       const base = makeComponent({ inputs: [] });
       const head = makeComponent({
-        inputs: [makeInput({ name: 'size', type: 'string', required: false, defaultValue: "'md'" })],
+        inputs: [
+          makeInput({
+            name: 'size',
+            type: 'string',
+            required: false,
+            defaultValue: "'md'",
+          }),
+        ],
       });
       const result = diff([base], [head]);
 
@@ -241,7 +273,10 @@ describe('diff', () => {
 
       expect(result.nonBreaking).toHaveLength(1);
       expect(result.nonBreaking[0].change).toBe('default-changed');
-      expect(result.nonBreaking[0].details).toEqual({ before: "'sm'", after: "'md'" });
+      expect(result.nonBreaking[0].details).toEqual({
+        before: "'sm'",
+        after: "'md'",
+      });
     });
 
     it('classifies description changed as non-breaking', () => {
@@ -362,7 +397,10 @@ describe('diff', () => {
 
       expect(result.breaking).toHaveLength(1);
       expect(result.breaking[0].change).toBe('selector-changed');
-      expect(result.breaking[0].details).toEqual({ before: 'app-old', after: 'app-new' });
+      expect(result.breaking[0].details).toEqual({
+        before: 'app-old',
+        after: 'app-new',
+      });
     });
   });
 
@@ -421,16 +459,20 @@ describe('diff', () => {
 
     it('classifies method param type changed as breaking', () => {
       const base = makeComponent({
-        methods: [makeMethod({
-          name: 'setLabel',
-          params: [makeMethodParam({ name: 'label', type: 'string' })],
-        })],
+        methods: [
+          makeMethod({
+            name: 'setLabel',
+            params: [makeMethodParam({ name: 'label', type: 'string' })],
+          }),
+        ],
       });
       const head = makeComponent({
-        methods: [makeMethod({
-          name: 'setLabel',
-          params: [makeMethodParam({ name: 'label', type: 'number' })],
-        })],
+        methods: [
+          makeMethod({
+            name: 'setLabel',
+            params: [makeMethodParam({ name: 'label', type: 'number' })],
+          }),
+        ],
       });
       const result = diff([base], [head]);
 
@@ -466,10 +508,18 @@ describe('diff', () => {
         methods: [makeMethod({ name: 'doSomething', params: [] })],
       });
       const head = makeComponent({
-        methods: [makeMethod({
-          name: 'doSomething',
-          params: [makeMethodParam({ name: 'value', type: 'string', optional: false })],
-        })],
+        methods: [
+          makeMethod({
+            name: 'doSomething',
+            params: [
+              makeMethodParam({
+                name: 'value',
+                type: 'string',
+                optional: false,
+              }),
+            ],
+          }),
+        ],
       });
       const result = diff([base], [head]);
 
@@ -482,10 +532,18 @@ describe('diff', () => {
         methods: [makeMethod({ name: 'doSomething', params: [] })],
       });
       const head = makeComponent({
-        methods: [makeMethod({
-          name: 'doSomething',
-          params: [makeMethodParam({ name: 'value', type: 'string', optional: true })],
-        })],
+        methods: [
+          makeMethod({
+            name: 'doSomething',
+            params: [
+              makeMethodParam({
+                name: 'value',
+                type: 'string',
+                optional: true,
+              }),
+            ],
+          }),
+        ],
       });
       const result = diff([base], [head]);
 
@@ -525,14 +583,30 @@ describe('diff', () => {
       const basePipe = makePipe({
         name: 'FormatPipe',
         transform: {
-          params: [{ name: 'value', type: 'string', optional: false, defaultValue: undefined, description: '' }],
+          params: [
+            {
+              name: 'value',
+              type: 'string',
+              optional: false,
+              defaultValue: undefined,
+              description: '',
+            },
+          ],
           returnType: 'string',
         },
       });
       const headPipe = makePipe({
         name: 'FormatPipe',
         transform: {
-          params: [{ name: 'value', type: 'number', optional: false, defaultValue: undefined, description: '' }],
+          params: [
+            {
+              name: 'value',
+              type: 'number',
+              optional: false,
+              defaultValue: undefined,
+              description: '',
+            },
+          ],
           returnType: 'string',
         },
       });
@@ -555,7 +629,10 @@ describe('diff', () => {
 
       expect(result.breaking).toHaveLength(1);
       expect(result.breaking[0].change).toBe('input-default-removed');
-      expect(result.breaking[0].details).toEqual({ before: "'md'", after: undefined });
+      expect(result.breaking[0].details).toEqual({
+        before: "'md'",
+        after: undefined,
+      });
     });
 
     it('classifies default added as non-breaking', () => {
@@ -569,7 +646,10 @@ describe('diff', () => {
 
       expect(result.nonBreaking).toHaveLength(1);
       expect(result.nonBreaking[0].change).toBe('input-default-added');
-      expect(result.nonBreaking[0].details).toEqual({ before: undefined, after: "'md'" });
+      expect(result.nonBreaking[0].details).toEqual({
+        before: undefined,
+        after: "'md'",
+      });
     });
 
     it('classifies default value changed as non-breaking', () => {
@@ -583,7 +663,10 @@ describe('diff', () => {
 
       expect(result.nonBreaking).toHaveLength(1);
       expect(result.nonBreaking[0].change).toBe('default-changed');
-      expect(result.nonBreaking[0].details).toEqual({ before: "'sm'", after: "'lg'" });
+      expect(result.nonBreaking[0].details).toEqual({
+        before: "'sm'",
+        after: "'lg'",
+      });
     });
   });
 
@@ -721,19 +804,27 @@ describe('diff', () => {
       expect(result.breaking.length).toBeGreaterThanOrEqual(2);
       expect(result.nonBreaking.length).toBeGreaterThanOrEqual(2);
 
-      const removedInput = result.breaking.find(c => c.change === 'input-removed');
+      const removedInput = result.breaking.find(
+        (c) => c.change === 'input-removed',
+      );
       expect(removedInput).toBeDefined();
       expect(removedInput!.name).toBe('variant');
 
-      const typeChanged = result.breaking.find(c => c.change === 'input-type-changed');
+      const typeChanged = result.breaking.find(
+        (c) => c.change === 'input-type-changed',
+      );
       expect(typeChanged).toBeDefined();
       expect(typeChanged!.name).toBe('disabled');
 
-      const addedInput = result.nonBreaking.find(c => c.change === 'input-added');
+      const addedInput = result.nonBreaking.find(
+        (c) => c.change === 'input-added',
+      );
       expect(addedInput).toBeDefined();
       expect(addedInput!.name).toBe('size');
 
-      const addedOutput = result.nonBreaking.find(c => c.change === 'output-added');
+      const addedOutput = result.nonBreaking.find(
+        (c) => c.change === 'output-added',
+      );
       expect(addedOutput).toBeDefined();
       expect(addedOutput!.name).toBe('clicked');
     });
@@ -745,7 +836,9 @@ describe('formatters', () => {
     [
       makeComponent({
         name: 'ButtonComponent',
-        inputs: [makeInput({ name: 'variant', type: "'primary' | 'secondary'" })],
+        inputs: [
+          makeInput({ name: 'variant', type: "'primary' | 'secondary'" }),
+        ],
       }),
     ],
     [
