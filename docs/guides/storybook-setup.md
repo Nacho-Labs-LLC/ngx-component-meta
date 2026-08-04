@@ -1,14 +1,14 @@
 # Setting Up Storybook Integration
 
-Storybook for Angular uses Compodoc to extract component metadata for its docs addon. Compodoc works, but it has real problems: it is slow on large projects, it does not understand signal-based APIs (`input()`, `output()`, `model()`), and it requires a separate build step that runs an entirely separate TypeScript compiler pass.
+Storybook for Angular has a Compodoc-based metadata path for docs. It works, but teams using larger codebases often prefer a lighter metadata-first flow when signal APIs, type fidelity, and low-friction startup matter.
 
-`ngx-component-meta` replaces Compodoc for Storybook with faster extraction, full signal support, and proper type unwrapping (you see `string`, not `InputSignal<string>`).
+`ngx-component-meta` can be used either as a Compodoc-compatible bridge or a direct Storybook extractor for richer arg-type control.
 
 There are three integration modes. Pick the one that fits your setup.
 
-## Mode A: Drop-In Replacement (Manual)
+## Mode A: Compodoc-compatible bridge (Manual)
 
-This is the simplest path. You generate Compodoc-compatible JSON and feed it to Storybook's existing `setCompodocJson()` API.
+This is the migration-friendly path. You generate Compodoc-compatible JSON and feed it to Storybook's existing `setCompodocJson()` API.
 
 ### 1. Install
 
@@ -16,9 +16,9 @@ This is the simplest path. You generate Compodoc-compatible JSON and feed it to 
 npm install -D ngx-component-meta
 ```
 
-### 2. Remove Compodoc
+### 2. Remove Compodoc from Storybook docs flow
 
-Delete `@compodoc/compodoc` from your `devDependencies` and remove any `compodoc` script from `package.json`:
+If your setup currently depends on Compodoc output for Storybook docs, remove `@compodoc/compodoc` from `devDependencies` and drop any explicit compodoc docs script:
 
 ```diff
   "scripts": {
@@ -54,14 +54,14 @@ const preview = {
 export default preview;
 ```
 
-`toCompodocJson()` maps the `ngx-component-meta` output to the exact shape Storybook expects. Signal inputs, outputs, and models are mapped to their Compodoc equivalents -- Storybook sees them as normal `@Input()` / `@Output()` decorators with correct types.
+`toCompodocJson()` maps the `ngx-component-meta` output to Storybook's expected shape. Signal inputs, outputs, and models are mapped to Compodoc-like entries so existing docs config continues to work.
 
 ### 4. What Changes
 
 - The `documentation.json` file is no longer needed.
 - Storybook docs tables now show unwrapped types: `string` instead of `InputSignal<string>`.
 - Signal `model()` bindings appear as both an input and an output (the `nameChange` pattern).
-- Build time drops because there is no separate Compodoc compilation pass.
+- Build time can drop because you avoid a separate Compodoc compilation pass.
 
 ## Mode B: Direct ArgTypes Bypass
 
@@ -218,20 +218,24 @@ Add the client types to your `tsconfig.json` for type checking:
 
 The plugin watches for changes to `.component.ts`, `.directive.ts`, and `.pipe.ts` files and triggers HMR reloads automatically.
 
-## What Works Better Than Compodoc
+## Comparison with Compodoc
 
-| Feature                          | Compodoc              | ngx-component-meta                       |
-| -------------------------------- | --------------------- | ---------------------------------------- |
-| `input()` signals                | Not recognized        | Full support, type unwrapped             |
-| `output()` signals               | Not recognized        | Full support                             |
-| `model()` two-way bindings       | Not recognized        | Mapped to input + output pair            |
-| `input.required<T>()`            | Not recognized        | Shown as required with correct type      |
-| Union type inputs                | Shows raw type string | Generates `select` control automatically |
-| Boolean inputs                   | Sometimes misdetected | Correct `boolean` control                |
-| Build speed (100 components)     | ~8-15 seconds         | ~1-2 seconds                             |
-| Incremental rebuilds             | Full reparse          | Cached, sub-second                       |
-| Inherited members                | Inconsistent          | Included by default, configurable        |
-| `@HostBinding` / `@HostListener` | In separate section   | Extracted with full types                |
+| Feature                          | Compodoc                                                     | ngx-component-meta                       |
+| -------------------------------- | ------------------------------------------------------------ | ---------------------------------------- |
+| `input()` signals                | Supported in many setups, with version-dependent limitations | Full support, type unwrapped             |
+| `output()` signals               | Limited support in some setups                               | Full support                             |
+| `model()` two-way bindings       | Partial support                                              | Mapped to input + output pair            |
+| `input.required<T>()`            | Varies by version and Storybook integration path             | Shown as required with correct type      |
+| Union type inputs                | Type display can be less polished in some cases              | Generates `select` control automatically |
+| Boolean inputs                   | Some edge-case mis-detections reported                       | Correct `boolean` control                |
+| Build speed (100 components)     | ~8-15 seconds                                                | ~1-2 seconds                             |
+| Incremental rebuilds             | Full reparse                                                 | Cached, sub-second                       |
+| Inherited members                | Inconsistent                                                 | Included by default, configurable        |
+| `@HostBinding` / `@HostListener` | In separate section                                          | Extracted with full types                |
+
+## When to use this page
+
+Use this guide when your goal is Storybook adoption and documentation metadata extraction. For a broader decision between `ngx-component-meta` and Compodoc, see [When to use ngx-component-meta vs Compodoc](../when-to-use-ngx-component-meta-vs-compodoc.md).
 
 ## Troubleshooting
 

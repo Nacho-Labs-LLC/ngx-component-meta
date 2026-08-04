@@ -11,7 +11,7 @@
 
 ## Why ngx-component-meta?
 
-Angular has no lightweight metadata extraction tool. Compodoc is a full documentation site generator -- 43 dependencies, ~15MB install -- with multiple open bugs around signal inputs, no `model()` support, and known freezes on some projects. Typedoc doesn't understand Angular semantics: it sees `InputSignal<T>`, not a template binding.
+Angular teams often need lightweight metadata-first extraction for component API governance. Compodoc is a full documentation site generator -- 43 dependencies, ~15MB install -- and remains useful for broader docs output, while `ngx-component-meta` focuses on lean API metadata, signal-aware extraction, and CI enforcement. Typedoc doesn't understand Angular semantics: it sees `InputSignal<T>`, not a template binding.
 
 `ngx-component-meta` understands Angular. Inputs, outputs, models, host bindings, signal queries -- all extracted with proper type unwrapping. Zero runtime dependencies. Structured JSON output. Build whatever you want on top: Storybook controls, custom doc sites, API diff checks in CI, migration dashboards.
 
@@ -70,7 +70,7 @@ TypeScript (`>=5.0.0`) is the only peer dependency.
 | **Diff**       | Compare API snapshots across versions. Detects breaking vs non-breaking changes (removed inputs, type changes, new required params). CI-ready with exit code 1 on breaking changes. GitHub Action included.                                                                                                                                                                              |
 | **Lint**       | Enforce documentation and quality rules. 7 built-in rules with configurable severity. ESLint-style output with `--format stylish`.                                                                                                                                                                                                                                                       |
 | **Stats**      | Track signal migration progress. Per-component breakdown of decorator vs signal bindings. "63% migrated" in one command.                                                                                                                                                                                                                                                                 |
-| **Storybook**  | Drop-in Compodoc replacement via `toCompodocJson()`. Or bypass Compodoc entirely with `createArgTypesExtractor()` for richer categories (inputs, outputs, two-way bindings, methods). Vite plugin included.                                                                                                                                                                              |
+| **Storybook**  | Provide Storybook metadata through a Compodoc-compatible bridge (`toCompodocJson()`) or bypass Compodoc with `createArgTypesExtractor()` for richer arg-types control. Vite plugin included.                                                                                                                                                                                             |
 | **Props JSON** | Framework-agnostic prop tables for Docusaurus, Astro, VitePress, or any static site generator.                                                                                                                                                                                                                                                                                           |
 
 ## CLI Reference
@@ -266,9 +266,9 @@ console.log(formatStatsText(stats));
 
 ## Storybook Integration
 
-### Mode A: Drop-in Compodoc replacement
+### Mode A: Compodoc-compatible bridge
 
-No Storybook config changes needed. Replace Compodoc's JSON with `ngx-component-meta` output:
+No Storybook config changes needed. Replace Compodoc's JSON with `ngx-component-meta` output for a migration-compatible path:
 
 ```typescript
 // .storybook/preview.ts
@@ -350,19 +350,21 @@ Outputs: `breaking-count`, `non-breaking-count`, `has-breaking`, `diff-output`.
 
 ## Comparison
 
-| Feature                                       | ngx-component-meta                       | Compodoc               | typedoc                     |
-| --------------------------------------------- | ---------------------------------------- | ---------------------- | --------------------------- |
-| Signal inputs (`input()`, `input.required()`) | Yes                                      | Broken (10+ open bugs) | No (shows `InputSignal<T>`) |
-| `model()` / `model.required()`                | Yes                                      | No                     | No                          |
-| Type unwrapping                               | Yes (`string` not `InputSignal<string>`) | Partial                | No                          |
-| Breaking change detection                     | Yes                                      | No                     | No                          |
-| Lint rules                                    | 7 built-in                               | No                     | No                          |
-| Signal migration tracking                     | Yes                                      | No                     | No                          |
-| Structured JSON output                        | Yes                                      | Yes (with HTML site)   | Yes                         |
-| Storybook integration                         | Drop-in + direct mode                    | Native                 | No                          |
-| Props JSON for static sites                   | Yes                                      | No                     | No                          |
-| Dependencies                                  | 0 (TypeScript peer)                      | 43                     | 27                          |
-| Install size                                  | ~50KB                                    | ~15MB                  | ~8MB                        |
+For adoption decisions, start with [When to use ngx-component-meta vs Compodoc](docs/when-to-use-ngx-component-meta-vs-compodoc.md).
+
+| Feature                                       | ngx-component-meta                       | Compodoc                                                 | typedoc                     |
+| --------------------------------------------- | ---------------------------------------- | -------------------------------------------------------- | --------------------------- |
+| Signal inputs (`input()`, `input.required()`) | Yes                                      | Supported in recent releases; behavior can vary by setup | No (shows `InputSignal<T>`) |
+| `model()` / `model.required()`                | Yes                                      | Partial depending on version and project setup           | No                          |
+| Type unwrapping                               | Yes (`string` not `InputSignal<string>`) | Often unwrapped, but still inconsistent on some configs  | No                          |
+| Breaking change detection                     | Yes                                      | No                                                       | No                          |
+| Lint rules                                    | 7 built-in                               | No                                                       | No                          |
+| Signal migration tracking                     | Yes                                      | No                                                       | No                          |
+| Structured JSON output                        | Yes                                      | Yes (with HTML site)                                     | Yes                         |
+| Storybook integration                         | Compatibility bridge + direct mode       | Native                                                   | No                          |
+| Props JSON for static sites                   | Yes                                      | No                                                       | No                          |
+| Dependencies                                  | 0 (TypeScript peer)                      | 43                                                       | 27                          |
+| Install size                                  | ~50KB                                    | ~15MB                                                    | ~8MB                        |
 
 ## What It Extracts
 
