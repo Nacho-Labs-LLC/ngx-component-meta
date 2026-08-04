@@ -21,6 +21,10 @@ function getActionMainPath() {
   return match[1];
 }
 
+function normalizeLineEndings(content: string) {
+  return content.replace(/\r\n/g, '\n');
+}
+
 describe('GitHub Action launch surface', () => {
   it('ships the compiled entrypoint referenced by action.yml', () => {
     const actionMainPath = getActionMainPath();
@@ -47,9 +51,9 @@ describe('GitHub Action launch surface', () => {
         path.basename(committedBundlePath),
       );
       expect(existsSync(rebuiltBundlePath)).toBe(true);
-      expect(readFileSync(rebuiltBundlePath, 'utf8')).toBe(
-        readFileSync(committedBundlePath, 'utf8'),
-      );
+      expect(
+        normalizeLineEndings(readFileSync(rebuiltBundlePath, 'utf8')),
+      ).toBe(normalizeLineEndings(readFileSync(committedBundlePath, 'utf8')));
     } finally {
       rmSync(tempOutdir, { recursive: true, force: true });
     }
