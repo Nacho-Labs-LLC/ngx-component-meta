@@ -267,3 +267,5 @@ tests/
   unit/                  — Diff, lint, stats, props-json, watch, markdown
   integration/           — CLI, Storybook compat
 ```
+
+> Note: For the latest ecosystem and positioning analysis, see `docs/research/2026-07-15-oss-positioning-adoption-sweep.md`. Some competitive framing in this summary predates Angular v22 / Storybook 10.x ecosystem changes.

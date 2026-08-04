@@ -330,11 +330,12 @@ Child class overrides take precedence. Set `shouldIncludeInherited: false` in pa
 
 ## How This Differs from Compodoc
 
-Compodoc has known issues with signal APIs:
+Compodoc and `ngx-component-meta` have different strengths for signal workflows:
 
-- `input()` calls are often not recognized or produce incorrect types
-- `input.required()` is not detected as required
-- `model()` signals are not supported at all
-- Signal query functions are not extracted
+- Compodoc focuses on full documentation output and broad route/component context
+- `ngx-component-meta` focuses on compact, compiler-accurate API metadata with signal source details
+- Compodoc’s signal support has improved over time, but some setups still report metadata edge cases and output fidelity gaps
+- `ngx-component-meta` normalizes signal types (`InputSignal<T>` / `ModelSignal<T>` / `Signal<T>`) down to template-level contracts (`T`)
+- `ngx-component-meta` also tracks source (`decorator` vs `signal`) and emits metadata structures optimized for CI and downstream tooling
 
 `ngx-component-meta` handles all signal patterns natively through the TypeScript compiler API, producing accurate types, defaults, and required/optional status.
