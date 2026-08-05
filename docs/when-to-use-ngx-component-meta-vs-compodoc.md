@@ -24,15 +24,17 @@ Use this for quick positioning decisions on what to recommend to users.
 - `ngx-component-meta` focuses on small output contracts, downstream adapters, and governance workflows (diff/lint/stats).
 - The strongest signal is not "feature parity" but "friction and trust" in metadata pipelines.
 
-## Output-consumer note
+## Small schema/versioning note
 
 - Public outputs are used in three layers:
   1. **Native parse output** (`parse`/`parseAll`): flexible internal format for tooling and adapters.
   2. **Compat bridge output** (`toCompodocJson`): adapter surface for existing Compodoc consumers.
-  3. **Static-props output** (`toPropsJson`): framework-agnostic consumer format that includes caller-supplied `version` metadata.
+  3. **Static-props output** (`toPropsJson`): framework-agnostic consumer format with explicit `version` metadata.
 
-- The `version` option labels generated output; it is not a schema-version policy.
-- Consumers that depend on an output shape should retain representative snapshots and validate them when updating this package.
+- Stability expectation:
+  - Treat `toPropsJson(..., { version })` as the explicit stability contract when you publish output snapshots.
+  - For native/adapter formats, treat each package major as the compatibility boundary and pin on both package and expected output shape in integration tests.
+  - Any consumer relying on full-shape compatibility of `toCompodocJson` should validate against real snapshots on each dependency bump.
 
 ## One-line recommendation
 
