@@ -68,18 +68,18 @@ import { toPropsJson } from 'ngx-component-meta';
 
 ## Benchmarks (Deposco design system — 54 source files)
 
-| Metric                    | ngx-component-meta  | Compodoc                 |
-| ------------------------- | ------------------- | ------------------------ |
-| Parse time                | 1.2s                | 1.1s                     |
-| Output type quality       | Unwrapped (`Event`) | Wrapper (`EventEmitter`) |
-| JSON output size          | 165KB               | 5.1MB                    |
-| Install size              | 812KB               | 13MB                     |
-| Runtime dependencies      | 0                   | 43                       |
-| Signal input support      | Full                | Buggy                    |
-| `model()` support         | Full                | None                     |
-| Breaking change detection | Built-in            | None                     |
-| Lint rules                | 7 built-in          | None                     |
-| Migration tracking        | Built-in            | None                     |
+| Metric                    | ngx-component-meta  | Compodoc                                               |
+| ------------------------- | ------------------- | ------------------------------------------------------ |
+| Parse time                | 1.2s                | 1.1s                                                   |
+| Output type quality       | Unwrapped (`Event`) | Wrapper (`EventEmitter`)                               |
+| JSON output size          | 165KB               | 5.1MB                                                  |
+| Install size              | 812KB               | 13MB                                                   |
+| Runtime dependencies      | 0                   | 43                                                     |
+| Signal input support      | Full                | Supported in recent releases; behavior varies by setup |
+| `model()` support         | Full                | Partial depending on version and project setup         |
+| Breaking change detection | Built-in            | None                                                   |
+| Lint rules                | 7 built-in          | None                                                   |
+| Migration tracking        | Built-in            | None                                                   |
 
 Parse speed is comparable. The differentiator is output quality, footprint, and the features Compodoc doesn't have.
 
@@ -109,7 +109,7 @@ Parse speed is comparable. The differentiator is output quality, footprint, and 
 
 **Who:** Any Angular team using Storybook (which means using Compodoc today)
 
-**Problem:** Compodoc has 10+ open signal-related bugs, no `model()` support, freezes on some projects, 43 deps, slow builds. Every Angular 17+ team hits these issues.
+**Problem:** Compodoc is a broad documentation site generator — 43 deps, slow builds, and signal/model coverage that varies by setup. Teams focused on API governance and CI enforcement often need something lighter.
 
 **Solution:** Replace `@compodoc/compodoc` with `ngx-component-meta`. Two options:
 

@@ -218,7 +218,7 @@ Add the client types to your `tsconfig.json` for type checking:
 
 The plugin watches for changes to `.component.ts`, `.directive.ts`, and `.pipe.ts` files and triggers HMR reloads automatically.
 
-## Comparison with Compodoc
+## What Works Better Than Compodoc
 
 | Feature                          | Compodoc                                                     | ngx-component-meta                       |
 | -------------------------------- | ------------------------------------------------------------ | ---------------------------------------- |
