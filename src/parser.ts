@@ -24,6 +24,7 @@ import type {
   Parser,
   WatchParser,
   MemberDoc,
+  DecoratorInfo,
 } from './types.js';
 import {
   findDecorator,
@@ -335,7 +336,20 @@ function extractAllFromProgram(
       if (ts.isClassDeclaration(node) && node.name) {
         const decorators = getDecorators(node);
 
-        const pipeDecorator = decorators.find((d) => d.name === 'Pipe');
+        let pipeDecorator: DecoratorInfo | undefined;
+        let componentDecorator: DecoratorInfo | undefined;
+        let directiveDecorator: DecoratorInfo | undefined;
+        let injectableDecorator: DecoratorInfo | undefined;
+
+        for (let i = 0; i < decorators.length; i++) {
+          const d = decorators[i];
+          const name = d.name;
+          if (name === 'Pipe') pipeDecorator = d;
+          else if (name === 'Component') componentDecorator = d;
+          else if (name === 'Directive') directiveDecorator = d;
+          else if (name === 'Injectable') injectableDecorator = d;
+        }
+
         if (pipeDecorator) {
           const pipeDoc = extractPipe(checker, node, pipeDecorator, sourceFile);
           if (pipeDoc) pipes.push(pipeDoc);
@@ -344,12 +358,6 @@ function extractAllFromProgram(
 
         // Check Component/Directive before Injectable — a class with both
         // decorators should be treated as a component, not an injectable.
-        const componentDecorator = decorators.find(
-          (d) => d.name === 'Component',
-        );
-        const directiveDecorator = decorators.find(
-          (d) => d.name === 'Directive',
-        );
         const decorator = componentDecorator ?? directiveDecorator;
         if (decorator) {
           const doc = extractComponentDoc(
@@ -364,9 +372,6 @@ function extractAllFromProgram(
           return;
         }
 
-        const injectableDecorator = decorators.find(
-          (d) => d.name === 'Injectable',
-        );
         if (injectableDecorator) {
           const injectableDoc = extractInjectable(
             checker,
