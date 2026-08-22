@@ -40,8 +40,16 @@ function readBody(req) {
   });
 }
 
+const ALLOWED_ORIGINS = (
+  process.env.CORS_ORIGIN || `http://localhost:${PORT},http://127.0.0.1:${PORT}`
+).split(',');
+
 const server = http.createServer(async (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  const origin = req.headers.origin;
+  if (origin && ALLOWED_ORIGINS.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+  res.setHeader('Vary', 'Origin');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
