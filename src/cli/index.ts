@@ -421,9 +421,7 @@ function globPromise(pattern: string): Promise<string[]> {
       });
     } else {
       // Fallback: simple recursive file matching
-      simpleGlobAsync(pattern)
-        .then(resolve)
-        .catch(reject);
+      simpleGlobAsync(pattern).then(resolve).catch(reject);
     }
   });
 }
