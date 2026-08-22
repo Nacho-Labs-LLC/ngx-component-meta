@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { formatJson, formatCompodoc, formatMarkdown } from '../../src/cli/formatters.js';
+import {
+  formatJson,
+  formatCompodoc,
+  formatMarkdown,
+} from '../../src/cli/formatters.js';
 import { ComponentDoc, PipeDoc } from '../../src/types.js';
 
 describe('cli/formatters', () => {
@@ -28,13 +32,21 @@ describe('cli/formatters', () => {
     tags: {},
     transform: {
       name: 'transform',
-      params: [{ name: 'value', type: 'string', optional: false, defaultValue: undefined, description: '' }],
+      params: [
+        {
+          name: 'value',
+          type: 'string',
+          optional: false,
+          defaultValue: undefined,
+          description: '',
+        },
+      ],
       returnType: 'string',
       modifier: 'public',
       description: '',
       rawDescription: '',
       tags: {},
-    }
+    },
   };
   const docs = [doc];
 
