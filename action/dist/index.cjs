@@ -237251,18 +237251,23 @@ function extractAllFromProgram(program, filePaths, options) {
     import_typescript615.default.forEachChild(sourceFile, (node) => {
       if (import_typescript615.default.isClassDeclaration(node) && node.name) {
         const decorators = getDecorators(node);
-        const pipeDecorator = decorators.find((d) => d.name === "Pipe");
+        let pipeDecorator;
+        let componentDecorator;
+        let directiveDecorator;
+        let injectableDecorator;
+        for (let i = 0; i < decorators.length; i++) {
+          const d = decorators[i];
+          const name = d.name;
+          if (name === "Pipe") pipeDecorator = d;
+          else if (name === "Component") componentDecorator = d;
+          else if (name === "Directive") directiveDecorator = d;
+          else if (name === "Injectable") injectableDecorator = d;
+        }
         if (pipeDecorator) {
           const pipeDoc = extractPipe(checker, node, pipeDecorator, sourceFile);
           if (pipeDoc) pipes.push(pipeDoc);
           return;
         }
-        const componentDecorator = decorators.find(
-          (d) => d.name === "Component"
-        );
-        const directiveDecorator = decorators.find(
-          (d) => d.name === "Directive"
-        );
         const decorator = componentDecorator ?? directiveDecorator;
         if (decorator) {
           const doc = extractComponentDoc(
@@ -237276,9 +237281,6 @@ function extractAllFromProgram(program, filePaths, options) {
           if (doc) components.push(doc);
           return;
         }
-        const injectableDecorator = decorators.find(
-          (d) => d.name === "Injectable"
-        );
         if (injectableDecorator) {
           const injectableDoc = extractInjectable(
             checker,
