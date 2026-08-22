@@ -237207,14 +237207,17 @@ function extractFromProgram(program, filePaths, options) {
     import_typescript615.default.forEachChild(sourceFile, (node) => {
       if (!import_typescript615.default.isClassDeclaration(node) || !node.name) return;
       const decorators = getDecorators(node);
-      const pipeDecorator = decorators.find((d) => d.name === "Pipe");
+      let pipeDecorator, componentDecorator, directiveDecorator;
+      for (const d of decorators) {
+        if (d.name === "Pipe") pipeDecorator = d;
+        else if (d.name === "Component") componentDecorator = d;
+        else if (d.name === "Directive") directiveDecorator = d;
+      }
       if (pipeDecorator) {
         const pipeDoc = extractPipe(checker, node, pipeDecorator, sourceFile);
         if (pipeDoc) results.push(pipeDoc);
         return;
       }
-      const componentDecorator = decorators.find((d) => d.name === "Component");
-      const directiveDecorator = decorators.find((d) => d.name === "Directive");
       const decorator = componentDecorator ?? directiveDecorator;
       if (!decorator) return;
       const doc = extractComponentDoc(
@@ -237251,18 +237254,18 @@ function extractAllFromProgram(program, filePaths, options) {
     import_typescript615.default.forEachChild(sourceFile, (node) => {
       if (import_typescript615.default.isClassDeclaration(node) && node.name) {
         const decorators = getDecorators(node);
-        const pipeDecorator = decorators.find((d) => d.name === "Pipe");
+        let pipeDecorator, componentDecorator, directiveDecorator, injectableDecorator;
+        for (const d of decorators) {
+          if (d.name === "Pipe") pipeDecorator = d;
+          else if (d.name === "Component") componentDecorator = d;
+          else if (d.name === "Directive") directiveDecorator = d;
+          else if (d.name === "Injectable") injectableDecorator = d;
+        }
         if (pipeDecorator) {
           const pipeDoc = extractPipe(checker, node, pipeDecorator, sourceFile);
           if (pipeDoc) pipes.push(pipeDoc);
           return;
         }
-        const componentDecorator = decorators.find(
-          (d) => d.name === "Component"
-        );
-        const directiveDecorator = decorators.find(
-          (d) => d.name === "Directive"
-        );
         const decorator = componentDecorator ?? directiveDecorator;
         if (decorator) {
           const doc = extractComponentDoc(
@@ -237276,9 +237279,6 @@ function extractAllFromProgram(program, filePaths, options) {
           if (doc) components.push(doc);
           return;
         }
-        const injectableDecorator = decorators.find(
-          (d) => d.name === "Injectable"
-        );
         if (injectableDecorator) {
           const injectableDoc = extractInjectable(
             checker,
@@ -237523,47 +237523,45 @@ function extractPropertyMember(checker, prop, sourceFile, options, inputs, outpu
     }
   }
   const decorators = getDecorators(prop);
-  if (hostBindings) {
-    const hostBindingDecorator = decorators.find(
-      (d) => d.name === "HostBinding"
-    );
-    if (hostBindingDecorator) {
-      const bindingDoc = extractHostBindingFromProperty(
-        checker,
-        prop,
-        hostBindingDecorator,
-        sourceFile
-      );
-      if (bindingDoc) hostBindings.push(bindingDoc);
-      return;
-    }
+  let hostBindingDecorator, inputDecorator, outputDecorator, qDecorator;
+  for (const d of decorators) {
+    if (d.name === "HostBinding") hostBindingDecorator = d;
+    else if (d.name === "Input") inputDecorator = d;
+    else if (d.name === "Output") outputDecorator = d;
+    else if (options?.shouldIncludeQueries && d.name in QUERY_DECORATORS)
+      qDecorator = d;
   }
-  const inputDecorator = decorators.find((d) => d.name === "Input");
+  if (hostBindings && hostBindingDecorator) {
+    const bindingDoc = extractHostBindingFromProperty(
+      checker,
+      prop,
+      hostBindingDecorator,
+      sourceFile
+    );
+    if (bindingDoc) hostBindings.push(bindingDoc);
+    return;
+  }
   if (inputDecorator) {
     inputs.push(
       extractDecoratorInput(checker, prop, inputDecorator, sourceFile)
     );
     return;
   }
-  const outputDecorator = decorators.find((d) => d.name === "Output");
   if (outputDecorator) {
     outputs.push(extractDecoratorOutput(checker, prop, outputDecorator));
     return;
   }
-  if (options?.shouldIncludeQueries) {
-    const qDecorator = decorators.find((d) => d.name in QUERY_DECORATORS);
-    if (qDecorator) {
-      const queryKind = QUERY_DECORATORS[qDecorator.name];
-      const queryDoc = extractDecoratorQuery(
-        checker,
-        prop,
-        qDecorator,
-        queryKind,
-        sourceFile
-      );
-      if (queryDoc) queries.push(queryDoc);
-      return;
-    }
+  if (options?.shouldIncludeQueries && qDecorator) {
+    const queryKind = QUERY_DECORATORS[qDecorator.name];
+    const queryDoc = extractDecoratorQuery(
+      checker,
+      prop,
+      qDecorator,
+      queryKind,
+      sourceFile
+    );
+    if (queryDoc) queries.push(queryDoc);
+    return;
   }
   const propDoc = extractProperty(checker, prop, sourceFile);
   if (propDoc) properties.push(propDoc);
