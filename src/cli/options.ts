@@ -111,6 +111,52 @@ Examples:
   ngx-component-meta stats -p tsconfig.lib.json "src/**/*.ts"
 `.trim();
 
+function applyCommonArg(
+  options: {
+    project?: string;
+    output?: string;
+    format: string;
+    noMethods: boolean;
+    noInherited: boolean;
+    help: boolean;
+    version: boolean;
+  },
+  arg: string,
+  argv: string[],
+  i: number,
+): number {
+  switch (arg) {
+    case '-h':
+    case '--help':
+      options.help = true;
+      break;
+    case '--version':
+      options.version = true;
+      break;
+    case '-p':
+    case '--project':
+      options.project = argv[++i];
+      break;
+    case '-o':
+    case '--output':
+      options.output = argv[++i];
+      break;
+    case '-f':
+    case '--format':
+      options.format = argv[++i];
+      break;
+    case '--no-methods':
+      options.noMethods = true;
+      break;
+    case '--no-inherited':
+      options.noInherited = true;
+      break;
+    default:
+      return -1;
+  }
+  return i;
+}
+
 export function parseArgs(argv: string[]): CliOptions {
   if (argv[0] === 'diff') {
     return parseDiffArgs(argv.slice(1));
@@ -142,40 +188,20 @@ function parseDiffArgs(argv: string[]): DiffCliOptions {
   while (i < argv.length) {
     const arg = argv[i];
 
-    switch (arg) {
-      case '-h':
-      case '--help':
-        options.help = true;
-        break;
-      case '--version':
-        options.version = true;
-        break;
-      case '--base':
-        options.base = argv[++i];
-        break;
-      case '--head':
-        options.head = argv[++i];
-        break;
-      case '-p':
-      case '--project':
-        options.project = argv[++i];
-        break;
-      case '-o':
-      case '--output':
-        options.output = argv[++i];
-        break;
-      case '-f':
-      case '--format':
-        options.format = argv[++i] as 'text' | 'json' | 'markdown';
-        break;
-      case '--no-methods':
-        options.noMethods = true;
-        break;
-      case '--no-inherited':
-        options.noInherited = true;
-        break;
-      default:
-        break;
+    const nextI = applyCommonArg(options, arg, argv, i);
+    if (nextI !== -1) {
+      i = nextI;
+    } else {
+      switch (arg) {
+        case '--base':
+          options.base = argv[++i];
+          break;
+        case '--head':
+          options.head = argv[++i];
+          break;
+        default:
+          break;
+      }
     }
     i++;
   }
@@ -200,37 +226,17 @@ function parseLintArgs(argv: string[]): LintCliOptions {
   while (i < argv.length) {
     const arg = argv[i];
 
-    switch (arg) {
-      case '-h':
-      case '--help':
-        options.help = true;
-        break;
-      case '--version':
-        options.version = true;
-        break;
-      case '-p':
-      case '--project':
-        options.project = argv[++i];
-        break;
-      case '-o':
-      case '--output':
-        options.output = argv[++i];
-        break;
-      case '-f':
-      case '--format':
-        options.format = argv[++i] as 'text' | 'json' | 'stylish';
-        break;
-      case '--no-methods':
-        options.noMethods = true;
-        break;
-      case '--no-inherited':
-        options.noInherited = true;
-        break;
-      default:
-        if (!arg.startsWith('-')) {
-          options.files.push(arg);
-        }
-        break;
+    const nextI = applyCommonArg(options, arg, argv, i);
+    if (nextI !== -1) {
+      i = nextI;
+    } else {
+      switch (arg) {
+        default:
+          if (!arg.startsWith('-')) {
+            options.files.push(arg);
+          }
+          break;
+      }
     }
     i++;
   }
@@ -255,37 +261,17 @@ function parseStatsArgs(argv: string[]): StatsCliOptions {
   while (i < argv.length) {
     const arg = argv[i];
 
-    switch (arg) {
-      case '-h':
-      case '--help':
-        options.help = true;
-        break;
-      case '--version':
-        options.version = true;
-        break;
-      case '-p':
-      case '--project':
-        options.project = argv[++i];
-        break;
-      case '-o':
-      case '--output':
-        options.output = argv[++i];
-        break;
-      case '-f':
-      case '--format':
-        options.format = argv[++i] as 'text' | 'json' | 'markdown';
-        break;
-      case '--no-methods':
-        options.noMethods = true;
-        break;
-      case '--no-inherited':
-        options.noInherited = true;
-        break;
-      default:
-        if (!arg.startsWith('-')) {
-          options.files.push(arg);
-        }
-        break;
+    const nextI = applyCommonArg(options, arg, argv, i);
+    if (nextI !== -1) {
+      i = nextI;
+    } else {
+      switch (arg) {
+        default:
+          if (!arg.startsWith('-')) {
+            options.files.push(arg);
+          }
+          break;
+      }
     }
     i++;
   }
@@ -313,47 +299,27 @@ function parseExtractArgs(argv: string[]): ExtractCliOptions {
   while (i < argv.length) {
     const arg = argv[i];
 
-    switch (arg) {
-      case '-h':
-      case '--help':
-        options.help = true;
-        break;
-      case '--version':
-        options.version = true;
-        break;
-      case '-p':
-      case '--project':
-        options.project = argv[++i];
-        break;
-      case '-o':
-      case '--output':
-        options.output = argv[++i];
-        break;
-      case '-f':
-      case '--format':
-        options.format = argv[++i] as 'json' | 'compodoc' | 'markdown';
-        break;
-      case '--pretty':
-        options.pretty = true;
-        break;
-      case '--split':
-        options.split = true;
-        break;
-      case '-w':
-      case '--watch':
-        options.watch = true;
-        break;
-      case '--no-methods':
-        options.noMethods = true;
-        break;
-      case '--no-inherited':
-        options.noInherited = true;
-        break;
-      default:
-        if (!arg.startsWith('-')) {
-          options.files.push(arg);
-        }
-        break;
+    const nextI = applyCommonArg(options, arg, argv, i);
+    if (nextI !== -1) {
+      i = nextI;
+    } else {
+      switch (arg) {
+        case '--pretty':
+          options.pretty = true;
+          break;
+        case '--split':
+          options.split = true;
+          break;
+        case '-w':
+        case '--watch':
+          options.watch = true;
+          break;
+        default:
+          if (!arg.startsWith('-')) {
+            options.files.push(arg);
+          }
+          break;
+      }
     }
     i++;
   }
