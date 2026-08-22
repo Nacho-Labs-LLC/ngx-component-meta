@@ -13,7 +13,11 @@ function createCallExpression(sourceText: string) {
 
   // Expecting the source text to be just a call expression, e.g., "myFunc()" or "obj.myFunc()"
   const stmt = sourceFile.statements[0];
-  if (stmt && ts.isExpressionStatement(stmt) && ts.isCallExpression(stmt.expression)) {
+  if (
+    stmt &&
+    ts.isExpressionStatement(stmt) &&
+    ts.isCallExpression(stmt.expression)
+  ) {
     return stmt.expression;
   }
 
