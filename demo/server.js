@@ -40,7 +40,9 @@ function readBody(req) {
   });
 }
 
-const ALLOWED_ORIGINS = (process.env.CORS_ORIGIN || `http://localhost:${PORT},http://127.0.0.1:${PORT}`).split(',');
+const ALLOWED_ORIGINS = (
+  process.env.CORS_ORIGIN || `http://localhost:${PORT},http://127.0.0.1:${PORT}`
+).split(',');
 
 const server = http.createServer(async (req, res) => {
   const origin = req.headers.origin;
