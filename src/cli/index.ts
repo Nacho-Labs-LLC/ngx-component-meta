@@ -421,12 +421,12 @@ function globPromise(pattern: string): Promise<string[]> {
       });
     } else {
       // Fallback: simple recursive file matching
-      resolve(simpleGlob(pattern));
+      simpleGlobAsync(pattern).then(resolve).catch(reject);
     }
   });
 }
 
-function simpleGlob(pattern: string): string[] {
+async function simpleGlobAsync(pattern: string): Promise<string[]> {
   // Handle simple **/*.ts patterns
   const parts = pattern.split('**/');
   if (parts.length !== 2) return [];
@@ -435,27 +435,29 @@ function simpleGlob(pattern: string): string[] {
   const ext = parts[1].replace('*', '');
 
   const results: string[] = [];
-  function walk(dir: string): void {
+  async function walk(dir: string): Promise<void> {
     try {
-      const entries = fs.readdirSync(dir, { withFileTypes: true });
-      for (const entry of entries) {
-        const fullPath = path.join(dir, entry.name);
-        if (
-          entry.isDirectory() &&
-          !entry.name.startsWith('.') &&
-          entry.name !== 'node_modules'
-        ) {
-          walk(fullPath);
-        } else if (entry.isFile() && entry.name.endsWith(ext)) {
-          results.push(fullPath);
-        }
-      }
+      const entries = await fs.promises.readdir(dir, { withFileTypes: true });
+      await Promise.all(
+        entries.map(async (entry) => {
+          const fullPath = path.join(dir, entry.name);
+          if (
+            entry.isDirectory() &&
+            !entry.name.startsWith('.') &&
+            entry.name !== 'node_modules'
+          ) {
+            await walk(fullPath);
+          } else if (entry.isFile() && entry.name.endsWith(ext)) {
+            results.push(fullPath);
+          }
+        }),
+      );
     } catch {
       // ignore permission errors
     }
   }
 
-  walk(path.resolve(baseDir));
+  await walk(path.resolve(baseDir));
   return results;
 }
 
